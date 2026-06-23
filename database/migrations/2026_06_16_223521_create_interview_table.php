@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('interview_observ', 500)->nullable();
             $table->boolean('interview_adminsible')->default(true);
             $table->date('interview_dateassign');
+            $table->string('interview_estado',25)->default('activo');
             $table->timestamps();
         });
     }

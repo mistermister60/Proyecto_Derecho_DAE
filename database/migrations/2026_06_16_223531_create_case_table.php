@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('cases_pendientes',500)->nullable();
             $table->string('cases_documentos',500)->nullable();
             $table->string('cases_observ',500)->nullable();
+            $table->string('cases_estado',25)->default('activo');
             $table->timestamps();
         });
     }
