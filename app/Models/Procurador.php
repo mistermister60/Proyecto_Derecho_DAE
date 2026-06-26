@@ -14,13 +14,15 @@ class Procurador extends Model
         'procurador_apellido',
         'procurador_dni',
         'procurador_carnet',
-        'procurador_fecha_nacimiento',
         'procurador_genero',
         'procurador_email',
         'procurador_telefono',
         'procurador_direccion',
         'procurador_estado',
     ];
+    protected $casts = [
+    'procurador_fecha_nacimiento' => 'date', // o 'datetime'
+];
 
     public function getNombreCompletoAttribute()
     {

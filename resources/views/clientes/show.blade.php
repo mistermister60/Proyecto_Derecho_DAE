@@ -20,15 +20,26 @@
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Editar
             </a>
-            <form action="{{ route('clientes.destroy', $cliente->cliente_dni) }}" method="POST" onsubmit="return confirm('¿Desactivar este cliente?');" style="display:inline;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                        style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;"
-                        onmouseover="this.style.background='#FECACA';" onmouseout="this.style.background='#FEE2E2';">
-                    Desactivar
-                </button>
-            </form>
+            @if ($cliente->cliente_estado === 'activo')
+                <form action="{{ route('clientes.destroy', $cliente->cliente_dni) }}" method="POST" class="swal-confirm-form" data-title="¿Desactivar este cliente?" data-text="El cliente pasará a estar inactivo en el sistema." data-icon="warning" data-confirm-text="Sí, desactivar" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                            style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;"
+                            onmouseover="this.style.background='#FECACA';" onmouseout="this.style.background='#FEE2E2';">
+                        Desactivar
+                    </button>
+                </form>
+            @else
+                <form action="{{ route('clientes.activar', $cliente->cliente_dni) }}" method="POST" class="swal-confirm-form" data-title="¿Activar este cliente?" data-text="El cliente volverá a estar activo en el sistema." data-icon="question" data-confirm-text="Sí, activar" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                            style="background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0;"
+                            onmouseover="this.style.background='#A7F3D0';" onmouseout="this.style.background='#D1FAE5';">
+                        Activar
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 

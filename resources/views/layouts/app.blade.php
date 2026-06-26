@@ -43,6 +43,8 @@
                     ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard'],
                     ['route' => 'casos.index', 'label' => 'Casos', 'icon' => 'casos'],
                     ['route' => 'clientes.index', 'label' => 'Clientes', 'icon' => 'clientes'],
+                    ['route' => 'demandados.index', 'label' => 'Demandados', 'icon' => 'demandados'],
+                    ['route' => 'procuradores.index', 'label' => 'Procuradores', 'icon' => 'procuradores'],
                     ['route' => 'agenda.index', 'label' => 'Audiencias', 'icon' => 'agenda'],
                 ];
             @endphp
@@ -70,6 +72,14 @@
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
                             <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
+                    @elseif ($item['icon'] === 'demandados')
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M4 21v-2a4 4 0 0 1 3-3.87"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    @elseif ($item['icon'] === 'procuradores')
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"/><path d="M12 4h9"/><path d="M4 12h16"/><path d="M4 6h.01"/><path d="M4 18h.01"/><path d="M4 12h.01"/>
+                        </svg>    
                     @elseif ($item['icon'] === 'agenda')
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
@@ -172,5 +182,67 @@
 </style>
 
 @stack('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Alertas de sesión (Success/Error)
+        @if (session('success'))
+            if (window.Swal) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#2563EB'
+                });
+            }
+        @endif
+
+        @if (session('error'))
+            if (window.Swal) {
+                Swal.fire({
+                    title: 'Error',
+                    text: "{{ session('error') }}",
+                    icon: 'error',
+                    confirmButtonColor: '#DC2626'
+                });
+            }
+        @endif
+
+        // Escuchador global de confirmaciones SweetAlert2
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (form && form.classList.contains('swal-confirm-form')) {
+                e.preventDefault();
+                const title = form.getAttribute('data-title') || '¿Estás seguro?';
+                const text = form.getAttribute('data-text') || '';
+                const icon = form.getAttribute('data-icon') || 'warning';
+                const confirmText = form.getAttribute('data-confirm-text') || 'Confirmar';
+                const cancelText = form.getAttribute('data-cancel-text') || 'Cancelar';
+                const isWarning = icon === 'warning';
+
+                if (window.Swal) {
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: icon,
+                        showCancelButton: true,
+                        confirmButtonColor: isWarning ? '#DC2626' : '#2563EB',
+                        cancelButtonColor: '#6B7280',
+                        confirmButtonText: confirmText,
+                        cancelButtonText: cancelText
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.classList.remove('swal-confirm-form');
+                            form.submit();
+                        }
+                    });
+                } else {
+                    if (confirm(title)) {
+                        form.submit();
+                    }
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
