@@ -1,0 +1,55 @@
+@extends('layouts.app')
+
+@section('title', 'Clientes')
+
+@section('content')
+<div x-data="{ search: '' }">
+    {{-- Header --}}
+    <div class="flex items-center justify-between mb-5">
+        <h1 class="text-xl font-bold" style="color: #111827;">Clientes</h1>
+        <a href="{{ route('clientes.create') }}" class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
+           style="background: #2563EB; color: white;"
+           onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo cliente
+        </a>
+    </div>
+
+    {{-- Buscador --}}
+    <div class="relative mb-4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="absolute" style="top: 50%; left: 12px; transform: translateY(-50%);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" x-model="search" placeholder="Buscar clientes..." class="w-full rounded-lg pl-9 pr-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+    </div>
+
+    {{-- Tarjetas de clientes --}}
+    <div class="grid grid-cols-3 gap-4">
+        @forelse ($clientes as $cliente)
+        <a href="{{ route('clientes.show', $cliente->cliente_dni) }}" class="rounded-xl p-4 transition-all"
+           style="background: #FFFFFF; border: 1px solid #E5E7EB; display: block;"
+           onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='#93C5FD';" onmouseout="this.style.boxShadow='none'; this.style.borderColor='#E5E7EB';">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="flex items-center justify-center rounded-full shrink-0" style="width: 40px; height: 40px; background: #1E3A5F; color: white; font-size: 14px; font-weight: 600;">
+                    {{ strtoupper(substr($cliente->cliente_nombre, 0, 1)) }}{{ strtoupper(substr($cliente->cliente_apellido, 0, 1)) }}
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-medium" style="color: #111827;">{{ $cliente->nombre_completo }}</p>
+                    <p class="text-xs" style="color: #6B7280;">{{ $cliente->cliente_dni }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 text-xs" style="color: #6B7280;">
+                <span>{{ $cliente->cliente_telefono }}</span>
+                <span class="ml-auto">{{ $cliente->casos_count }} {{ $cliente->casos_count === 1 ? 'caso' : 'casos' }}</span>
+            </div>
+            @if ($cliente->cliente_estado !== 'activo')
+            <span class="inline-block mt-2 text-xs px-2 py-0.5 rounded" style="background: #FEE2E2; color: #DC2626;">Inactivo</span>
+            @endif
+        </a>
+        @empty
+        <div class="col-span-3 py-12 text-center">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <p class="text-sm" style="color: #9CA3AF;">No hay clientes registrados</p>
+        </div>
+        @endforelse
+    </div>
+</div>
+@endsection
