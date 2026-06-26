@@ -2,6 +2,8 @@
 
 @php
 $colors = [
+    'Activo' => ['bg' => '#DCFCE7', 'text' => '#166534', 'dot' => '#16A34A'],
+    'Inactivo' => ['bg' => '#FEE2E2', 'text' => '#991B1B', 'dot' => '#DC2626'],
     'Entrevista' => ['bg' => '#F3F4F6', 'text' => '#6B7280', 'dot' => '#9CA3AF'],
     'Admitido' => ['bg' => '#EFF6FF', 'text' => '#1D4ED8', 'dot' => '#60A5FA'],
     'Poder conferido' => ['bg' => '#DBEAFE', 'text' => '#1E40AF', 'dot' => '#3B82F6'],
