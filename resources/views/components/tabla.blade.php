@@ -10,8 +10,7 @@
             </tr>
         </thead>
         <tbody style="color: #111827;">
-            @if (count($slot)
-                && !(count($slot) === 1 && method_exists($slot, '__toString') && trim($slot->__toString()) === ''))
+            @if (trim((string) $slot) !== '')
                 {{ $slot }}
             @else
                 <tr>

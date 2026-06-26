@@ -131,10 +131,10 @@
                 {{-- Usuario --}}
                 <div class="flex items-center gap-2 cursor-pointer" x-data="{ open: false }" @click.outside="open = false">
                     <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
-                        DR
+                        {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
                     </div>
                     <div class="text-sm" style="color: #111827;">
-                        <span class="font-medium">Director</span>
+                        <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
                     </div>
                     <svg @click="open = !open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280; cursor: pointer;">
                         <polyline points="6 9 12 15 18 9"/>
@@ -144,10 +144,16 @@
                     <div x-show="open" x-cloak
                          class="absolute top-14 right-4 w-48 rounded-lg shadow-lg border py-1 z-50"
                          style="background: #FFFFFF; border-color: #E5E7EB;">
-                        <a href="#" class="block px-4 py-2 text-sm" style="color: #374151;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">Perfil</a>
-                        <a href="#" class="block px-4 py-2 text-sm" style="color: #374151;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">Configuración</a>
-                        <hr style="border-color: #E5E7EB; margin: 4px 0;">
-                        <a href="#" class="block px-4 py-2 text-sm" style="color: #EF4444;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">Cerrar sesión</a>
+                        <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
+                            <p class="text-xs" style="color: #9CA3AF;">{{ Auth::user()->email }}</p>
+                            <p class="text-xs font-medium mt-0.5" style="color: #6B7280;">{{ Auth::user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
+                                Cerrar sesión
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

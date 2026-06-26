@@ -1,113 +1,130 @@
 @extends('layouts.app')
 
-@section('title', 'Agenda de audiencias')
+@section('title', 'Agenda')
 
 @section('content')
-<div x-data="{ vista: 'mes' }">
+<div x-data="{ mes: {{ now()->month }}, año: {{ now()->year }} }">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-            <button class="p-2 rounded-lg transition-colors" style="border: 1px solid #E5E7EB; color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <h2 class="text-base font-semibold" style="color: #111827;">Junio 2026</h2>
-            <button class="p-2 rounded-lg transition-colors" style="border: 1px solid #E5E7EB; color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <div class="flex rounded-lg overflow-hidden ml-4" style="border: 1px solid #E5E7EB;">
-                <button @click="vista = 'mes'" class="px-3 py-1.5 text-sm font-medium transition-colors" :style="vista === 'mes' ? 'background: #2563EB; color: white;' : 'background: #FFFFFF; color: #6B7280;'">Mes</button>
-                <button @click="vista = 'semana'" class="px-3 py-1.5 text-sm font-medium transition-colors" :style="vista === 'semana' ? 'background: #2563EB; color: white;' : 'background: #FFFFFF; color: #6B7280;'">Semana</button>
+        <h1 class="text-xl font-bold" style="color: #111827;">Agenda de audiencias</h1>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+        {{-- Calendario --}}
+        <div class="col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+            <div class="flex items-center justify-between mb-4">
+                <button @click="mes = mes === 1 ? 12 : mes - 1; if(mes === 12) año--"
+                        class="p-1.5 rounded-lg transition-colors" style="border: 1px solid #E5E7EB;"
+                        onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <h3 class="text-sm font-semibold" style="color: #111827;" x-text="`${['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][mes - 1]} ${año}`"></h3>
+                <button @click="mes = mes === 12 ? 1 : mes + 1; if(mes === 1) año++"
+                        class="p-1.5 rounded-lg transition-colors" style="border: 1px solid #E5E7EB;"
+                        onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+            </div>
+
+            {{-- Días de la semana --}}
+            <div class="grid grid-cols-7 gap-1 mb-2">
+                @foreach (['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] as $dia)
+                <div class="text-center text-xs font-medium py-1" style="color: #9CA3AF;">{{ $dia }}</div>
+                @endforeach
+            </div>
+
+            {{-- Días del calendario --}}
+            <div class="grid grid-cols-7 gap-1">
+                @php
+                    $primerDia = now()->startOfMonth();
+                    $diaSemanaInicio = ($primerDia->dayOfWeekIso - 1); // 0 = lunes
+                    $diasEnMes = now()->daysInMonth;
+                @endphp
+                @for ($i = 0; $i < $diaSemanaInicio; $i++)
+                <div></div>
+                @endfor
+                @for ($dia = 1; $dia <= $diasEnMes; $dia++)
+                @php
+                    $fechaActual = now()->setDay($dia)->toDateString();
+                    $tieneAudiencia = $audiencias->first(fn($a) => $a->audiencia_fecha == $fechaActual);
+                    $esHoy = $fechaActual === now()->toDateString();
+                @endphp
+                <div class="text-center py-2 rounded-lg text-sm relative {{ $esHoy ? 'font-bold' : '' }}"
+                     style="{{ $esHoy ? 'background: #2563EB; color: white;' : ($tieneAudiencia ? 'background: #EFF6FF; color: #2563EB;' : 'color: #374151;') }}">
+                    {{ $dia }}
+                    @if ($tieneAudiencia)
+                    <span class="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full" style="width: 4px; height: 4px; background: #2563EB; display: inline-block;"></span>
+                    @endif
+                </div>
+                @endfor
+            </div>
+        </div>
+
+        {{-- Próximas audiencias --}}
+        <div class="rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+            <div class="px-4 py-3" style="border-bottom: 1px solid #E5E7EB;">
+                <h3 class="text-sm font-semibold" style="color: #111827;">Próximas audiencias</h3>
+            </div>
+            <div class="divide-y" style="border-color: #E5E7EB;">
+                @forelse ($proximas as $aud)
+                <div class="px-4 py-3 transition-colors" style="cursor: pointer;" onclick="window.location='{{ route('casos.show', $aud->caso->caso_numero_expediente) }}'" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs font-semibold" style="color: #2563EB;">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m/Y') }}</span>
+                        <span class="text-xs" style="color: #9CA3AF;">{{ \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') }}</span>
+                    </div>
+                    <p class="text-sm font-medium" style="color: #111827;">{{ $aud->audiencia_tipo }}</p>
+                    <p class="text-xs" style="color: #6B7280;">
+                        {{ $aud->caso->caso_numero_expediente }} — {{ $aud->procurador?->nombre_completo ?? 'N/A' }}
+                    </p>
+                </div>
+                @empty
+                <div class="px-4 py-8 text-center text-sm" style="color: #9CA3AF;">No hay audiencias programadas</div>
+                @endforelse
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
-        {{-- Calendario (2/3) --}}
-        <div class="col-span-2 rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
-            {{-- Días de la semana --}}
-            <div class="grid grid-cols-7 gap-0" style="border-bottom: 1px solid #E5E7EB;">
-                @foreach (['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'] as $dia)
-                <div class="text-center py-2 text-xs font-medium" style="color: #9CA3AF;">{{ $dia }}</div>
-                @endforeach
-            </div>
-
-            {{-- Grid de días --}}
-            <div class="grid grid-cols-7 gap-0">
-                @php
-                $dias = [
-                    ['num' => 1, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 2, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 3, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 4, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 5, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 6, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 7, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 8, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 9, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 10, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 11, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 12, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 13, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 14, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 15, 'eventos' => 1, 'hoy' => false],
-                    ['num' => 16, 'eventos' => 1, 'hoy' => false],
-                    ['num' => 17, 'eventos' => 1, 'hoy' => false],
-                    ['num' => 18, 'eventos' => 1, 'hoy' => true],
-                    ['num' => 19, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 20, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 21, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 22, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 23, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 24, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 25, 'eventos' => 1, 'hoy' => false],
-                    ['num' => 26, 'eventos' => 1, 'hoy' => false],
-                    ['num' => 27, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 28, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 29, 'eventos' => 0, 'hoy' => false],
-                    ['num' => 30, 'eventos' => 0, 'hoy' => false],
-                ];
-                @endphp
-                @foreach ($dias as $dia)
-                <div class="min-h-[90px] p-1.5 transition-colors" style="border-bottom: 1px solid #F3F4F6; border-right: 1px solid #F3F4F6; {{ $dia['hoy'] ? 'background: #EFF6FF;' : '' }}" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='{{ $dia['hoy'] ? '#EFF6FF' : 'transparent' }}';">
-                    <span class="text-xs font-medium" style="color: {{ $dia['hoy'] ? '#2563EB' : '#6B7280' }}; {{ $dia['hoy'] ? 'display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #2563EB; color: white;' : '' }}">{{ $dia['num'] }}</span>
-                    @if ($dia['eventos'] > 0)
-                    <div class="mt-1">
-                        <div class="text-xs px-1 py-0.5 rounded truncate" style="background: #DBEAFE; color: #1D4ED8;">Audiencia</div>
-                    </div>
-                    @endif
-                </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Lista lateral de próximas audiencias (1/3) --}}
-        <div class="rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
-            <div class="px-4 py-4" style="border-bottom: 1px solid #E5E7EB;">
-                <h3 class="text-sm font-semibold" style="color: #111827;">Próximas audiencias</h3>
-            </div>
-            <div class="divide-y" style="border-color: #E5E7EB;">
-                @php
-                $proximas = [
-                    ['fecha' => '18 jun', 'hora' => '08:30', 'exp' => '0501-2026-00431', 'juzgado' => 'J-7', 'procurador' => 'Iris Lizeth Rodríguez', 'tipo' => 'Audiencia preliminar', 'destacado' => true],
-                    ['fecha' => '18 jun', 'hora' => '10:00', 'exp' => '0501-2026-00428', 'juzgado' => 'J-3', 'procurador' => 'Carlos Brizuela', 'tipo' => 'Conciliación', 'destacado' => true],
-                    ['fecha' => '18 jun', 'hora' => '11:30', 'exp' => '0501-2026-00415', 'juzgado' => 'J-8', 'procurador' => 'Indira Galindo', 'tipo' => 'Audiencia de pruebas', 'destacado' => true],
-                    ['fecha' => '19 jun', 'hora' => '09:00', 'exp' => '0501-2026-00422', 'juzgado' => 'J-7', 'procurador' => 'Franklyn Salgado', 'tipo' => 'Sentencia', 'destacado' => false],
-                    ['fecha' => '25 jun', 'hora' => '09:00', 'exp' => '0501-2026-00405', 'juzgado' => 'J-3', 'procurador' => 'Ena Flores', 'tipo' => 'Audiencia inicial', 'destacado' => false],
-                ];
-                @endphp
-                @foreach ($proximas as $aud)
-                <div class="px-4 py-3 transition-colors" style="{{ $aud['destacado'] ? 'background: #FFFBEB;' : '' }}" onmouseover="this.style.background='{{ $aud['destacado'] ? '#FEF3C7' : '#F9FAFB' }}';" onmouseout="this.style.background='{{ $aud['destacado'] ? '#FFFBEB' : 'transparent' }}';">
-                    <div class="flex items-start justify-between">
-                        <span class="text-xs font-semibold" style="color: {{ $aud['destacado'] ? '#B45309' : '#2563EB' }};">{{ $aud['fecha'] }} — {{ $aud['hora'] }}</span>
-                        <span class="text-xs px-1.5 py-0.5 rounded" style="background: #F3F4F6; color: #6B7280;">{{ $aud['juzgado'] }}</span>
-                    </div>
-                    <p class="text-sm font-medium mt-1" style="color: #111827;">{{ $aud['exp'] }}</p>
-                    <p class="text-xs mt-0.5" style="color: #6B7280;">{{ $aud['tipo'] }}</p>
-                    <p class="text-xs mt-0.5" style="color: #9CA3AF;">{{ $aud['procurador'] }}</p>
-                </div>
-                @endforeach
-            </div>
-        </div>
+    {{-- Todas las audiencias --}}
+    <div class="rounded-xl p-5 mt-6" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Todas las audiencias</h3>
+        <table class="w-full text-sm">
+            <thead>
+                <tr style="border-bottom: 1px solid #E5E7EB;">
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Fecha</th>
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Hora</th>
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Expediente</th>
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Tipo</th>
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Juzgado</th>
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Procurador</th>
+                    <th class="text-left py-2 font-medium" style="color: #6B7280;">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($audiencias as $aud)
+                <tr class="transition-colors" style="cursor: pointer; border-bottom: 1px solid #F3F4F6;" onclick="window.location='{{ route('casos.show', $aud->caso->caso_numero_expediente) }}'" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                    <td class="py-2.5" style="color: #111827;">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m/Y') }}</td>
+                    <td class="py-2.5" style="color: #6B7280;">{{ \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') }}</td>
+                    <td class="py-2.5 font-medium" style="color: #2563EB;">{{ $aud->caso->caso_numero_expediente }}</td>
+                    <td class="py-2.5" style="color: #374151;">{{ $aud->audiencia_tipo }}</td>
+                    <td class="py-2.5"><span class="px-1.5 py-0.5 rounded text-xs" style="background: #F3F4F6; color: #6B7280;">{{ $aud->audiencia_juzgado }}</span></td>
+                    <td class="py-2.5" style="color: #6B7280;">{{ $aud->procurador?->nombre_completo ?? 'N/A' }}</td>
+                    <td class="py-2.5">
+                        @if ($aud->audiencia_estado === 'pendiente')
+                        <span class="text-xs px-2 py-0.5 rounded font-medium" style="background: #FEF3C7; color: #92400E;">Pendiente</span>
+                        @elseif ($aud->audiencia_estado === 'realizada')
+                        <span class="text-xs px-2 py-0.5 rounded font-medium" style="background: #D1FAE5; color: #065F46;">Realizada</span>
+                        @else
+                        <span class="text-xs px-2 py-0.5 rounded font-medium" style="background: #F3F4F6; color: #6B7280;">{{ $aud->audiencia_estado }}</span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="py-8 text-center" style="color: #9CA3AF;">No hay audiencias registradas</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 @endsection

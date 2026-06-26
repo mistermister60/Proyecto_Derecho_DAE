@@ -24,29 +24,18 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- Filtros --}}
             <select x-model="filtroEstado" class="text-sm rounded-lg px-3 py-1.5 outline-none" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
                 <option value="">Todos los estados</option>
-                <option>Entrevista</option>
-                <option>Admitido</option>
-                <option>Poder conferido</option>
-                <option>Presentado al juzgado</option>
-                <option>Admitido por el juzgado</option>
-                <option>Audiencia señalada</option>
-                <option>En sentencia</option>
-                <option>Cerrado</option>
-                <option>Inadmisible</option>
-                <option>Atrasado</option>
+                @foreach ($estados as $estado)
+                <option value="{{ $estado->estado_nombre }}">{{ $estado->estado_nombre }}</option>
+                @endforeach
             </select>
 
             <select x-model="filtroTramite" class="text-sm rounded-lg px-3 py-1.5 outline-none" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
                 <option value="">Todos los trámites</option>
-                <option>Divorcio contencioso</option>
-                <option>Disolución por mutuo acuerdo</option>
-                <option>Demanda de alimentos</option>
-                <option>Revisión de alimentos</option>
-                <option>Reconocimiento forzoso de paternidad</option>
-                <option>Solicitud de ejecución forzosa</option>
+                @foreach ($tramites as $tramite)
+                <option value="{{ $tramite->tramite_nombre }}">{{ $tramite->tramite_nombre }}</option>
+                @endforeach
             </select>
 
             <a href="{{ route('casos.create') }}" class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
@@ -61,48 +50,27 @@
     {{-- ==================== VISTA TABLA ==================== --}}
     <div x-show="vista === 'tabla'">
         <x-tabla :encabezados="['No. Expediente', 'Cliente', 'Tipo de trámite', 'Parte', 'Procurador', 'Juzgado', 'Estado', 'Última actualización']">
-            @php
-            $casos = [
-                ['exp' => '0501-2026-00431', 'cliente' => 'Ena Elizabeth Flores Álvarez', 'tipo' => 'Divorcio contencioso', 'parte' => 'Demandante', 'procurador' => 'Iris Lizeth Rodríguez', 'juzgado' => 'J-7', 'estado' => 'Audiencia señalada', 'fecha' => '15/06/2026'],
-                ['exp' => '0501-2026-00430', 'cliente' => 'Franklyn Geovanny Salgado Pineda', 'tipo' => 'Disolución por mutuo acuerdo', 'parte' => 'Ambas partes', 'procurador' => 'Carlos Alberto Brizuela', 'juzgado' => 'J-3', 'estado' => 'Admitido por el juzgado', 'fecha' => '14/06/2026'],
-                ['exp' => '0501-2026-00429', 'cliente' => 'Indira Pauleth Galindo Vásquez', 'tipo' => 'Demanda de alimentos', 'parte' => 'Demandante', 'procurador' => 'Franklyn Geovanny Salgado', 'juzgado' => 'J-8', 'estado' => 'Presentado al juzgado', 'fecha' => '12/06/2026'],
-                ['exp' => '0501-2026-00428', 'cliente' => 'Bernarda Aracely Paz Guzmán', 'tipo' => 'Revisión de alimentos', 'parte' => 'Demandada', 'procurador' => 'Iris Lizeth Rodríguez', 'juzgado' => 'J-3', 'estado' => 'Audiencia señalada', 'fecha' => '10/06/2026'],
-                ['exp' => '0501-2026-00427', 'cliente' => 'Carlos Alberto Brizuela Zamora', 'tipo' => 'Reconocimiento forzoso de paternidad', 'parte' => 'Demandante', 'procurador' => 'Indira Pauleth Galindo', 'juzgado' => 'J-7', 'estado' => 'Poder conferido', 'fecha' => '08/06/2026'],
-                ['exp' => '0501-2026-00426', 'cliente' => 'María José Reyes Padilla', 'tipo' => 'Divorcio contencioso', 'parte' => 'Demandante', 'procurador' => 'Carlos Alberto Brizuela', 'juzgado' => 'J-8', 'estado' => 'Cerrado', 'fecha' => '05/06/2026'],
-                ['exp' => '0501-2026-00425', 'cliente' => 'Pedro Antonio Mejía López', 'tipo' => 'Solicitud de ejecución forzosa', 'parte' => 'Demandante', 'procurador' => 'Ena Elizabeth Flores', 'juzgado' => 'J-3', 'estado' => 'Entrevista', 'fecha' => '03/06/2026'],
-                ['exp' => '0501-2026-00424', 'cliente' => 'Ana Cecilia García Hernández', 'tipo' => 'Disolución por mutuo acuerdo', 'parte' => 'Ambas partes', 'procurador' => 'Indira Pauleth Galindo', 'juzgado' => 'J-7', 'estado' => 'Atrasado', 'fecha' => '01/06/2026'],
-            ];
-            @endphp
-            @foreach ($casos as $caso)
-            <tr class="transition-colors border-t" style="border-color: #F3F4F6; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';" onclick="window.location='{{ route('casos.show', $caso['exp']) }}'">
-                <td class="px-4 py-3 text-sm font-medium" style="color: #2563EB;">{{ $caso['exp'] }}</td>
-                <td class="px-4 py-3 text-sm">{{ $caso['cliente'] }}</td>
-                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso['tipo'] }}</td>
-                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso['parte'] }}</td>
-                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso['procurador'] }}</td>
-                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded text-xs font-medium" style="background: #F3F4F6; color: #6B7280;">{{ $caso['juzgado'] }}</span></td>
-                <td class="px-4 py-3"><x-estado-badge :estado="$caso['estado']" /></td>
-                <td class="px-4 py-3 text-sm" style="color: #9CA3AF;">{{ $caso['fecha'] }}</td>
+            @forelse ($casos as $caso)
+            <tr class="transition-colors border-t" style="border-color: #F3F4F6; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';" onclick="window.location='{{ route('casos.show', $caso->caso_numero_expediente) }}'">
+                <td class="px-4 py-3 text-sm font-medium" style="color: #2563EB;">{{ $caso->caso_numero_expediente }}</td>
+                <td class="px-4 py-3 text-sm">{{ $caso->cliente?->nombre_completo ?? 'N/A' }}</td>
+                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</td>
+                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso->caso_parte_representada }}</td>
+                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso->procurador?->nombre_completo ?? 'N/A' }}</td>
+                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded text-xs font-medium" style="background: #F3F4F6; color: #6B7280;">{{ $caso->caso_juzgado ?? 'N/A' }}</span></td>
+                <td class="px-4 py-3"><x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" /></td>
+                <td class="px-4 py-3 text-sm" style="color: #9CA3AF;">{{ $caso->created_at->format('d/m/Y') }}</td>
             </tr>
-            @endforeach
+            @empty
+            <tr>
+                <td colspan="8" class="px-4 py-8 text-center text-sm" style="color: #9CA3AF;">No hay casos registrados</td>
+            </tr>
+            @endforelse
         </x-tabla>
     </div>
 
     {{-- ==================== VISTA KANBAN ==================== --}}
     <div x-show="vista === 'kanban'" class="flex gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
-        @php
-        $columnas = [
-            'Entrevista' => ['#9CA3AF', ['0501-2026-00425' => ['Pedro Antonio Mejía López', 'Ejecución forzosa', '']]],
-            'Admitido' => ['#60A5FA', []],
-            'Poder conferido' => ['#3B82F6', ['0501-2026-00427' => ['Carlos Alberto Brizuela Zamora', 'Reconocimiento paternidad', '']]],
-            'Presentado al juzgado' => ['#2563EB', ['0501-2026-00429' => ['Indira Pauleth Galindo Vásquez', 'Demanda alimentos', '']]],
-            'Admitido por el juzgado' => ['#1D4ED8', ['0501-2026-00430' => ['Franklyn Geovanny Salgado Pineda', 'Disolución mutuo acuerdo', '']]],
-            'Audiencia señalada' => ['#F59E0B', ['0501-2026-00431' => ['Ena Elizabeth Flores Álvarez', 'Divorcio contencioso', '15/06'], '0501-2026-00428' => ['Bernarda Aracely Paz Guzmán', 'Revisión alimentos', '17/06']]],
-            'En sentencia' => ['#D97706', []],
-            'Cerrado' => ['#16A34A', ['0501-2026-00426' => ['María José Reyes Padilla', 'Divorcio contencioso', '']]],
-        ];
-        @endphp
-
         @foreach ($columnas as $estado => [$color, $tarjetas])
         <div class="flex flex-col rounded-xl shrink-0" style="width: 220px; background: #F3F4F6;">
             <div class="flex items-center gap-2 px-3 py-3">
