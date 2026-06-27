@@ -9,7 +9,11 @@ use App\Http\Controllers\DemandandoController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\UsuariosController;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 use Illuminate\Support\Facades\Route;
+=======
+use App\Http\Controllers\DashboardController;
+>>>>>>> Stashed changes
 =======
 use App\Http\Controllers\DashboardController;
 >>>>>>> Stashed changes
