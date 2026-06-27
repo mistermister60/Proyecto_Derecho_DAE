@@ -4,11 +4,10 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CasoController;
 use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandandoController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\UsuariosController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AgendaController;
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
 Route::get('/', function () {
@@ -49,13 +48,14 @@ Route::middleware('auth')->group(function () {
 
     // Usuarios
     Route::get('/usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
-    Route::get('/usuarios/crear',[UsuariosController::class,'create'])->name('usuarios.create');
+    Route::get('/usuarios/crear', [UsuariosController::class, 'create'])->name('usuarios.create');
     Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
-    Route::get('/usuarios/{identidad}/editar', [UsuariosController::class, 'edit'])->name('usuarios.edit');
-    Route::put('/usuarios/{identidad}', [UsuariosController::class, 'update'])->name('usuarios.update');
-    Route::delete('/usuarios/{identidad}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
-    Route::post('/usuarios/{identidad}/activar', [UsuariosController::class, 'activar'])->name('usuarios.activar');
-    Route::get('/usuarios/{identidad}', [UsuariosController::class, 'show'])->name('usuarios.show');
+    Route::get('/usuarios/{id}/editar', [UsuariosController::class, 'edit'])->name('usuarios.edit');
+    Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+    Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+    Route::post('/usuarios/{id}/activar', [UsuariosController::class, 'activar'])->name('usuarios.activar');
+    Route::get('/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
+
     // Demandados
     Route::get('/demandados', [DemandandoController::class, 'index'])->name('demandados.index');
     Route::get('/demandados/crear', [DemandandoController::class, 'create'])->name('demandados.create');

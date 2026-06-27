@@ -53,14 +53,14 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de nacimiento</label>
-                <input type="date" name="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento', $procurador->procurador_fecha_nacimiento?->format('Y-m-d')) }}" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <input type="date" name="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento', $procurador->procurador_fecha_nacimiento ? (is_string($procurador->procurador_fecha_nacimiento) ? $procurador->procurador_fecha_nacimiento : $procurador->procurador_fecha_nacimiento->format('Y-m-d')) : '') }}" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('procurador_fecha_nacimiento')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Género</label>
-                <select name="procurador_genero" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <select name="procurador_genero" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar...</option>
                     <option value="Masculino" {{ old('procurador_genero', $procurador->procurador_genero) == 'Masculino' ? 'selected' : '' }}>Masculino</option>
                     <option value="Femenino" {{ old('procurador_genero', $procurador->procurador_genero) == 'Femenino' ? 'selected' : '' }}>Femenino</option>
@@ -72,7 +72,7 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Correo electrónico</label>
-                <input type="email" name="procurador_email" value="{{ old('procurador_email', $procurador->procurador_email) }}" required placeholder="Ej: maria@ejemplo.com" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <input type="email" name="procurador_email" value="{{ old('procurador_email', $procurador->procurador_email) }}" placeholder="Ej: maria@ejemplo.com" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('procurador_email')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
