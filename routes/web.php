@@ -8,7 +8,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandandoController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\UsuariosController;
+<<<<<<< Updated upstream
 use Illuminate\Support\Facades\Route;
+=======
+use App\Http\Controllers\DashboardController;
+>>>>>>> Stashed changes
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
 Route::get('/', function () {
