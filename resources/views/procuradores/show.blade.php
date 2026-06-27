@@ -60,8 +60,6 @@
             </dl>
         </div>
 
-
-
         {{-- Casos asociados --}}
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Casos asociados</h3>

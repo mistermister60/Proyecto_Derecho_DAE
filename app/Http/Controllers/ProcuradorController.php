@@ -7,9 +7,20 @@ use Illuminate\Http\Request;
 
 class ProcuradorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim($request->query('search', ''));
+
         $procuradores = Procurador::withCount('casos')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('procurador_dni', 'like', "%{$search}%")
+                        ->orWhere('procurador_telefono', 'like', "%{$search}%")
+                        ->orWhere('procurador_nombre', 'like', "%{$search}%")
+                        ->orWhere('procurador_apellido', 'like', "%{$search}%")
+                        ->orWhere('procurador_email', 'like', "%{$search}%");
+                });
+            })
             ->orderBy('procurador_apellido')
             ->orderBy('procurador_nombre')
             ->get();
@@ -67,11 +78,11 @@ class ProcuradorController extends Controller
         $validated = $request->validate([
             'procurador_nombre' => 'required|string|max:100',
             'procurador_apellido' => 'required|string|max:100',
-            'procurador_dni' => 'required|string|max:19|unique:procuradores,procurador_dni,'.$procurador->procurador_id.',procurador_id',
-            'procurador_carnet' => 'nullable|string|max:20|unique:procuradores,procurador_carnet,'.$procurador->procurador_id.',procurador_id',
-            'procurador_fecha_nacimiento' => 'required|date',
-            'procurador_genero' => 'required|string|max:25',
-            'procurador_email' => 'required|email|max:150|unique:procuradores,procurador_email,'.$procurador->procurador_id.',procurador_id',
+            'procurador_dni' => 'required|string|max:19|unique:procuradores,procurador_dni,' . $procurador->procurador_id . ',procurador_id',
+            'procurador_carnet' => 'nullable|string|max:20|unique:procuradores,procurador_carnet,' . $procurador->procurador_id . ',procurador_id',
+            'procurador_fecha_nacimiento' => 'nullable|date',
+            'procurador_genero' => 'nullable|string|max:25',
+            'procurador_email' => 'nullable|email|max:150|unique:procuradores,procurador_email,' . $procurador->procurador_id . ',procurador_id',
             'procurador_telefono' => 'nullable|string|max:29',
             'procurador_direccion' => 'nullable|string|max:200',
         ]);

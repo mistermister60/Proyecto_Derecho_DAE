@@ -39,7 +39,7 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">DNI</label>
-                <input type="number" inputmode="numeric" step="1" min="0" name="cliente_dni" value="{{ old('cliente_dni', $cliente->cliente_dni) }}" required placeholder="Ej: 12345678" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                <input type="text" name="cliente_dni" value="{{ old('cliente_dni', $cliente->cliente_dni) }}" required placeholder="Ej: 12345678" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('cliente_dni')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -47,14 +47,13 @@
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Estado civil</label>
                 <select name="cliente_estado_civil" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
-                    <option value="" {{ old('cliente_estado_civil', $cliente->cliente_estado_civil) == '' ? 'selected' : '' }}>Seleccionar...</option>
+                    <option value="">Seleccionar...</option>
                     <option value="Soltero/a" {{ old('cliente_estado_civil', $cliente->cliente_estado_civil) == 'Soltero/a' ? 'selected' : '' }}>Soltero/a</option>
                     <option value="Casado/a" {{ old('cliente_estado_civil', $cliente->cliente_estado_civil) == 'Casado/a' ? 'selected' : '' }}>Casado/a</option>
                     <option value="Divorciado/a" {{ old('cliente_estado_civil', $cliente->cliente_estado_civil) == 'Divorciado/a' ? 'selected' : '' }}>Divorciado/a</option>
                     <option value="Viudo/a" {{ old('cliente_estado_civil', $cliente->cliente_estado_civil) == 'Viudo/a' ? 'selected' : '' }}>Viudo/a</option>
                     <option value="Unión libre" {{ old('cliente_estado_civil', $cliente->cliente_estado_civil) == 'Unión libre' ? 'selected' : '' }}>Unión libre</option>
                 </select>
-                <p class="text-xs mt-1" style="color: #6B7280;">Seleccione una única opción.</p>
                 @error('cliente_estado_civil')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror

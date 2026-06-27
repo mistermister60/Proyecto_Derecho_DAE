@@ -49,12 +49,9 @@ class ClienteController extends Controller
         ]);
 
         $parts = preg_split('/\s+/', trim($validated['nombre_completo']), 2);
-        $nombre = $parts[0] ?? '';
-        $apellido = $parts[1] ?? '';
-
         $data = [
-            'cliente_nombre' => $nombre,
-            'cliente_apellido' => $apellido,
+            'cliente_nombre' => $parts[0] ?? '',
+            'cliente_apellido' => $parts[1] ?? '',
             'cliente_dni' => $validated['cliente_dni'],
             'cliente_estado_civil' => $validated['cliente_estado_civil'],
             'cliente_telefono' => $validated['cliente_telefono'],

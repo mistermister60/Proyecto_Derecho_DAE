@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 
 class DemandandoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim($request->query('search', ''));
+
         $demandados = Demandado::withCount('casos')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('demandado_dni', 'like', "%{$search}%")
+                        ->orWhere('demandado_telefono', 'like', "%{$search}%")
+                        ->orWhere('demandado_nombre', 'like', "%{$search}%")
+                        ->orWhere('demandado_apellido', 'like', "%{$search}%");
+                });
+            })
             ->orderBy('demandado_apellido')
             ->orderBy('demandado_nombre')
             ->get();
@@ -67,7 +77,7 @@ class DemandandoController extends Controller
         $validated = $request->validate([
             'demandado_nombre' => 'required|string|max:100',
             'demandado_apellido' => 'required|string|max:100',
-            'demandado_dni' => 'required|string|max:19|unique:demandados,demandado_dni,'.$demandado->demandado_id.',demandado_id',
+            'demandado_dni' => 'required|string|max:19|unique:demandados,demandado_dni,' . $demandado->demandado_id . ',demandado_id',
             'demandado_estado_civil' => 'nullable|string|max:50',
             'demandado_telefono' => 'nullable|string|max:29',
             'demandado_direccion' => 'nullable|string|max:200',
