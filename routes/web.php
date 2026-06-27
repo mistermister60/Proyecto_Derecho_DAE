@@ -5,6 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CasoController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\DemandandoController;
+use App\Http\Controllers\ProcuradorController;
+use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\AgendaController;
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
@@ -42,6 +45,36 @@ Route::middleware('auth')->group(function () {
     Route::delete('/clientes/{identidad}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
     Route::get('/clientes/{identidad}', [ClienteController::class, 'show'])->name('clientes.show');
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+
+    // Usuarios
+    Route::get('/usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
+    Route::get('/usuarios/crear', [UsuariosController::class, 'create'])->name('usuarios.create');
+    Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios/{id}/editar', [UsuariosController::class, 'edit'])->name('usuarios.edit');
+    Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+    Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+    Route::post('/usuarios/{id}/activar', [UsuariosController::class, 'activar'])->name('usuarios.activar');
+    Route::get('/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
+
+    // Demandados
+    Route::get('/demandados', [DemandandoController::class, 'index'])->name('demandados.index');
+    Route::get('/demandados/crear', [DemandandoController::class, 'create'])->name('demandados.create');
+    Route::post('/demandados', [DemandandoController::class, 'store'])->name('demandados.store');
+    Route::get('/demandados/{identidad}/editar', [DemandandoController::class, 'edit'])->name('demandados.edit');
+    Route::put('/demandados/{identidad}', [DemandandoController::class, 'update'])->name('demandados.update');
+    Route::delete('/demandados/{identidad}', [DemandandoController::class, 'destroy'])->name('demandados.destroy');
+    Route::post('/demandados/{identidad}/activar', [DemandandoController::class, 'activar'])->name('demandados.activar');
+    Route::get('/demandados/{identidad}', [DemandandoController::class, 'show'])->name('demandados.show');
+
+    // Procuradores
+    Route::get('/procuradores', [ProcuradorController::class, 'index'])->name('procuradores.index');
+    Route::get('/procuradores/crear', [ProcuradorController::class, 'create'])->name('procuradores.create');
+    Route::post('/procuradores', [ProcuradorController::class, 'store'])->name('procuradores.store');
+    Route::get('/procuradores/{identidad}/editar', [ProcuradorController::class, 'edit'])->name('procuradores.edit');
+    Route::put('/procuradores/{identidad}', [ProcuradorController::class, 'update'])->name('procuradores.update');
+    Route::delete('/procuradores/{identidad}', [ProcuradorController::class, 'destroy'])->name('procuradores.destroy');
+    Route::post('/procuradores/{identidad}/activar', [ProcuradorController::class, 'activar'])->name('procuradores.activar');
+    Route::get('/procuradores/{identidad}', [ProcuradorController::class, 'show'])->name('procuradores.show');
 
     // Agenda
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
