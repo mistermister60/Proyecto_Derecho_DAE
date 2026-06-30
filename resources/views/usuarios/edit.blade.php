@@ -56,18 +56,6 @@
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
             </div>
-            <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Procurador asociado (opcional)</label>
-                <select name="procurador_id" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
-                    <option value="">Sin procurador...</option>
-                    @foreach ($procuradores as $procurador)
-                        <option value="{{ $procurador->procurador_id }}" {{ old('procurador_id', $usuario->procurador_id) == $procurador->procurador_id ? 'selected' : '' }}>{{ $procurador->nombre_completo }}</option>
-                    @endforeach
-                </select>
-                @error('procurador_id')
-                <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
-                @enderror
-            </div>
         </div>
     </div>
 </form>
