@@ -9,6 +9,7 @@
 
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @PwaHead
 </head>
 <body>
 
@@ -244,5 +245,6 @@
         });
     });
 </script>
+@RegisterServiceWorkerScript
 </body>
 </html>
