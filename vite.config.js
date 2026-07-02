@@ -10,4 +10,10 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        host: '0.0.0.0',
+        hmr: {
+            host: '172.30.103.13', //esta ip es de una red local que uso no es definitivo
+        },
+    },
 });
