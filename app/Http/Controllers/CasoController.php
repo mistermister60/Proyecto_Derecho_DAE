@@ -15,9 +15,12 @@ class CasoController extends Controller
 {
     public function index()
     {
-        $casos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+$queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador'])->orderBy('created_at', 'desc');
+    
+    if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador') {
+        $queryCasos->where('procurador_id', auth()->user()->procurador_id);
+    }
+    $casos = $queryCasos->get();
 
         $estados = EstadoCaso::where('estado_tipo', 'pipeline')
             ->orderBy('estado_orden')
@@ -90,6 +93,9 @@ class CasoController extends Controller
             ->where('caso_numero_expediente', $expediente)
             ->firstOrFail();
 
+    if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+        abort(403, 'No tienes permiso para ver este caso.');
+    }
         return view('casos.show', compact('caso'));
     }
 

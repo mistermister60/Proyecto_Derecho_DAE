@@ -8,7 +8,7 @@ use App\Http\Controllers\DemandandoController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\DashboardController;
-
+use App\Http\Controllers\SeguimentoController;
 // Ruta raíz redirige al dashboard (o login si no autenticado)
 Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
@@ -78,4 +78,7 @@ Route::middleware('auth')->group(function () {
 
     // Agenda
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
+
+    //Seguimiento
+    Route::post('/casos/{caso_id}/seguimiento', [SeguimentoController::class, 'store'])->name('seguimientos.store');
 });

@@ -37,17 +37,26 @@
         </div>
 
         {{-- Navegación --}}
-        <nav class="flex-1 px-3 py-4 space-y-1">
+<nav class="flex-1 px-3 py-4 space-y-1">
             @php
                 $current = request()->route()->getName() ?? 'dashboard';
+                $rolUsuario = strtolower(Auth::user()->rol?->rol_nombre ?? '');
+
+                // 1. Iniciamos con los elementos base que ve el procurador (y todos)
                 $navItems = [
                     ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard'],
                     ['route' => 'casos.index', 'label' => 'Casos', 'icon' => 'casos'],
-                    ['route' => 'clientes.index', 'label' => 'Clientes', 'icon' => 'clientes'],
-                    ['route' => 'demandados.index', 'label' => 'Demandados', 'icon' => 'demandados'],
-                    ['route' => 'procuradores.index', 'label' => 'Procuradores', 'icon' => 'procuradores'],
-                    ['route' => 'agenda.index', 'label' => 'Audiencias', 'icon' => 'agenda'],
                 ];
+
+                // 2. Si NO es procurador, inyectamos los catálogos administrativos
+                if ($rolUsuario !== 'procurador') {
+                    $navItems[] = ['route' => 'clientes.index', 'label' => 'Clientes', 'icon' => 'clientes'];
+                    $navItems[] = ['route' => 'demandados.index', 'label' => 'Demandados', 'icon' => 'demandados'];
+                    $navItems[] = ['route' => 'procuradores.index', 'label' => 'Procuradores', 'icon' => 'procuradores'];
+                }
+
+                // 3. Audiencias lo ven todos (el procurador solo verá las suyas desde el controlador)
+                $navItems[] = ['route' => 'agenda.index', 'label' => 'Audiencias', 'icon' => 'agenda'];
             @endphp
 
             @foreach ($navItems as $item)
@@ -94,19 +103,21 @@
             @endforeach
         </nav>
 
-        {{-- Nuevo caso button --}}
-        <div class="px-3 pb-4">
-            <a href="{{ route('casos.create') }}"
-               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
-               style="background: #2563EB; color: white;"
-               onmouseover="this.style.background='#1d4ed8';"
-               onmouseout="this.style.background='#2563EB';">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Nuevo caso
-            </a>
-        </div>
+{{-- Nuevo caso button (Oculto para el procurador ya que él no crea casos) --}}
+        @if (strtolower(Auth::user()->rol?->rol_nombre ?? '') !== 'procurador')
+            <div class="px-3 pb-4">
+                <a href="{{ route('casos.create') }}"
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
+                   style="background: #2563EB; color: white;"
+                   onmouseover="this.style.background='#1d4ed8';"
+                   onmouseout="this.style.background='#2563EB';">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Nuevo caso
+                </a>
+            </div>
+        @endif
     </aside>
 
     {{-- ==================== CONTENIDO PRINCIPAL ==================== --}}
