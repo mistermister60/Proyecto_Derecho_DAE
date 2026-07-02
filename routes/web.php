@@ -7,7 +7,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DemandandoController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\UsuariosController;
-use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\DashboardController;
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
 Route::get('/', function () {

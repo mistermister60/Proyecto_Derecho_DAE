@@ -14,6 +14,7 @@ class Procurador extends Model
         'procurador_apellido',
         'procurador_dni',
         'procurador_carnet',
+        'procurador_fecha_nacimiento',
         'procurador_genero',
         'procurador_email',
         'procurador_telefono',
@@ -21,7 +22,7 @@ class Procurador extends Model
         'procurador_estado',
     ];
     protected $casts = [
-    'procurador_fecha_nacimiento' => 'date', // o 'datetime'
+    'procurador_fecha_nacimiento' => 'date', 
 ];
 
     public function getNombreCompletoAttribute()
@@ -48,4 +49,9 @@ class Procurador extends Model
     {
         return $this->hasMany(Reasignacion::class, 'procurador_destino_id');
     }
+
+    public function usuario()
+{
+    return $this->hasOne(Usuario::class, 'procurador_id', 'procurador_id');
+}
 }

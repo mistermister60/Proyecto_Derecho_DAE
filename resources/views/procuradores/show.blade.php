@@ -16,6 +16,13 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
+            @if($procurador->usuario)
+        <a href="{{ route('usuarios.edit', $procurador->usuario->usuario_id) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+           style="background: #EEF2F6; color: #1E40AF; border: 1px solid #DBEAFE;"
+           onmouseover="this.style.background='#DBEAFE';" onmouseout="this.style.background='#EEF2F6';">
+            Editar Usuario
+        </a>
+            @endif
             <a href="{{ route('procuradores.edit', $procurador->procurador_dni) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Editar
