@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Procurador extends Model
 {
     protected $table = 'procuradores';
+
     protected $primaryKey = 'procurador_id';
 
     protected $fillable = [
@@ -21,9 +22,10 @@ class Procurador extends Model
         'procurador_direccion',
         'procurador_estado',
     ];
+
     protected $casts = [
-    'procurador_fecha_nacimiento' => 'date', 
-];
+        'procurador_fecha_nacimiento' => 'date',
+    ];
 
     public function getNombreCompletoAttribute()
     {
@@ -51,7 +53,7 @@ class Procurador extends Model
     }
 
     public function usuario()
-{
-    return $this->hasOne(Usuario::class, 'procurador_id', 'procurador_id');
-}
+    {
+        return $this->hasOne(Usuario::class, 'procurador_id', 'procurador_id');
+    }
 }

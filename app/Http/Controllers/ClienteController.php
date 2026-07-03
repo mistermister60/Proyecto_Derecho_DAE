@@ -22,7 +22,7 @@ class ClienteController extends Controller
             })
             ->orderBy('cliente_apellido')
             ->orderBy('cliente_nombre')
-            ->get();
+            ->paginate(20);
 
         return view('clientes.index', compact('clientes'));
     }
@@ -57,6 +57,7 @@ class ClienteController extends Controller
             'cliente_telefono' => $validated['cliente_telefono'],
             'cliente_direccion' => $validated['cliente_direccion'],
             'cliente_numero_hijos' => $validated['cliente_numero_hijos'] ?? 0,
+            'cliente_nombres_hijos' => $validated['cliente_nombres_hijos'] ?? null,
             'cliente_profesion' => $validated['cliente_profesion'] ?? null,
             'cliente_lugar_trabajo' => $validated['cliente_lugar_trabajo'] ?? null,
             'cliente_direccion_trabajo' => $validated['cliente_direccion_trabajo'] ?? null,

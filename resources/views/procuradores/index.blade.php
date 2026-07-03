@@ -23,7 +23,7 @@
         <a href="{{ route('procuradores.create') }}" class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
            style="background: #2563EB; color: white;"
            onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Nuevo procurador
         </a>
     </div>
@@ -31,7 +31,7 @@
     {{-- Buscador y Filtros --}}
     <div class="flex flex-col sm:flex-row gap-3 mb-5">
         <div class="relative flex-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="absolute" style="top: 50%; left: 12px; transform: translateY(-50%);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="absolute" style="top: 50%; left: 12px; transform: translateY(-50%);" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" x-model="search" placeholder="Buscar procuradores por nombre, DNI o teléfono..." class="w-full rounded-lg pl-9 pr-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
         </div>
         <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg self-start sm:self-auto" style="background: #F3F4F6; border: 1px solid #E5E7EB;">
@@ -73,7 +73,7 @@
         </a>
         @empty
         <div class="col-span-3 py-12 text-center">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <p class="text-sm" style="color: #9CA3AF;">No hay procuradores registrados</p>
         </div>
         @endforelse
@@ -81,9 +81,11 @@
         <div x-show="[...document.querySelectorAll('.procurador-card')].every(el => el.style.display === 'none')" 
              class="col-span-3 py-12 text-center" 
              style="display: none;">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <p class="text-sm" style="color: #9CA3AF;">No se encontraron procuradores que coincidan con la búsqueda o el filtro.</p>
         </div>
     </div>
+
+    {{ $procuradores->links() }}
 </div>
 @endsection

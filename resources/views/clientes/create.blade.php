@@ -78,6 +78,13 @@
                 @enderror
             </div>
             <div>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Nombres de los hijos</label>
+                <input type="text" name="cliente_nombres_hijos" value="{{ old('cliente_nombres_hijos') }}" placeholder="Ej: Ana Pérez, Luis Pérez" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                @error('cliente_nombres_hijos')
+                <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Profesión</label>
                 <input type="text" name="cliente_profesion" value="{{ old('cliente_profesion') }}" placeholder="Ej: Abogado" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('cliente_profesion')

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Procurador;
 use App\Models\Rol;
 use App\Models\Usuario;
-use App\Models\Procurador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -26,7 +26,7 @@ class UsuariosController extends Controller
                 $query->where('usuario_estado', $estado);
             })
             ->orderBy('usuario_nombre')
-            ->get();
+            ->paginate(20);
 
         return view('usuarios.index', compact('usuarios', 'estado'));
     }
@@ -42,11 +42,11 @@ class UsuariosController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'rol_id'           => 'required|exists:roles,rol_id',
-            'procurador_id'    => 'nullable|exists:procuradores,procurador_id',
-            'usuario_nombre'   => 'required|string|max:255',
-            'email'            => 'required|email|max:255|unique:usuarios,email',
-            'contrasena'       => 'required|string|min:6|max:255',
+            'rol_id' => 'required|exists:roles,rol_id',
+            'procurador_id' => 'nullable|exists:procuradores,procurador_id',
+            'usuario_nombre' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:usuarios,email',
+            'contrasena' => 'required|string|min:6|max:255',
         ]);
 
         $validated['usuario_estado'] = 'activo';
@@ -81,10 +81,10 @@ class UsuariosController extends Controller
         $usuario = Usuario::where('usuario_id', $id)->firstOrFail();
 
         $rules = [
-            'rol_id'           => 'required|exists:roles,rol_id',
-            'procurador_id'    => 'nullable|exists:procuradores,procurador_id',
-            'usuario_nombre'   => 'required|string|max:255',
-            'email'            => 'required|email|max:255|unique:usuarios,email,' . $usuario->usuario_id . ',usuario_id',
+            'rol_id' => 'required|exists:roles,rol_id',
+            'procurador_id' => 'nullable|exists:procuradores,procurador_id',
+            'usuario_nombre' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:usuarios,email,'.$usuario->usuario_id.',usuario_id',
         ];
 
         // Solo validar y actualizar contraseña si se envía una nueva

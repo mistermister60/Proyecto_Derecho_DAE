@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EstadoCaso extends Model
 {
     protected $table = 'estados_caso';
+
     protected $primaryKey = 'estado_id';
 
     protected $fillable = [

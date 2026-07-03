@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TipoTramite extends Model
 {
     protected $table = 'tipos_tramite';
+
     protected $primaryKey = 'tipo_tramite_id';
 
     protected $fillable = [

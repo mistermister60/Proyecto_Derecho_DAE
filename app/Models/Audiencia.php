@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Audiencia extends Model
 {
     protected $table = 'audiencias';
+
     protected $primaryKey = 'audiencia_id';
 
     protected $fillable = [
@@ -19,6 +20,13 @@ class Audiencia extends Model
         'audiencia_estado',
         'audiencia_observaciones',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'audiencia_fecha' => 'date',
+        ];
+    }
 
     public function caso()
     {

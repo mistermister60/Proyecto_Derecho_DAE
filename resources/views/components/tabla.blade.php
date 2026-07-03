@@ -1,11 +1,11 @@
 @props(['encabezados' => [], 'sinDatos' => 'No hay datos disponibles.'])
 
-<div class="w-full overflow-hidden rounded-xl" style="border: 1px solid #E5E7EB; background: #FFFFFF;">
+<div class="w-full overflow-x-auto rounded-xl" style="border: 1px solid #E5E7EB; background: #FFFFFF;">
     <table class="w-full text-sm">
         <thead>
             <tr style="background: #F9FAFB;">
                 @foreach ($encabezados as $enc)
-                    <th class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider" style="color: #6B7280;">{{ $enc }}</th>
+                    <th scope="col" class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider" style="color: #6B7280;">{{ $enc }}</th>
                 @endforeach
             </tr>
         </thead>

@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Seguimiento;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 class SeguimentoController extends Controller
 {
     public function store(Request $request, $caso_id)
     {
         $request->validate([
-            'seguimiento_tipo'        => 'required|string|max:50',
+            'seguimiento_tipo' => 'required|string|max:50',
             'seguimiento_descripcion' => 'required|string',
         ]);
 
         Seguimiento::create([
-            'caso_id'                 => $caso_id,                                 
-            'usuario_id'              => Auth::user()->usuario_id ?? Auth::id(),   
-            'seguimiento_fecha'       => now()->toDateString(),                    
-            'seguimiento_tipo'        => $request->input('seguimiento_tipo'),
+            'caso_id' => $caso_id,
+            'usuario_id' => Auth::user()->usuario_id ?? Auth::id(),
+            'seguimiento_fecha' => now()->toDateString(),
+            'seguimiento_tipo' => $request->input('seguimiento_tipo'),
             'seguimiento_descripcion' => $request->input('seguimiento_descripcion'),
-            'seguimiento_estado'      => 'activo',                                
+            'seguimiento_estado' => 'activo',
         ]);
 
         return redirect()->back()->with('success', 'Bitácora actualizada correctamente.');

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Reasignacion extends Model
 {
     protected $table = 'reasignaciones';
+
     protected $primaryKey = 'reasignacion_id';
 
     protected $fillable = [
@@ -18,6 +19,13 @@ class Reasignacion extends Model
         'reasignacion_observaciones',
         'reasignacion_estado',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'reasignacion_fecha' => 'datetime',
+        ];
+    }
 
     public function caso()
     {

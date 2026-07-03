@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Procurador;
+use App\Models\Rol;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Usuario;
+
 class ProcuradorController extends Controller
 {
     public function index(Request $request)
@@ -25,7 +27,7 @@ class ProcuradorController extends Controller
             })
             ->orderBy('procurador_apellido')
             ->orderBy('procurador_nombre')
-            ->get();
+            ->paginate(20);
 
         return view('procuradores.index', compact('procuradores'));
     }
@@ -49,27 +51,27 @@ class ProcuradorController extends Controller
             'procurador_direccion' => 'required|string|max:200',
         ]);
 
-$validated['procurador_estado'] = 'activo';
+        $validated['procurador_estado'] = 'activo';
 
-    DB::transaction(function () use ($validated) {
-        $procurador = Procurador::create($validated);
-        Usuario::create([
-            'rol_id'           => 2, 
-            'procurador_id'    => $procurador->procurador_id, 
-            'usuario_nombre'   => $validated['procurador_nombre'] . ' ' . $validated['procurador_apellido'],
-            'email'            => $validated['procurador_email'],
-            'contrasena'       => Hash::make($validated['procurador_dni']), 
-            'usuario_estado'   => 'activo'
-        ]);
-    });
+        DB::transaction(function () use ($validated) {
+            $procurador = Procurador::create($validated);
+            Usuario::create([
+                'rol_id' => Rol::where('rol_nombre', 'Procurador')->value('rol_id'),
+                'procurador_id' => $procurador->procurador_id,
+                'usuario_nombre' => $validated['procurador_nombre'].' '.$validated['procurador_apellido'],
+                'email' => $validated['procurador_email'],
+                'contrasena' => Hash::make($validated['procurador_dni']),
+                'usuario_estado' => 'activo',
+            ]);
+        });
 
-    return redirect()->route('procuradores.index')
-        ->with('success', 'Procurador y usuario registrados exitosamente.');
+        return redirect()->route('procuradores.index')
+            ->with('success', 'Procurador y usuario registrados exitosamente.');
     }
 
     public function show(string $identidad)
     {
-        $procurador = Procurador::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador','usuario'])
+        $procurador = Procurador::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador', 'usuario'])
             ->where('procurador_dni', $identidad)
             ->firstOrFail();
 
@@ -90,11 +92,11 @@ $validated['procurador_estado'] = 'activo';
         $validated = $request->validate([
             'procurador_nombre' => 'required|string|max:100',
             'procurador_apellido' => 'required|string|max:100',
-            'procurador_dni' => 'required|string|max:19|unique:procuradores,procurador_dni,' . $procurador->procurador_id . ',procurador_id',
-            'procurador_carnet' => 'required|string|max:20|unique:procuradores,procurador_carnet,' . $procurador->procurador_id . ',procurador_id',
+            'procurador_dni' => 'required|string|max:19|unique:procuradores,procurador_dni,'.$procurador->procurador_id.',procurador_id',
+            'procurador_carnet' => 'required|string|max:20|unique:procuradores,procurador_carnet,'.$procurador->procurador_id.',procurador_id',
             'procurador_fecha_nacimiento' => 'required|date',
             'procurador_genero' => 'required|string|max:25',
-            'procurador_email' => 'required|email|max:150|unique:procuradores,procurador_email,' . $procurador->procurador_id . ',procurador_id',
+            'procurador_email' => 'required|email|max:150|unique:procuradores,procurador_email,'.$procurador->procurador_id.',procurador_id',
             'procurador_telefono' => 'required|string|max:29',
             'procurador_direccion' => 'required|string|max:200',
         ]);
@@ -111,11 +113,11 @@ $validated['procurador_estado'] = 'activo';
 
         DB::transaction(function () use ($procurador) {
             $procurador->update(['procurador_estado' => 'inactivo']);
-        if ($procurador->usuario) {
+            if ($procurador->usuario) {
                 $procurador->usuario->update(['usuario_estado' => 'inactivo']);
             }
-            });
-            
+        });
+
         return redirect()->route('procuradores.index')
             ->with('success', 'Procurador desactivado exitosamente. El registro se conserva en el sistema.');
     }
@@ -123,10 +125,9 @@ $validated['procurador_estado'] = 'activo';
     public function activar(string $identidad)
     {
         $procurador = Procurador::where('procurador_dni', $identidad)->firstOrFail();
-        
+
         DB::transaction(function () use ($procurador) {
             $procurador->update(['procurador_estado' => 'activo']);
-
 
             if ($procurador->usuario) {
                 $procurador->usuario->update(['usuario_estado' => 'activo']);

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Caso extends Model
 {
     protected $table = 'casos';
+
     protected $primaryKey = 'caso_id';
 
     protected $fillable = [
@@ -25,6 +26,15 @@ class Caso extends Model
         'caso_fecha_asignacion',
         'caso_estado',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'caso_admisible' => 'boolean',
+            'caso_fecha_interpuesta' => 'date',
+            'caso_fecha_asignacion' => 'date',
+        ];
+    }
 
     public function cliente()
     {

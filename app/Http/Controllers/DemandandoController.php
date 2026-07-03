@@ -22,7 +22,7 @@ class DemandandoController extends Controller
             })
             ->orderBy('demandado_apellido')
             ->orderBy('demandado_nombre')
-            ->get();
+            ->paginate(20);
 
         return view('demandados.index', compact('demandados'));
     }
@@ -77,7 +77,7 @@ class DemandandoController extends Controller
         $validated = $request->validate([
             'demandado_nombre' => 'required|string|max:100',
             'demandado_apellido' => 'required|string|max:100',
-            'demandado_dni' => 'required|string|max:19|unique:demandados,demandado_dni,' . $demandado->demandado_id . ',demandado_id',
+            'demandado_dni' => 'required|string|max:19|unique:demandados,demandado_dni,'.$demandado->demandado_id.',demandado_id',
             'demandado_estado_civil' => 'nullable|string|max:50',
             'demandado_telefono' => 'nullable|string|max:29',
             'demandado_direccion' => 'nullable|string|max:200',

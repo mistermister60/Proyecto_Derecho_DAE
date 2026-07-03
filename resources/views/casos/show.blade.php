@@ -35,22 +35,22 @@
     <div class="flex gap-1 mb-5 rounded-lg" style="background: #F3F4F6; padding: 3px;">
         <button @click="tab = 'resumen'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
                 :style="tab === 'resumen' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Resumen
         </button>
         <button @click="tab = 'hechos'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
                 :style="tab === 'hechos' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Relación de hechos
         </button>
         <button @click="tab = 'documentos'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
                 :style="tab === 'documentos' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             Documentos
         </button>
         <button @click="tab = 'bitacora'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
                 :style="tab === 'bitacora' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             Bitácora
         </button>
     </div>
@@ -145,7 +145,7 @@
         @forelse ($caso->documentos as $doc)
         <div class="flex items-center gap-4 p-3 rounded-lg mb-2" style="border: 1px solid #E5E7EB;">
             <div class="flex items-center justify-center rounded-lg shrink-0" style="width: 40px; height: 40px; background: #F3F4F6;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium" style="color: #111827;">{{ $doc->documento_nombre }}</p>
@@ -154,7 +154,7 @@
         </div>
         @empty
         <div class="py-8 text-center">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mx-auto mb-3" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             <p class="text-sm" style="color: #9CA3AF;">No hay documentos adjuntos</p>
         </div>
         @endforelse
@@ -199,42 +199,42 @@
     {{-- Presentado al Juzgado --}}
     <button type="button" @click="aplicarPlantilla('YA FUE PRESENTADO AL JUZGADO', 'Presentación')" 
             class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-gray-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-gray-500" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Presentado al Juzgado
     </button>
 
     {{-- Admitida (Hoy) --}}
     <button type="button" @click="aplicarPlantilla('ADMITIDA EN FECHA {{ now()->format('d/m/Y') }}', 'Admisión')" 
             class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-green-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-green-600" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         Admitida (Hoy)
     </button>
 
     {{-- Espera Audiencia --}}
     <button type="button" @click="aplicarPlantilla('EN ESPERA DE SEÑALAMIENTO DE AUDIENCIA POR PARTE DEL JUZGADO', 'Audiencia')" 
             class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-amber-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-amber-500" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Espera Audiencia
     </button>
 
     {{-- Emplazado --}}
     <button type="button" @click="aplicarPlantilla('YA FUE EMPLAZADO EL DEMANDANTE POR PARTE DEL JUZGADO', 'Notificación')" 
             class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-blue-500"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-blue-500" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Emplazado
     </button>
 
     {{-- Confirió / Presentó Poder --}}
     <button type="button" @click="aplicarPlantilla('SE CONFIRIO PODER POR PARTE DE LA DEMANDANTE Y SE PRESENTO PODER YA ME NOTIFIQUE AL JUZGADO EL DIA ', 'Notificación')" 
             class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-purple-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-purple-500" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
         Confirió/Presentó Poder
     </button>
 
     {{-- Desde Cero --}}
     <button type="button" @click="aplicarPlantilla('CASO QUE SE LLEVARA DESDE CERO', 'Inicio')" 
             class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-indigo-500"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-indigo-500" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         Desde Cero
     </button>
 </div>

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Entrevista extends Model
 {
     protected $table = 'entrevistas';
+
     protected $primaryKey = 'entrevista_id';
 
     protected $fillable = [
@@ -17,6 +18,13 @@ class Entrevista extends Model
         'entrevista_observaciones',
         'entrevista_estado',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'entrevista_fecha' => 'date',
+        ];
+    }
 
     public function caso()
     {

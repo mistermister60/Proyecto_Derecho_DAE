@@ -5,22 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Caso;
 use App\Models\Cliente;
 use App\Models\Demandado;
-use App\Models\Procurador;
 use App\Models\EstadoCaso;
-use App\Models\TipoTramite;
+use App\Models\Procurador;
 use App\Models\Reasignacion;
+use App\Models\TipoTramite;
 use Illuminate\Http\Request;
 
 class CasoController extends Controller
 {
     public function index()
     {
-$queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador'])->orderBy('created_at', 'desc');
-    
-    if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador') {
-        $queryCasos->where('procurador_id', auth()->user()->procurador_id);
-    }
-    $casos = $queryCasos->get();
+        $queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador', 'audiencias'])->orderBy('created_at', 'desc');
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador') {
+            $queryCasos->where('procurador_id', auth()->user()->procurador_id);
+        }
+        $casos = $queryCasos->get();
 
         $estados = EstadoCaso::where('estado_tipo', 'pipeline')
             ->orderBy('estado_orden')
@@ -70,8 +70,8 @@ $queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador'])->or
         // Generar número de expediente automático
         $ultimo = Caso::orderBy('caso_id', 'desc')->first();
         $correlativo = $ultimo ? intval(substr($ultimo->caso_numero_expediente, -5)) + 1 : 1;
-        $validated['caso_numero_expediente'] = '0501-' . now()->year . '-' . str_pad($correlativo, 5, '0', STR_PAD_LEFT);
-        $validated['estado_id'] = 1; // Entrevista
+        $validated['caso_numero_expediente'] = '0501-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
+        $validated['estado_id'] = EstadoCaso::where('estado_nombre', 'Entrevista')->value('estado_id');
         $validated['caso_fecha_interpuesta'] = now()->toDateString();
         $validated['caso_fecha_asignacion'] = now()->toDateString();
         $validated['caso_admisible'] = $request->boolean('caso_admisible', true);
@@ -88,14 +88,15 @@ $queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador'])->or
         $caso = Caso::with([
             'cliente', 'demandado', 'tipoTramite', 'estado', 'procurador',
             'entrevistas.procurador', 'seguimientos.usuario',
-            'audiencias.procurador', 'documentos'
+            'audiencias.procurador', 'documentos',
         ])
             ->where('caso_numero_expediente', $expediente)
             ->firstOrFail();
 
-    if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-        abort(403, 'No tienes permiso para ver este caso.');
-    }
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para ver este caso.');
+        }
+
         return view('casos.show', compact('caso'));
     }
 

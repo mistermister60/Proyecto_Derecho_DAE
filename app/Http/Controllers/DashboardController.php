@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Caso;
 use App\Models\Audiencia;
-use App\Models\Procurador;
+use App\Models\Caso;
 use App\Models\EstadoCaso;
+use App\Models\Procurador;
 use App\Models\TipoTramite;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -22,10 +21,11 @@ class DashboardController extends Controller
             ->count();
 
         $audienciasEstaSemana = Audiencia::whereBetween('audiencia_fecha', [
-            now()->startOfWeek(), now()->endOfWeek()
+            now()->startOfWeek(), now()->endOfWeek(),
         ])->count();
 
-        $atrasados = Caso::where('estado_id', 11)->where('caso_estado', 'activo')->count();
+        $estadoAtrasado = EstadoCaso::where('estado_nombre', 'Atrasado')->value('estado_id');
+        $atrasados = Caso::where('estado_id', $estadoAtrasado)->where('caso_estado', 'activo')->count();
 
         // Audiencias próximas (hoy + 7 días)
         $proximasAudiencias = Audiencia::with(['caso', 'procurador'])
@@ -39,11 +39,11 @@ class DashboardController extends Controller
         $procuradores = Procurador::withCount([
             'casos as total_casos' => function ($q) {
                 $q->where('caso_estado', 'activo');
-            }
+            },
         ])->get();
         $procuradores->loadCount(['casos as activos' => function ($q) {
             $q->where('caso_estado', 'activo')
-              ->whereNotIn('estado_id', [8, 9]); // No cerrados ni inadmisibles
+                ->whereNotIn('estado_id', EstadoCaso::whereIn('estado_nombre', ['Cerrado', 'Inadmisible'])->pluck('estado_id'));
         }]);
 
         // Datos para gráfica de pipeline
@@ -51,19 +51,21 @@ class DashboardController extends Controller
             ->orderBy('estado_orden')
             ->get();
         $pipelineLabels = $estados->pluck('estado_nombre');
-        $pipelineData = $estados->map(fn($e) => Caso::where('estado_id', $e->estado_id)
-            ->where('caso_estado', 'activo')
-            ->count()
-        );
+        $pipelineCounts = Caso::where('caso_estado', 'activo')
+            ->selectRaw('estado_id, COUNT(*) as total')
+            ->groupBy('estado_id')
+            ->pluck('total', 'estado_id');
+        $pipelineData = $estados->map(fn ($e) => $pipelineCounts[$e->estado_id] ?? 0);
         $pipelineColors = $estados->pluck('estado_color');
 
         // Datos para gráfica de tipo de trámite
         $tramites = TipoTramite::all();
         $tipoLabels = $tramites->pluck('tramite_nombre');
-        $tipoData = $tramites->map(fn($t) => Caso::where('tipo_tramite_id', $t->tipo_tramite_id)
-            ->where('caso_estado', 'activo')
-            ->count()
-        );
+        $tipoCounts = Caso::where('caso_estado', 'activo')
+            ->selectRaw('tipo_tramite_id, COUNT(*) as total')
+            ->groupBy('tipo_tramite_id')
+            ->pluck('total', 'tipo_tramite_id');
+        $tipoData = $tramites->map(fn ($t) => $tipoCounts[$t->tipo_tramite_id] ?? 0);
 
         return view('dashboard.index', compact(
             'casosActivos', 'cerrados', 'totalCasos',

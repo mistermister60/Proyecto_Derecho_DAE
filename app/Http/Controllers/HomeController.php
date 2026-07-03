@@ -2,12 +2,4 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-class HomeController extends Controller
-{
-    public function index()
-    {
-        return view("home.index");
-    }
-}
+// HomeController eliminado — código muerto sin rutas que lo referencien
