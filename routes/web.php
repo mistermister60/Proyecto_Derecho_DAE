@@ -20,7 +20,7 @@ Route::get('/', function () {
 
 // Autenticación (públicas)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:5,1');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas protegidas (requieren autenticación)

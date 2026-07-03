@@ -64,16 +64,10 @@ class CasoController extends Controller
     {
         $validated = $request->validated();
 
-        // Generar número de expediente automático con transacción y lock pesimista
-        $validated['caso_numero_expediente'] = DB::transaction(function () {
-            $ultimo = Caso::where('caso_numero_expediente', 'like', '0501-'.now()->year.'-%')
-                ->lockForUpdate()
-                ->orderBy('caso_id', 'desc')
-                ->first();
-            $correlativo = $ultimo ? intval(substr($ultimo->caso_numero_expediente, -5)) + 1 : 1;
-
-            return '0501-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
-        });
+        // Generar número de expediente automático
+        $ultimo = Caso::orderBy('caso_id', 'desc')->first();
+        $correlativo = $ultimo ? intval(substr($ultimo->caso_numero_expediente, -5)) + 1 : 1;
+        $validated['caso_numero_expediente'] = '0501-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
         $validated['estado_id'] = EstadoCaso::where('estado_nombre', 'Entrevista')->value('estado_id');
         $validated['caso_fecha_interpuesta'] = now()->toDateString();
         $validated['caso_fecha_asignacion'] = now()->toDateString();

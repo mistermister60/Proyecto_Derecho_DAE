@@ -51,7 +51,7 @@
         @forelse ($demandados as $demandado)
         <a href="{{ route('demandados.show', $demandado->demandado_dni) }}" 
            class="demandado-card rounded-xl p-4 transition-all"
-           x-show="shouldShow(@js($demandado->demandado_nombre), @js($demandado->demandado_apellido), @js($demandado->demandado_dni), @js($demandado->demandado_telefono), @js($demandado->demandado_estado))"
+           x-show="shouldShow('{{ addslashes($demandado->demandado_nombre) }}', '{{ addslashes($demandado->demandado_apellido) }}', '{{ $demandado->demandado_dni }}', '{{ $demandado->demandado_telefono }}', '{{ $demandado->demandado_estado }}')"
            style="background: #FFFFFF; border: 1px solid #E5E7EB; display: block;"
            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='#93C5FD';" onmouseout="this.style.boxShadow='none'; this.style.borderColor='#E5E7EB';">
             <div class="flex items-center gap-3 mb-3">
