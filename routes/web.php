@@ -31,9 +31,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/casos', [CasoController::class, 'store'])->name('casos.store');
     Route::get('/casos/{expediente}/editar', [CasoController::class, 'edit'])->name('casos.edit');
     Route::put('/casos/{expediente}', [CasoController::class, 'update'])->name('casos.update');
+Route::middleware('role:Director')->group(function () {
     Route::delete('/casos/{expediente}', [CasoController::class, 'destroy'])->name('casos.destroy');
     Route::get('/casos/{expediente}/reasignar', [CasoController::class, 'reasignar'])->name('casos.reasignar');
     Route::post('/casos/{expediente}/reasignar', [CasoController::class, 'storeReasignacion'])->name('casos.storeReasignacion');
+    });
     Route::get('/casos/{expediente}', [CasoController::class, 'show'])->name('casos.show');
     Route::get('/casos', [CasoController::class, 'index'])->name('casos.index');
 
