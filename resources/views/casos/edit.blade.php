@@ -3,6 +3,7 @@
 @section('title', 'Editar Caso — ' . $caso->caso_numero_expediente)
 
 @section('content')
+@php($esDirector = strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'director')
 <form action="{{ route('casos.update', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
     @method('PUT')
@@ -33,6 +34,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Cliente (Representado)</label>
+                @if ($esDirector)
                 <select name="cliente_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar cliente...</option>
                     @foreach ($clientes as $cliente)
@@ -41,6 +43,11 @@
                     </option>
                     @endforeach
                 </select>
+                 @else
+                <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #6B7280; background: #F9FAFB;">
+                   {{ $caso->cliente?->nombre_completo ?? 'Sin cliente' }} <span class="text-xs">(solo Director)</span>
+               </div>
+               @endif
                 @error('cliente_id')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -48,6 +55,7 @@
 
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Demandado (Opcional)</label>
+                 @if ($esDirector)
                 <select name="demandado_id" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar demandado (si aplica)...</option>
                     @foreach ($demandados as $dem)
@@ -56,6 +64,11 @@
                     </option>
                     @endforeach
                 </select>
+                 @else
+                <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #6B7280; background: #F9FAFB;">
+                    {{ $caso->demandado?->nombre_completo ?? $caso->demandado?->demandado_nombre ?? 'Sin demandado' }} <span class="text-xs">(solo Director)</span>
+                </div>
+               @endif
                 @error('demandado_id')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -69,6 +82,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Tipo de trámite</label>
+                @if ($esDirector)
                 <select name="tipo_tramite_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar...</option>
                     @foreach ($tramites as $tramite)
@@ -77,6 +91,11 @@
                     </option>
                     @endforeach
                 </select>
+                @else
+                <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #6B7280; background: #F9FAFB;">
+                    {{ $caso->tipoTramite?->tramite_nombre ?? 'Sin trámite' }} <span class="text-xs">(solo Director)</span>
+               </div>
+               @endif
                 @error('tipo_tramite_id')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -112,10 +131,16 @@
 
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Estado del Registro</label>
+                @if ($esDirector)
                 <select name="caso_estado" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="activo" {{ old('caso_estado', $caso->caso_estado) === 'activo' ? 'selected' : '' }}>Activo</option>
                     <option value="cerrado" {{ old('caso_estado', $caso->caso_estado) === 'cerrado' ? 'selected' : '' }}>Cerrado</option>
                 </select>
+                @else
+               <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #6B7280; background: #F9FAFB;">
+                    {{ ucfirst($caso->caso_estado) }} <span class="text-xs">(solo Director)</span>
+                </div>
+               @endif
                 @error('caso_estado')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -129,6 +154,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="md:col-span-2">
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Procurador asignado</label>
+                @if ($esDirector)
                 <select name="procurador_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar procurador...</option>
                     @foreach ($procuradores as $procurador)
@@ -137,6 +163,11 @@
                     </option>
                     @endforeach
                 </select>
+                @else
+                <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #6B7280; background: #F9FAFB;">
+                    {{ $caso->procurador?->nombre_completo ?? 'Sin procurador' }} <span class="text-xs">(reasignación: solo Director)</span>
+                </div>
+                @endif
                 @error('procurador_id')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -152,7 +183,13 @@
 
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de Interposición</label>
+                @if ($esDirector)
                 <input type="date" name="caso_fecha_interpuesta" value="{{ old('caso_fecha_interpuesta', $caso->caso_fecha_interpuesta ? \Carbon\Carbon::parse($caso->caso_fecha_interpuesta)->format('Y-m-d') : '') }}" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                @else
+                <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #6B7280; background: #F9FAFB;">
+                    {{ $caso->caso_fecha_interpuesta ? \Carbon\Carbon::parse($caso->caso_fecha_interpuesta)->format('d/m/Y') : '—' }} <span class="text-xs">(solo Director)</span>
+                </div>
+                @endif
                 @error('caso_fecha_interpuesta')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -170,6 +207,7 @@
             <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
             @enderror
         </div>
+        @if ($esDirector)
         <div class="mt-4">
             <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Observaciones del Director (opcional)</label>
             <textarea name="caso_observaciones_director" rows="3" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;" placeholder="Notas internas...">{{ old('caso_observaciones_director', $caso->caso_observaciones_director) }}</textarea>
@@ -177,6 +215,7 @@
             <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
             @enderror
         </div>
+        @endif
     </div>
 </form>
 @endsection

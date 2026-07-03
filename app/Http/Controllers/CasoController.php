@@ -10,6 +10,9 @@ use App\Models\Procurador;
 use App\Models\Reasignacion;
 use App\Models\TipoTramite;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCasoRequest;
+use App\Http\Requests\UpdateCasoRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 
 class CasoController extends Controller
@@ -56,17 +59,9 @@ class CasoController extends Controller
         return view('casos.create', compact('clientes', 'procuradores', 'tramites'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCasoRequest $request)
     {
-        $validated = $request->validate([
-            'cliente_id' => 'required|exists:clientes,cliente_id',
-            'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',
-            'procurador_id' => 'required|exists:procuradores,procurador_id',
-            'caso_parte_representada' => 'required|string|max:100',
-            'caso_juzgado' => 'nullable|string|max:50',
-            'caso_relacion_hechos' => 'required|string',
-            'caso_observaciones_director' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         // Generar número de expediente automático con transacción y lock pesimista
         $validated['caso_numero_expediente'] = DB::transaction(function () {
@@ -100,9 +95,7 @@ class CasoController extends Controller
             ->where('caso_numero_expediente', $expediente)
             ->firstOrFail();
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-            abort(403, 'No tienes permiso para ver este caso.');
-        }
+        Gate::authorize('view', $caso);
 
         return view('casos.show', compact('caso'));
     }
@@ -111,9 +104,7 @@ class CasoController extends Controller
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-            abort(403, 'No tienes permiso para editar este caso.');
-        }
+        Gate::authorize('update', $caso);
 
         $clientes = Cliente::where('cliente_estado', 'activo')->get();
         $procuradores = Procurador::where('procurador_estado', 'activo')->get();
@@ -124,28 +115,14 @@ class CasoController extends Controller
         return view('casos.edit', compact('caso', 'clientes', 'procuradores', 'tramites', 'estados', 'demandados'));
     }
 
-    public function update(Request $request, string $expediente)
+    public function update(UpdateCasoRequest $request, string $expediente)
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-            abort(403, 'No tienes permiso para modificar este caso.');
-        }
-
-        $validated = $request->validate([
-            'cliente_id' => 'required|exists:clientes,cliente_id',
-            'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',
-            'procurador_id' => 'required|exists:procuradores,procurador_id',
-            'estado_id' => 'required|exists:estados_caso,estado_id',
-            'caso_parte_representada' => 'required|string|max:100',
-            'caso_juzgado' => 'nullable|string|max:50',
-            'caso_relacion_hechos' => 'required|string',
-            'caso_observaciones_director' => 'nullable|string',
-            'caso_admisible' => 'boolean',
-            'caso_estado' => 'required|in:activo,cerrado',
-        ]);
-
+        $validated = $request->validated();
+        if ($request->esDirector()) {
         $validated['caso_admisible'] = $request->boolean('caso_admisible', true);
+        }
 
         $caso->update($validated);
 
@@ -157,9 +134,7 @@ class CasoController extends Controller
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-            abort(403, 'No tienes permiso para eliminar este caso.');
-        }
+        Gate::authorize('delete', $caso);
 
         $caso->update(['caso_estado' => 'inactivo']);
 
@@ -171,9 +146,7 @@ class CasoController extends Controller
     {
         $caso = Caso::with(['procurador'])->where('caso_numero_expediente', $expediente)->firstOrFail();
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-            abort(403, 'No tienes permiso para reasignar este caso.');
-        }
+        Gate::authorize('reasignar', $caso);
 
         $procuradores = Procurador::where('procurador_estado', 'activo')
             ->where('procurador_id', '!=', $caso->procurador_id)
@@ -186,9 +159,7 @@ class CasoController extends Controller
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
-            abort(403, 'No tienes permiso para reasignar este caso.');
-        }
+        Gate::authorize('reasignar', $caso);
 
         $validated = $request->validate([
             'procurador_destino_id' => 'required|exists:procuradores,procurador_id|different:procurador_origen_id',
