@@ -126,7 +126,13 @@
             <div class="p-4 rounded-lg" style="background: #F9FAFB;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm font-medium" style="color: #111827;">{{ $entrevista->procurador?->nombre_completo ?? 'N/A' }}</span>
-                    <span class="text-xs" style="color: #6B7280;">{{ \Carbon\Carbon::parse($entrevista->entrevista_fecha)->format('d/m/Y') }}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs" style="color: #6B7280;">{{ \Carbon\Carbon::parse($entrevista->entrevista_fecha)->format('d/m/Y') }}</span>
+                        <form method="POST" action="{{ route('entrevistas.destroy', [$caso->caso_numero_expediente, $entrevista->entrevista_id]) }}" onsubmit="return confirm('¿Eliminar esta entrevista?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs px-2 py-1 rounded" style="color: #EF4444; background: #FEF2F2;">Eliminar</button>
+                        </form>
+                    </div>
                 </div>
                 <p class="text-sm" style="color: #374151;">{{ $entrevista->entrevista_relacion_hechos }}</p>
                 @if ($entrevista->entrevista_observaciones)
@@ -136,6 +142,27 @@
             @endforeach
         </div>
         @endif
+
+        {{-- Registrar nueva entrevista --}}
+        <div class="mt-6 p-4 rounded-xl" style="background: #F9FAFB; border: 1px solid #E5E7EB;">
+            <h4 class="text-sm font-semibold mb-3" style="color: #111827;">Registrar entrevista</h4>
+            <form method="POST" action="{{ route('entrevistas.store', $caso->caso_numero_expediente) }}" class="space-y-3">
+                @csrf
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Fecha</label>
+                    <input type="date" name="entrevista_fecha" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                </div>
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Relación de hechos</label>
+                    <textarea name="entrevista_relacion_hechos" rows="4" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;" placeholder="Narración de los hechos según la entrevista..."></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Observaciones (opcional)</label>
+                    <textarea name="entrevista_observaciones" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;"></textarea>
+                </div>
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium" style="background: #2563EB; color: white;">Guardar entrevista</button>
+            </form>
+        </div>
     </div>
 
     {{-- TAB: DOCUMENTOS --}}
@@ -151,7 +178,18 @@
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium" style="color: #111827;">{{ $doc->documento_nombre }}</p>
                 <p class="text-xs" style="color: #6B7280;">{{ $doc->documento_tipo }} • {{ $doc->documento_tamano ? round($doc->documento_tamano / 1024, 1) . ' KB' : '—' }}</p>
+                @if ($doc->documento_descripcion)
+                <p class="text-xs mt-1" style="color: #9CA3AF;">{{ $doc->documento_descripcion }}</p>
+                @endif
             </div>
+            <a href="{{ route('documentos.download', [$caso->caso_numero_expediente, $doc->documento_id]) }}"
+               class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background: #EFF6FF; color: #2563EB;">
+                Descargar
+            </a>
+            <form method="POST" action="{{ route('documentos.destroy', [$caso->caso_numero_expediente, $doc->documento_id]) }}" onsubmit="return confirm('¿Eliminar este documento?')">
+                @csrf @method('DELETE')
+                <button type="submit" class="text-xs px-2 py-1.5 rounded-lg" style="color: #EF4444; background: #FEF2F2;">Eliminar</button>
+            </form>
         </div>
         @empty
         <div class="py-8 text-center">
@@ -159,6 +197,25 @@
             <p class="text-sm" style="color: #9CA3AF;">No hay documentos adjuntos</p>
         </div>
         @endforelse
+
+        {{-- Subir documento --}}
+        <div class="mt-4 p-4 rounded-xl" style="background: #F9FAFB; border: 1px solid #E5E7EB;">
+            <h4 class="text-sm font-semibold mb-3" style="color: #111827;">Subir documento</h4>
+            <form method="POST" action="{{ route('documentos.store', $caso->caso_numero_expediente) }}" enctype="multipart/form-data" class="space-y-3">
+                @csrf
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Archivo (PDF, Word, JPG, PNG — máx. 10 MB)</label>
+                    <input type="file" name="archivo" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                           class="w-full text-sm rounded-lg px-3 py-2 outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                    @error('archivo')<p class="text-xs mt-1" style="color:#DC2626;">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Descripción (opcional)</label>
+                    <input type="text" name="documento_descripcion" maxlength="500" placeholder="Ej: Poder notarial" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                </div>
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium" style="background: #2563EB; color: white;">Subir documento</button>
+            </form>
+        </div>
     </div>
 
     {{-- TAB: BITÁCORA --}}
@@ -283,7 +340,7 @@
         <div class="py-8 text-center text-sm" style="color: #9CA3AF;">No hay seguimientos registrados</div>
         @endforelse
 
-        {{-- Audiencias (Tu bloque de código original de audiencias se mantiene intacto aquí abajo) --}}
+        {{-- Audiencias --}}
         @if ($caso->audiencias->count() > 0)
         <h3 class="text-sm font-semibold mt-6 mb-3" style="color: #111827;">Audiencias</h3>
         <div class="space-y-2">
@@ -291,21 +348,54 @@
             <div class="flex items-center gap-3 p-3 rounded-lg" style="background: #F9FAFB;">
                 <div class="text-center shrink-0" style="min-width: 48px;">
                     <div class="text-sm font-bold" style="color: #2563EB;">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m') }}</div>
-                    <div class="text-xs" style="color: #6B7280;">{{ \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') }}</div>
+                    <div class="text-xs" style="color: #6B7280;">{{ $aud->audiencia_hora ? \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') : '—' }}</div>
                 </div>
                 <div class="flex-1">
                     <p class="text-sm font-medium" style="color: #111827;">{{ $aud->audiencia_tipo }}</p>
-                    <p class="text-xs" style="color: #6B7280;">Juzgado {{ $aud->audiencia_juzgado }}</p>
+                    <p class="text-xs" style="color: #6B7280;">Juzgado {{ $aud->audiencia_juzgado ?? '—' }}</p>
                 </div>
                 @if ($aud->audiencia_estado === 'pendiente')
                 <span class="text-xs px-2 py-1 rounded font-medium" style="background: #FEF3C7; color: #92400E;">Pendiente</span>
                 @else
                 <span class="text-xs px-2 py-1 rounded font-medium" style="background: #D1FAE5; color: #065F46;">{{ ucfirst($aud->audiencia_estado) }}</span>
                 @endif
+                <form method="POST" action="{{ route('audiencias.destroy', [$caso->caso_numero_expediente, $aud->audiencia_id]) }}" onsubmit="return confirm('¿Eliminar esta audiencia?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="text-xs px-2 py-1 rounded" style="color: #EF4444; background: #FEF2F2;">Eliminar</button>
+                </form>
             </div>
             @endforeach
         </div>
         @endif
+
+        {{-- Agendar nueva audiencia --}}
+        <div class="mt-6 p-4 rounded-xl" style="background: #F9FAFB; border: 1px solid #E5E7EB;">
+            <h4 class="text-sm font-semibold mb-3" style="color: #111827;">Agendar audiencia</h4>
+            <form method="POST" action="{{ route('audiencias.store', $caso->caso_numero_expediente) }}" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                @csrf
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Tipo</label>
+                    <input type="text" name="audiencia_tipo" required placeholder="Ej: Audiencia inicial" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                </div>
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Fecha</label>
+                    <input type="date" name="audiencia_fecha" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                </div>
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Hora (opcional)</label>
+                    <input type="time" name="audiencia_hora" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                </div>
+                <div>
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Juzgado (opcional)</label>
+                    <input type="text" name="audiencia_juzgado" placeholder="Ej: J-7" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs font-medium mb-1 block" style="color: #6B7280;">Observaciones (opcional)</label>
+                    <textarea name="audiencia_observaciones" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; background: #fff;"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium" style="background: #2563EB; color: white;">Agendar audiencia</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-@endsection

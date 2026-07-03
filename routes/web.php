@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\AudienciaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CasoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandadoController;
+use App\Http\Controllers\DocumentoController;
+use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
@@ -88,4 +91,17 @@ Route::middleware('role:Director')->group(function () {
 
     // Seguimiento
     Route::post('/casos/{caso_id}/seguimiento', [SeguimientoController::class, 'store'])->name('seguimientos.store');
+
+    // Audiencias (dentro del expediente)
+    Route::post('/casos/{expediente}/audiencias', [AudienciaController::class, 'store'])->name('audiencias.store');
+    Route::delete('/casos/{expediente}/audiencias/{audiencia_id}', [AudienciaController::class, 'destroy'])->name('audiencias.destroy');
+
+    // Documentos (dentro del expediente)
+    Route::post('/casos/{expediente}/documentos', [DocumentoController::class, 'store'])->name('documentos.store');
+    Route::get('/casos/{expediente}/documentos/{documento_id}', [DocumentoController::class, 'download'])->name('documentos.download');
+    Route::delete('/casos/{expediente}/documentos/{documento_id}', [DocumentoController::class, 'destroy'])->name('documentos.destroy');
+
+    // Entrevistas (dentro del expediente)
+    Route::post('/casos/{expediente}/entrevistas', [EntrevistaController::class, 'store'])->name('entrevistas.store');
+    Route::delete('/casos/{expediente}/entrevistas/{entrevista_id}', [EntrevistaController::class, 'destroy'])->name('entrevistas.destroy');
 });

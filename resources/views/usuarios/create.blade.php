@@ -38,7 +38,7 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Contraseña</label>
-                <input type="password" name="contrasena" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <input type="password" name="contrasena" required minlength="8" placeholder="Mínimo 8 caracteres, mayúscula y número" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('contrasena')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
