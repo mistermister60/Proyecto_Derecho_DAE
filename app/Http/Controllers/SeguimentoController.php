@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Caso;
 use App\Models\Seguimiento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,12 @@ class SeguimentoController extends Controller
 {
     public function store(Request $request, $caso_id)
     {
+        $caso = Caso::findOrFail($caso_id);
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para agregar seguimientos a este caso.');
+        }
+
         $request->validate([
             'seguimiento_tipo' => 'required|string|max:50',
             'seguimiento_descripcion' => 'required|string',

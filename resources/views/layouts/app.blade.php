@@ -15,7 +15,7 @@
 
 <div class="flex h-screen w-full overflow-hidden">
     {{-- ==================== SIDEBAR ==================== --}}
-    <aside class="flex flex-col shrink-0 h-full" style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08);">
+    <aside id="sidebar" class="flex flex-col shrink-0 h-full fixed lg:static inset-y-0 left-0 z-30 transition-transform duration-200 -translate-x-full lg:translate-x-0" style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08);">
 
         {{-- Logo --}}
         <div class="flex items-center gap-3 px-5 py-5" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -64,10 +64,8 @@
                     $isActive = str_starts_with($current, explode('.', $item['route'])[0]);
                 @endphp
                 <a href="{{ route($item['route']) }}"
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
-                   style="{{ $isActive ? 'background: rgba(37,99,235,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65); hover:background: rgba(255,255,255,0.08);' }}"
-                   onmouseover="this.style.background='{{ $isActive ? 'rgba(37,99,235,0.2)' : 'rgba(255,255,255,0.08)' }}'; this.style.color='#FFFFFF';"
-                   onmouseout="this.style.background='{{ $isActive ? 'rgba(37,99,235,0.2)' : 'transparent' }}'; this.style.color='{{ $isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)' }}';">
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150
+                          {{ $isActive ? 'bg-blue-600/20 text-white' : 'text-white/65 hover:bg-white/10 hover:text-white' }}">
                     @if ($item['icon'] === 'dashboard')
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -107,10 +105,7 @@
         @if (strtolower(Auth::user()->rol?->rol_nombre ?? '') !== 'procurador')
             <div class="px-3 pb-4">
                 <a href="{{ route('casos.create') }}"
-                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
-                   style="background: #2563EB; color: white;"
-                   onmouseover="this.style.background='#1d4ed8';"
-                   onmouseout="this.style.background='#2563EB';">
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-150">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
@@ -120,6 +115,9 @@
         @endif
     </aside>
 
+    {{-- Overlay para móvil --}}
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-20 hidden lg:hidden" aria-hidden="true"></div>
+
     {{-- ==================== CONTENIDO PRINCIPAL ==================== --}}
     <div class="flex flex-col flex-1 h-full overflow-hidden">
 
@@ -127,6 +125,11 @@
         <header class="flex items-center justify-between shrink-0 px-6 py-3" style="background: #FFFFFF; border-bottom: 1px solid #E5E7EB;">
             <div class="flex items-center gap-3">
                 <h1 class="text-lg font-semibold" style="color: #111827;">@yield('title', 'Dashboard')</h1>
+                <button id="sidebarToggle" type="button" class="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors mr-2" aria-label="Abrir menú">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
             </div>
 
             <div class="flex items-center gap-4">
@@ -136,15 +139,12 @@
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
                     <input type="text" x-model="search" placeholder="Buscar..."
-                           class="pl-9 pr-3 py-1.5 rounded-lg text-sm outline-none transition-all duration-150"
-                           style="background: #F7F8FA; border: 1px solid #E5E7EB; color: #111827; width: 220px;"
-                           onfocus="this.style.borderColor='#2563EB'; this.style.width='260px';"
-                           onblur="this.style.borderColor='#E5E7EB'; this.style.width='220px';">
+                           class="pl-9 pr-3 py-1.5 rounded-lg text-sm outline-none transition-all duration-150 bg-gray-50 border border-gray-200 text-gray-900 focus:border-blue-600 focus:w-[260px] w-[220px]">
                 </div>
 
                 {{-- Notificaciones --}}
-                <button class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors duration-150" aria-label="Notificaciones">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                     </svg>
                     <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: #EF4444;"></span>
@@ -172,7 +172,7 @@
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors" style="background: none; border: none; cursor: pointer;">
                                 Cerrar sesión
                             </button>
                         </form>
@@ -254,6 +254,30 @@
                 }
             }
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (toggle && sidebar && overlay) {
+            toggle.addEventListener('click', function() {
+                const isOpen = sidebar.classList.contains('translate-x-0');
+                sidebar.classList.toggle('-translate-x-full', isOpen);
+                sidebar.classList.toggle('translate-x-0', !isOpen);
+                overlay.classList.toggle('hidden');
+                toggle.setAttribute('aria-label', isOpen ? 'Abrir menú' : 'Cerrar menú');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+                toggle.setAttribute('aria-label', 'Abrir menú');
+            });
+        }
     });
 </script>
 @RegisterServiceWorkerScript

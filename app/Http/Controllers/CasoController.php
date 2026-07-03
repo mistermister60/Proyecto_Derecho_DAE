@@ -10,6 +10,7 @@ use App\Models\Procurador;
 use App\Models\Reasignacion;
 use App\Models\TipoTramite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CasoController extends Controller
 {
@@ -67,10 +68,16 @@ class CasoController extends Controller
             'caso_observaciones_director' => 'nullable|string',
         ]);
 
-        // Generar número de expediente automático
-        $ultimo = Caso::orderBy('caso_id', 'desc')->first();
-        $correlativo = $ultimo ? intval(substr($ultimo->caso_numero_expediente, -5)) + 1 : 1;
-        $validated['caso_numero_expediente'] = '0501-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
+        // Generar número de expediente automático con transacción y lock pesimista
+        $validated['caso_numero_expediente'] = DB::transaction(function () {
+            $ultimo = Caso::where('caso_numero_expediente', 'like', '0501-'.now()->year.'-%')
+                ->lockForUpdate()
+                ->orderBy('caso_id', 'desc')
+                ->first();
+            $correlativo = $ultimo ? intval(substr($ultimo->caso_numero_expediente, -5)) + 1 : 1;
+
+            return '0501-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
+        });
         $validated['estado_id'] = EstadoCaso::where('estado_nombre', 'Entrevista')->value('estado_id');
         $validated['caso_fecha_interpuesta'] = now()->toDateString();
         $validated['caso_fecha_asignacion'] = now()->toDateString();
@@ -103,6 +110,11 @@ class CasoController extends Controller
     public function edit(string $expediente)
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para editar este caso.');
+        }
+
         $clientes = Cliente::where('cliente_estado', 'activo')->get();
         $procuradores = Procurador::where('procurador_estado', 'activo')->get();
         $tramites = TipoTramite::all();
@@ -115,6 +127,10 @@ class CasoController extends Controller
     public function update(Request $request, string $expediente)
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para modificar este caso.');
+        }
 
         $validated = $request->validate([
             'cliente_id' => 'required|exists:clientes,cliente_id',
@@ -140,6 +156,11 @@ class CasoController extends Controller
     public function destroy(string $expediente)
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para eliminar este caso.');
+        }
+
         $caso->update(['caso_estado' => 'inactivo']);
 
         return redirect()->route('casos.index')
@@ -149,6 +170,11 @@ class CasoController extends Controller
     public function reasignar(string $expediente)
     {
         $caso = Caso::with(['procurador'])->where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para reasignar este caso.');
+        }
+
         $procuradores = Procurador::where('procurador_estado', 'activo')
             ->where('procurador_id', '!=', $caso->procurador_id)
             ->get();
@@ -159,6 +185,10 @@ class CasoController extends Controller
     public function storeReasignacion(Request $request, string $expediente)
     {
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador' && $caso->procurador_id !== auth()->user()->procurador_id) {
+            abort(403, 'No tienes permiso para reasignar este caso.');
+        }
 
         $validated = $request->validate([
             'procurador_destino_id' => 'required|exists:procuradores,procurador_id|different:procurador_origen_id',

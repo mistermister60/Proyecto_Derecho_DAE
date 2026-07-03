@@ -51,7 +51,7 @@
         @forelse ($procuradores as $procurador)
         <a href="{{ route('procuradores.show', $procurador->procurador_dni) }}" 
            class="procurador-card rounded-xl p-4 transition-all"
-           x-show="shouldShow('{{ addslashes($procurador->procurador_nombre) }}', '{{ addslashes($procurador->procurador_apellido) }}', '{{ $procurador->procurador_dni }}', '{{ $procurador->procurador_telefono }}', '{{ $procurador->procurador_estado }}')"
+           x-show="shouldShow(@js($procurador->procurador_nombre), @js($procurador->procurador_apellido), @js($procurador->procurador_dni), @js($procurador->procurador_telefono), @js($procurador->procurador_estado))"
            style="background: #FFFFFF; border: 1px solid #E5E7EB; display: block;"
            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='#93C5FD';" onmouseout="this.style.boxShadow='none'; this.style.borderColor='#E5E7EB';">
             <div class="flex items-center gap-3 mb-3">
