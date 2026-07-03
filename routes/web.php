@@ -5,9 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CasoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DemandandoController;
+use App\Http\Controllers\DemandadoController;
 use App\Http\Controllers\ProcuradorController;
-use App\Http\Controllers\SeguimentoController;
+use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
@@ -60,14 +60,14 @@ Route::middleware('auth')->group(function () {
     });
 
     // Demandados
-    Route::get('/demandados', [DemandandoController::class, 'index'])->name('demandados.index');
-    Route::get('/demandados/crear', [DemandandoController::class, 'create'])->name('demandados.create');
-    Route::post('/demandados', [DemandandoController::class, 'store'])->name('demandados.store');
-    Route::get('/demandados/{identidad}/editar', [DemandandoController::class, 'edit'])->name('demandados.edit');
-    Route::put('/demandados/{identidad}', [DemandandoController::class, 'update'])->name('demandados.update');
-    Route::delete('/demandados/{identidad}', [DemandandoController::class, 'destroy'])->name('demandados.destroy');
-    Route::post('/demandados/{identidad}/activar', [DemandandoController::class, 'activar'])->name('demandados.activar');
-    Route::get('/demandados/{identidad}', [DemandandoController::class, 'show'])->name('demandados.show');
+    Route::get('/demandados', [DemandadoController::class, 'index'])->name('demandados.index');
+    Route::get('/demandados/crear', [DemandadoController::class, 'create'])->name('demandados.create');
+    Route::post('/demandados', [DemandadoController::class, 'store'])->name('demandados.store');
+    Route::get('/demandados/{identidad}/editar', [DemandadoController::class, 'edit'])->name('demandados.edit');
+    Route::put('/demandados/{identidad}', [DemandadoController::class, 'update'])->name('demandados.update');
+    Route::delete('/demandados/{identidad}', [DemandadoController::class, 'destroy'])->name('demandados.destroy');
+    Route::post('/demandados/{identidad}/activar', [DemandadoController::class, 'activar'])->name('demandados.activar');
+    Route::get('/demandados/{identidad}', [DemandadoController::class, 'show'])->name('demandados.show');
 
     // Procuradores (solo Director)
     Route::middleware('role:Director')->group(function () {
@@ -85,5 +85,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
 
     // Seguimiento
-    Route::post('/casos/{caso_id}/seguimiento', [SeguimentoController::class, 'store'])->name('seguimientos.store');
+    Route::post('/casos/{caso_id}/seguimiento', [SeguimientoController::class, 'store'])->name('seguimientos.store');
 });

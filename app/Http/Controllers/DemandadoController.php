@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Demandado;
 use Illuminate\Http\Request;
 
-class DemandandoController extends Controller
+class DemandadoController extends Controller
 {
     public function index(Request $request)
     {
