@@ -4,7 +4,8 @@ namespace App\Http\Requests;
 
 use App\Models\Caso;
 use Illuminate\Foundation\Http\FormRequest;
-
+use App\Enums\CasoEstadoEnum;
+use App\Enums\RolEnum;
 class UpdateCasoRequest extends FormRequest
 {
     public function authorize(): bool
@@ -34,12 +35,13 @@ class UpdateCasoRequest extends FormRequest
             'caso_fecha_interpuesta' => 'nullable|date',
             'caso_observaciones_director' => 'nullable|string',
             'caso_admisible' => 'boolean',
-            'caso_estado' => 'required|in:activo,cerrado',
+             // Sustitucion de string magico por validacion estricta basada en Enum
+            'caso_estado' => 'required|in:' . implode(',', CasoEstadoEnum::values()),
         ]);
     }
 
     public function esDirector(): bool
     {
-        return strtolower($this->user()?->rol?->rol_nombre ?? '') === 'director';
+        return RolEnum::equals($this->user()?->rol?->rol_nombre, RolEnum::DIRECTOR);
     }
 }

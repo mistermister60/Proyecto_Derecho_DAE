@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Caso;
 use App\Models\Usuario;
-
+use App\Enums\RolEnum;
 class CasoPolicy
 {
     public function view(Usuario $usuario, Caso $caso): bool
@@ -34,7 +34,7 @@ class CasoPolicy
 
     private function esDirector(Usuario $usuario): bool
     {
-        return strtolower($usuario->rol?->rol_nombre ?? '') === 'director';
+        return RolEnum::equals($usuario->rol?->rol_nombre, RolEnum::DIRECTOR);
     }
 
     private function esProcuradorAsignado(Usuario $usuario, Caso $caso): bool
