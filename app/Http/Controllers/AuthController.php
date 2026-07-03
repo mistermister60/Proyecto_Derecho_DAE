@@ -2,49 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Exceptions\AccountInactiveException;
+use App\Exceptions\AuthenticationException;
+use App\Exceptions\InvalidCredentialsException;
+use App\Exceptions\RateLimitExceededException;
+use App\Http\Requests\LoginCredentialsRequest;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Controller as BaseController;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
-    public function showLogin()
+    public function __construct(
+        private readonly AuthService $authService
+    ) {}
+
+    public function showLogin(): Response
     {
-        return view('auth.login');
+        return response()->view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(LoginCredentialsRequest $request): JsonResponse
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'contrasena' => 'required|string',
-        ]);
+        try {
+            $authResponse = $this->authService->attemptLogin(
+                $request->input('email'),
+                $request->input('contrasena')
+            );
 
-        $usuario = Usuario::where('email', $credentials['email'])->first();
+            return response()->json([
+                'success' => true,
+                'message' => 'Inicio de sesión exitoso',
+                'data' => $authResponse->toArray(),
+            ], 200);
 
-        if ($usuario && Hash::check($credentials['contrasena'], $usuario->contrasena)) {
-            if ($usuario->usuario_estado !== 'activo') {
-                return back()->withErrors(['email' => 'Su cuenta está desactivada.']);
-            }
-
-            Auth::login($usuario);
-            $request->session()->regenerate();
-
-            return redirect()->intended(route('dashboard'));
+        } catch (AuthenticationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error_code' => $this->getErrorCode($e),
+            ], $this->getHttpStatusCode($e));
         }
-
-        return back()->withErrors([
-            'email' => 'Las credenciales proporcionadas son incorrectas.',
-        ])->onlyInput('email');
     }
 
-    public function logout(Request $request)
+    public function logout(): JsonResponse
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        try {
+            $this->authService->logout(auth()->id());
 
-        return redirect()->route('login');
+            return response()->json([
+                'success' => true,
+                'message' => 'Cierre de sesión exitoso',
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cerrar sesión',
+            ], 500);
+        }
+    }
+
+    private function getErrorCode(AuthenticationException $exception): string
+    {
+        return match (get_class($exception)) {
+            InvalidCredentialsException::class => 'INVALID_CREDENTIALS',
+            AccountInactiveException::class => 'ACCOUNT_INACTIVE',
+            RateLimitExceededException::class => 'RATE_LIMIT_EXCEEDED',
+            default => 'AUTHENTICATION_ERROR',
+        };
+    }
+
+    private function getHttpStatusCode(AuthenticationException $exception): int
+    {
+        return match (get_class($exception)) {
+            RateLimitExceededException::class => 429,
+            AccountInactiveException::class => 403,
+            default => 401,
+        };
     }
 }

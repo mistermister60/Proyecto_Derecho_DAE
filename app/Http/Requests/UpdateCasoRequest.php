@@ -2,15 +2,17 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Caso;
-use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\CasoEstadoEnum;
 use App\Enums\RolEnum;
+use App\Models\Caso;
+use Illuminate\Foundation\Http\FormRequest;
+
 class UpdateCasoRequest extends FormRequest
 {
     public function authorize(): bool
     {
         $caso = Caso::where('caso_numero_expediente', $this->route('expediente'))->firstOrFail();
+
         return $this->user()->can('update', $caso);
     }
 
@@ -35,8 +37,8 @@ class UpdateCasoRequest extends FormRequest
             'caso_fecha_interpuesta' => 'nullable|date',
             'caso_observaciones_director' => 'nullable|string',
             'caso_admisible' => 'boolean',
-             // Sustitucion de string magico por validacion estricta basada en Enum
-            'caso_estado' => 'required|in:' . implode(',', CasoEstadoEnum::values()),
+            // Sustitucion de string magico por validacion estricta basada en Enum
+            'caso_estado' => 'required|in:'.implode(',', CasoEstadoEnum::values()),
         ]);
     }
 

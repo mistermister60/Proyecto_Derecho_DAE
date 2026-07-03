@@ -10,6 +10,7 @@ use App\Http\Controllers\DemandadoController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\ProcuradorController;
+use App\Http\Controllers\PwaController;
 use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
 
@@ -17,6 +18,57 @@ use App\Http\Controllers\UsuariosController;
 Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 });
+
+// Health check para Service Worker
+Route::get('/api/health', function () {
+    return response()->noContent();
+});
+
+// Archivos estáticos PWA (para servir en test y producción)
+Route::get('/manifest.json', function () {
+    $content = file_get_contents(public_path('manifest.json'));
+
+    return response($content, 200, [
+        'Content-Type' => 'application/json',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('pwa.manifest');
+
+Route::get('/sw.js', function () {
+    $content = file_get_contents(public_path('sw.js'));
+
+    return response($content, 200, [
+        'Content-Type' => 'application/javascript',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('pwa.sw');
+
+Route::get('/offline.html', function () {
+    $content = file_get_contents(public_path('offline.html'));
+
+    return response($content, 200, [
+        'Content-Type' => 'text/html',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('pwa.offline');
+
+Route::get('/logo.svg', function () {
+    $content = file_get_contents(public_path('logo.svg'));
+
+    return response($content, 200, [
+        'Content-Type' => 'image/svg+xml',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('pwa.logo_svg');
+
+Route::get('/logo.png', function () {
+    $content = file_get_contents(public_path('logo.png'));
+
+    return response($content, 200, [
+        'Content-Type' => 'image/png',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('pwa.logo_png');
 
 // Autenticación (públicas)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -34,10 +86,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/casos', [CasoController::class, 'store'])->name('casos.store');
     Route::get('/casos/{expediente}/editar', [CasoController::class, 'edit'])->name('casos.edit');
     Route::put('/casos/{expediente}', [CasoController::class, 'update'])->name('casos.update');
-Route::middleware('role:Director')->group(function () {
-    Route::delete('/casos/{expediente}', [CasoController::class, 'destroy'])->name('casos.destroy');
-    Route::get('/casos/{expediente}/reasignar', [CasoController::class, 'reasignar'])->name('casos.reasignar');
-    Route::post('/casos/{expediente}/reasignar', [CasoController::class, 'storeReasignacion'])->name('casos.storeReasignacion');
+    Route::middleware('role:Director')->group(function () {
+        Route::delete('/casos/{expediente}', [CasoController::class, 'destroy'])->name('casos.destroy');
+        Route::get('/casos/{expediente}/reasignar', [CasoController::class, 'reasignar'])->name('casos.reasignar');
+        Route::post('/casos/{expediente}/reasignar', [CasoController::class, 'storeReasignacion'])->name('casos.storeReasignacion');
     });
     Route::get('/casos/{expediente}', [CasoController::class, 'show'])->name('casos.show');
     Route::get('/casos', [CasoController::class, 'index'])->name('casos.index');
@@ -104,4 +156,21 @@ Route::middleware('role:Director')->group(function () {
     // Entrevistas (dentro del expediente)
     Route::post('/casos/{expediente}/entrevistas', [EntrevistaController::class, 'store'])->name('entrevistas.store');
     Route::delete('/casos/{expediente}/entrevistas/{entrevista_id}', [EntrevistaController::class, 'destroy'])->name('entrevistas.destroy');
+
+    // ============================================
+    // PWA - Notificaciones Push
+    // ============================================
+    Route::prefix('api/notifications')->group(function () {
+        Route::get('/vapid-public-key', [PwaController::class, 'getVapidPublicKey'])
+            ->name('pwa.vapid-key');
+
+        Route::post('/subscribe', [PwaController::class, 'subscribe'])
+            ->name('pwa.subscribe');
+
+        Route::post('/unsubscribe', [PwaController::class, 'unsubscribe'])
+            ->name('pwa.unsubscribe');
+
+        Route::get('/settings', [PwaController::class, 'notificationSettings'])
+            ->name('pwa.notifications');
+    });
 });

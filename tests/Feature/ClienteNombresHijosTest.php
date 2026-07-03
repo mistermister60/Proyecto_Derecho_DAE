@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
 use App\Models\Rol;
 use App\Models\Usuario;
-use App\Models\Cliente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -53,7 +53,7 @@ class ClienteNombresHijosTest extends TestCase
             'cliente_direccion' => 'SPS', 'cliente_numero_hijos' => 0, 'cliente_estado' => 'activo',
         ]);
 
-  $this->actingAs($director)->put(route('clientes.update', ['identidad' => $cliente->cliente_dni]), [
+        $this->actingAs($director)->put(route('clientes.update', ['identidad' => $cliente->cliente_dni]), [
             'cliente_nombre' => 'Juan',
             'cliente_apellido' => 'Pérez Modificado',
             'cliente_dni' => '0501199900022',

@@ -9,7 +9,10 @@ enum RolEnum: string
 
     public static function equals(?string $value, self $enum): bool
     {
-        if (!$value) return false;
+        if (! $value) {
+            return false;
+        }
+
         return strtolower($value) === $enum->value;
     }
 }

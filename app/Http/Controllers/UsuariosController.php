@@ -7,6 +7,7 @@ use App\Models\Rol;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UsuariosController extends Controller
 {
@@ -46,7 +47,7 @@ class UsuariosController extends Controller
             'procurador_id' => 'nullable|exists:procuradores,procurador_id',
             'usuario_nombre' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:usuarios,email',
-            'contrasena' => ['required', 'string', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()],
+            'contrasena' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
         ]);
 
         $validated['usuario_estado'] = 'activo';
@@ -89,7 +90,7 @@ class UsuariosController extends Controller
 
         // Solo validar y actualizar contraseña si se envía una nueva
         if ($request->filled('contrasena')) {
-            $rules['contrasena'] = [\Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()];
+            $rules['contrasena'] = [Password::min(8)->mixedCase()->numbers()];
         }
 
         $validated = $request->validate($rules);

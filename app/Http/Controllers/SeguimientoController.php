@@ -6,6 +6,7 @@ use App\Models\Seguimiento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+
 class SeguimientoController extends Controller
 {
     public function store(Request $request, $caso_id)

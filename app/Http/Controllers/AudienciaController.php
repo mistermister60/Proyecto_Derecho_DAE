@@ -15,14 +15,14 @@ class AudienciaController extends Controller
         Gate::authorize('update', $caso);
 
         $validated = $request->validate([
-            'audiencia_fecha'         => 'required|date',
-            'audiencia_hora'          => 'nullable|date_format:H:i',
-            'audiencia_tipo'          => 'required|string|max:100',
-            'audiencia_juzgado'       => 'nullable|string|max:50',
+            'audiencia_fecha' => 'required|date',
+            'audiencia_hora' => 'nullable|date_format:H:i',
+            'audiencia_tipo' => 'required|string|max:100',
+            'audiencia_juzgado' => 'nullable|string|max:50',
             'audiencia_observaciones' => 'nullable|string',
         ]);
 
-        $validated['caso_id']       = $caso->caso_id;
+        $validated['caso_id'] = $caso->caso_id;
         $validated['procurador_id'] = $caso->procurador_id;
         $validated['audiencia_estado'] = 'pendiente';
 

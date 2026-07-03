@@ -15,12 +15,12 @@ class EntrevistaController extends Controller
         Gate::authorize('update', $caso);
 
         $validated = $request->validate([
-            'entrevista_fecha'          => 'required|date',
+            'entrevista_fecha' => 'required|date',
             'entrevista_relacion_hechos' => 'required|string',
-            'entrevista_observaciones'  => 'nullable|string',
+            'entrevista_observaciones' => 'nullable|string',
         ]);
 
-        $validated['caso_id']       = $caso->caso_id;
+        $validated['caso_id'] = $caso->caso_id;
         $validated['procurador_id'] = $caso->procurador_id;
         $validated['entrevista_estado'] = 'activo';
 

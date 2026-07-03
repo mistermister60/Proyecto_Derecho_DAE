@@ -2,9 +2,10 @@
 
 namespace App\Policies;
 
+use App\Enums\RolEnum;
 use App\Models\Caso;
 use App\Models\Usuario;
-use App\Enums\RolEnum;
+
 class CasoPolicy
 {
     public function view(Usuario $usuario, Caso $caso): bool

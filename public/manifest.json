@@ -1,16 +1,68 @@
 {
-    "name": "Test PWA",
-    "short_name": "LPT",
-    "background_color": "#6777ef",
-    "display": "standalone",
-    "description": "A Progressive Web Application setup for Laravel projects.",
-    "theme_color": "#6777ef",
+    "name": "Procurador Legal - Sistema de Gestión",
+    "short_name": "Procurador Legal",
+    "description": "Sistema de gestión de casos y procuradores para el Despacho de Abogados DAE. Accede a expedientes, clientes y agenda desde tu móvil.",
     "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "display_override": ["standalone", "minimal-ui"],
+    "orientation": "portrait-primary",
+    "background_color": "#ffffff",
+    "theme_color": "#6777ef",
+    "lang": "es-HN",
+    "dir": "ltr",
+    "categories": ["business", "productivity", "legal"],
     "icons": [
+        {
+            "src": "logo.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
         {
             "src": "logo.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "logo.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Pantalla principal del sistema"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Inicio",
+            "description": "Panel principal con resumen de casos",
+            "url": "/dashboard",
+            "icons": [{ "src": "logo.png", "sizes": "512x512", "type": "image/png" }]
+        },
+        {
+            "name": "Casos",
+            "short_name": "Casos",
+            "description": "Gestión de expedientes y casos",
+            "url": "/casos",
+            "icons": [{ "src": "logo.png", "sizes": "512x512", "type": "image/png" }]
+        },
+        {
+            "name": "Clientes",
+            "short_name": "Clientes",
+            "description": "Directorio de clientes",
+            "url": "/clientes",
+            "icons": [{ "src": "logo.png", "sizes": "512x512", "type": "image/png" }]
+        },
+        {
+            "name": "Agenda",
+            "short_name": "Agenda",
+            "description": "Calendario de audiencias y citas",
+            "url": "/agenda",
+            "icons": [{ "src": "logo.png", "sizes": "512x512", "type": "image/png" }]
         }
     ]
 }

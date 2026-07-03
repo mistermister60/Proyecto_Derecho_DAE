@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolEnum;
+use App\Http\Requests\StoreCasoRequest;
+use App\Http\Requests\UpdateCasoRequest;
 use App\Models\Caso;
 use App\Models\Cliente;
 use App\Models\Demandado;
@@ -10,11 +13,7 @@ use App\Models\Procurador;
 use App\Models\Reasignacion;
 use App\Models\TipoTramite;
 use Illuminate\Http\Request;
-use App\Enums\RolEnum;
-use App\Http\Requests\StoreCasoRequest;
-use App\Http\Requests\UpdateCasoRequest;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\DB;
 
 class CasoController extends Controller
 {
@@ -116,7 +115,7 @@ class CasoController extends Controller
 
         $validated = $request->validated();
         if ($request->esDirector()) {
-        $validated['caso_admisible'] = $request->boolean('caso_admisible', true);
+            $validated['caso_admisible'] = $request->boolean('caso_admisible', true);
         }
 
         $caso->update($validated);

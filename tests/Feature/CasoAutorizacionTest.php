@@ -1,5 +1,7 @@
 <?php
+
 namespace Tests\Feature;
+
 use App\Models\Caso;
 use App\Models\Cliente;
 use App\Models\EstadoCaso;
@@ -16,10 +18,15 @@ class CasoAutorizacionTest extends TestCase
     use RefreshDatabase;
 
     private Usuario $director;
+
     private Usuario $procuradorA;
+
     private Usuario $procuradorB;
+
     private Caso $casoDeA;
+
     private int $estadoEntrevistaId;
+
     private int $estadoAdmitidoId;
 
     protected function setUp(): void
@@ -45,7 +52,7 @@ class CasoAutorizacionTest extends TestCase
             'procurador_fecha_nacimiento' => '1998-01-01', 'procurador_genero' => 'Masculino',
             'procurador_email' => 'proc.a@test.hn', 'procurador_telefono' => '1111-1111',
             'procurador_estado' => 'activo',
-       ]);
+        ]);
         $procB = Procurador::create([
             'procurador_nombre' => 'Proc', 'procurador_apellido' => 'B',
             'procurador_dni' => '0501199800002', 'procurador_carnet' => 'PB-002',
@@ -155,7 +162,7 @@ class CasoAutorizacionTest extends TestCase
         $this->assertDatabaseHas('casos', [
             'caso_id' => $this->casoDeA->caso_id,
             'caso_observaciones_director' => 'Nota del director',
-            'caso_estado' => 'cerrado'
+            'caso_estado' => 'cerrado',
         ]);
     }
 
@@ -179,7 +186,7 @@ class CasoAutorizacionTest extends TestCase
 
     public function test_director_puede_desactivar_caso(): void
     {
-       $this->actingAs($this->director)
+        $this->actingAs($this->director)
             ->delete(route('casos.destroy', $this->casoDeA->caso_numero_expediente))
             ->assertRedirect(route('casos.index'));
 
@@ -205,7 +212,7 @@ class CasoAutorizacionTest extends TestCase
     public function test_update_rechaza_parte_representada_mayor_a_50_caracteres(): void
     {
         $this->actingAs($this->procuradorA)
-           ->from(route('casos.edit', $this->casoDeA->caso_numero_expediente))
+            ->from(route('casos.edit', $this->casoDeA->caso_numero_expediente))
             ->put(route('casos.update', $this->casoDeA->caso_numero_expediente), $this->payloadProcurador([
                 'caso_parte_representada' => str_repeat('x', 51),
             ]))

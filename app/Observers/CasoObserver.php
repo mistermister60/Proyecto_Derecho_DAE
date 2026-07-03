@@ -25,19 +25,21 @@ class CasoObserver
 
         foreach ($caso->getChanges() as $campo => $nuevoValor) {
             // Omitir campo de actualizacion automatica de tiempo
-            if ($campo === 'updated_at') continue;
+            if ($campo === 'updated_at') {
+                continue;
+            }
 
             $cambios[$campo] = [
                 'antes' => $caso->getOriginal($campo),
-                'ahora' => $nuevoValor
+                'ahora' => $nuevoValor,
             ];
         }
 
-        if (!empty($cambios)) {
+        if (! empty($cambios)) {
             Log::channel('audit')->info('Expediente Modificado', [
                 'expediente' => $caso->caso_numero_expediente,
                 'usuario_id' => $usuario?->usuario_id ?? 'Sistema/Consola',
-                'cambios' => $cambios
+                'cambios' => $cambios,
             ]);
         }
     }

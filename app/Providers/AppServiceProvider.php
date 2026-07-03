@@ -2,11 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Models\Caso;
+use App\Observers\CasoObserver;
 use App\Policies\CasoPolicy;
 use Illuminate\Support\Facades\Gate;
-use App\Observers\CasoObserver;
+use Illuminate\Support\ServiceProvider;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -22,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-       Gate::policy(Caso::class, CasoPolicy::class);
-       Caso::observe(CasoObserver::class);
+        Gate::policy(Caso::class, CasoPolicy::class);
+        Caso::observe(CasoObserver::class);
     }
 }
