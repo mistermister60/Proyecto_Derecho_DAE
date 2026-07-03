@@ -7,6 +7,14 @@ use Illuminate\Support\Facades\Log;
 
 class CasoObserver
 {
+    public function created(Caso $caso): void
+    {
+        Log::channel('audit')->info('Expediente Creado', [
+            'expediente' => $caso->caso_numero_expediente,
+            'usuario_id' => auth()->id() ?? 'Sistema/Consola',
+        ]);
+    }
+
     /**
      * Dispara un log inmutable de auditoria cada vez que un expediente es modificado.
      */

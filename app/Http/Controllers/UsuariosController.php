@@ -46,7 +46,7 @@ class UsuariosController extends Controller
             'procurador_id' => 'nullable|exists:procuradores,procurador_id',
             'usuario_nombre' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:usuarios,email',
-            'contrasena' => 'required|string|min:6|max:255',
+            'contrasena' => ['required', 'string', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()],
         ]);
 
         $validated['usuario_estado'] = 'activo';
@@ -89,7 +89,7 @@ class UsuariosController extends Controller
 
         // Solo validar y actualizar contraseña si se envía una nueva
         if ($request->filled('contrasena')) {
-            $rules['contrasena'] = 'string|min:6|max:255';
+            $rules['contrasena'] = [\Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()];
         }
 
         $validated = $request->validate($rules);

@@ -3,7 +3,7 @@
 @section('title', 'Editar Caso — ' . $caso->caso_numero_expediente)
 
 @section('content')
-@php($esDirector = strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'director')
+@php($esDirector = \App\Enums\RolEnum::equals(auth()->user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
 <form action="{{ route('casos.update', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
     @method('PUT')

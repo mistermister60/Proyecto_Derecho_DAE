@@ -40,7 +40,8 @@
 <nav class="flex-1 px-3 py-4 space-y-1">
             @php
                 $current = request()->route()->getName() ?? 'dashboard';
-                $rolUsuario = strtolower(Auth::user()->rol?->rol_nombre ?? '');
+                $rolUsuario = strtolower(Auth::user()->rol?->rol_nombre ?? ''); // Usado en $navItems abajo
+                $esDirector = \App\Enums\RolEnum::equals(Auth::user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR);
 
                 // 1. Iniciamos con los elementos base que ve el procurador (y todos)
                 $navItems = [
@@ -102,7 +103,7 @@
         </nav>
 
 {{-- Nuevo caso button (Oculto para el procurador ya que él no crea casos) --}}
-        @if (strtolower(Auth::user()->rol?->rol_nombre ?? '') !== 'procurador')
+        @if ($esDirector)
             <div class="px-3 pb-4">
                 <a href="{{ route('casos.create') }}"
                    class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-150">

@@ -10,6 +10,7 @@ use App\Models\Procurador;
 use App\Models\Reasignacion;
 use App\Models\TipoTramite;
 use Illuminate\Http\Request;
+use App\Enums\RolEnum;
 use App\Http\Requests\StoreCasoRequest;
 use App\Http\Requests\UpdateCasoRequest;
 use Illuminate\Support\Facades\Gate;
@@ -21,7 +22,7 @@ class CasoController extends Controller
     {
         $queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador', 'audiencias'])->orderBy('created_at', 'desc');
 
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador') {
+        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
             $queryCasos->where('procurador_id', auth()->user()->procurador_id);
         }
         $casos = $queryCasos->get();

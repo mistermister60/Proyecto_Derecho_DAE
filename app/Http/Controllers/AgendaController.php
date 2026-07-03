@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolEnum;
 use App\Models\Audiencia;
 use Carbon\Carbon;
 
@@ -15,7 +16,7 @@ class AgendaController extends Controller
             ->orderBy('audiencia_hora');
 
         // 2. Si es procurador, filtramos por sus casos. Si es Director, se salta este IF y ve todo.
-        if (strtolower(auth()->user()->rol?->rol_nombre ?? '') === 'procurador') {
+        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
             $query->whereHas('caso', function ($q) {
                 $q->where('procurador_id', auth()->user()->procurador_id);
             });

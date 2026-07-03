@@ -16,13 +16,14 @@
         </div>
         <div class="flex items-center gap-2">
             <x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" />
-@if (strtolower(Auth::user()->rol?->rol_nombre ?? '') !== 'procurador')
+@php($esDirector = \App\Enums\RolEnum::equals(Auth::user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
+            @if ($esDirector)
                 <a href="{{ route('casos.reasignar', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
                    style="background: #A855F7; color: white;" onmouseover="this.style.background='#9333EA';" onmouseout="this.style.background='#A855F7';">
                     Reasignar
                 </a>
             @endif
-            @if (strtolower(Auth::user()->rol?->rol_nombre ?? '') !== 'procurador')
+            @if ($esDirector)
             <a href="{{ route('casos.edit', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;" onmouseover="this.style.background='#E5E7EB';" onmouseout="this.style.background='#F3F4F6';">
                 Editar

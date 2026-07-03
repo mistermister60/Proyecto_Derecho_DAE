@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\RolEnum;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,10 +17,8 @@ class CheckRole
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 
-        $userRole = strtolower($user->rol->rol_nombre);
-
         foreach ($roles as $role) {
-            if ($userRole === strtolower($role)) {
+            if (RolEnum::equals($user->rol->rol_nombre, RolEnum::from(strtolower($role)))) {
                 return $next($request);
             }
         }
