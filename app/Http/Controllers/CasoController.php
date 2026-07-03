@@ -19,12 +19,22 @@ class CasoController extends Controller
 {
     public function index()
     {
-        $queryCasos = Caso::with(['cliente', 'tipoTramite', 'estado', 'procurador', 'audiencias'])->orderBy('created_at', 'desc');
+        $esProcurador = RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR);
 
-        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
-            $queryCasos->where('procurador_id', auth()->user()->procurador_id);
-        }
-        $casos = $queryCasos->get();
+        // Query base reutilizada para tabla (paginada) y kanban (get completo)
+        $base = Caso::when($esProcurador, fn ($q) => $q->where('procurador_id', auth()->user()->procurador_id));
+
+        // Vista tabla: paginada — evita cargar cientos de expedientes en memoria
+        $casos = (clone $base)
+            ->with(['cliente', 'tipoTramite', 'estado', 'procurador', 'audiencias'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        // Vista kanban: get() liviano — solo los campos necesarios para las tarjetas
+        $casosKanban = (clone $base)
+            ->with(['cliente:cliente_id,cliente_nombre,cliente_apellido', 'tipoTramite:tipo_tramite_id,tramite_nombre', 'audiencias:audiencia_id,caso_id,audiencia_fecha'])
+            ->select('caso_id', 'caso_numero_expediente', 'estado_id', 'cliente_id', 'tipo_tramite_id', 'procurador_id')
+            ->get();
 
         $estados = EstadoCaso::where('estado_tipo', 'pipeline')
             ->orderBy('estado_orden')
@@ -35,9 +45,8 @@ class CasoController extends Controller
         // Datos agrupados para kanban
         $columnas = [];
         foreach ($estados as $estado) {
-            $casosEnEstado = $casos->where('estado_id', $estado->estado_id);
             $tarjetas = [];
-            foreach ($casosEnEstado as $caso) {
+            foreach ($casosKanban->where('estado_id', $estado->estado_id) as $caso) {
                 $tarjetas[$caso->caso_numero_expediente] = [
                     $caso->cliente?->nombre_completo ?? 'Sin cliente',
                     $caso->tipoTramite?->tramite_nombre ?? 'Sin trámite',

@@ -67,6 +67,11 @@
             </tr>
             @endforelse
         </x-tabla>
+        @if ($casos->hasPages())
+        <div class="px-4 py-3 border-t" style="border-color: #E5E7EB;">
+            {{ $casos->links() }}
+        </div>
+        @endif
     </div>
 
     {{-- ==================== VISTA KANBAN ==================== --}}
