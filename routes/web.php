@@ -34,14 +34,7 @@ Route::get('/manifest.json', function () {
     ]);
 })->name('pwa.manifest');
 
-Route::get('/sw.js', function () {
-    $content = file_get_contents(public_path('sw.js'));
-
-    return response($content, 200, [
-        'Content-Type' => 'application/javascript',
-        'Cache-Control' => 'public, max-age=86400',
-    ]);
-})->name('pwa.sw');
+// /sw.js se sirve directamente desde public/sw.js (sin closure PHP)
 
 Route::get('/offline.html', function () {
     $content = file_get_contents(public_path('offline.html'));

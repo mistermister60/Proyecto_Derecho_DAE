@@ -36,13 +36,15 @@ class SistemaInmunologicoTest extends TestCase
 
     public function test_creacion_de_caso_escribe_en_audit_log(): void
     {
-        Log::spy();
+        $mockLog = \Mockery::mock();
+        $mockLog->shouldReceive('info')->once();
 
-        $caso = $this->crearCasoBase();
-
-        Log::shouldHaveReceived('channel')
+        Log::shouldReceive('channel')
             ->with('audit')
-            ->once();
+            ->once()
+            ->andReturn($mockLog);
+
+        $this->crearCasoBase();
     }
 
     // ── Canal audit registra modificación ─────────────────────────────────
@@ -51,13 +53,15 @@ class SistemaInmunologicoTest extends TestCase
     {
         $caso = $this->crearCasoBase();
 
-        Log::spy();
+        $mockLog = \Mockery::mock();
+        $mockLog->shouldReceive('info')->once();
+
+        Log::shouldReceive('channel')
+            ->with('audit')
+            ->once()
+            ->andReturn($mockLog);
 
         $caso->update(['caso_juzgado' => 'J-7']);
-
-        Log::shouldHaveReceived('channel')
-            ->with('audit')
-            ->once();
     }
 
     // ── Política de contraseñas (A1) ───────────────────────────────────────

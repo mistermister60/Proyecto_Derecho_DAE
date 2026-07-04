@@ -72,15 +72,15 @@ class NotificationSubscriptionTest extends TestCase
         $this->assertContains('logo.png', $sources);
     }
 
-    public function test_service_worker_is_accessible(): void
+    public function test_service_worker_file_exists_in_public(): void
     {
-        $response = $this->get(route('pwa.sw'));
+        $path = public_path('sw.js');
+        $this->assertFileExists($path);
 
-        $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'application/javascript');
-        $response->assertSee('pwa-app-v1', false);
-        $response->assertSee('OFFLINE_URL', false);
-        $response->assertSee('networkFirstNavigate', false);
+        $content = file_get_contents($path);
+        $this->assertStringContainsString('pwa-app-v1', $content);
+        $this->assertStringContainsString('OFFLINE_URL', $content);
+        $this->assertStringContainsString('networkFirstNavigate', $content);
     }
 
     public function test_offline_page_is_accessible(): void
