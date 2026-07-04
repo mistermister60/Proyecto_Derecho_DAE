@@ -9,6 +9,7 @@ use App\Exceptions\RateLimitExceededException;
 use App\Http\Requests\LoginCredentialsRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 
@@ -23,7 +24,7 @@ class AuthController extends BaseController
         return response()->view('auth.login');
     }
 
-    public function login(LoginCredentialsRequest $request): JsonResponse
+    public function login(LoginCredentialsRequest $request): RedirectResponse
     {
         try {
             $authResponse = $this->authService->attemptLogin(
@@ -31,18 +32,12 @@ class AuthController extends BaseController
                 $request->input('contrasena')
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Inicio de sesión exitoso',
-                'data' => $authResponse->toArray(),
-            ], 200);
+            return redirect()->intended(route('dashboard'));
 
         } catch (AuthenticationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-                'error_code' => $this->getErrorCode($e),
-            ], $this->getHttpStatusCode($e));
+            return back()->withErrors([
+                'email' => $e->getMessage(),
+            ])->onlyInput('email');
         }
     }
 

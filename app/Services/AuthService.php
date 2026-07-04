@@ -30,6 +30,8 @@ class AuthService
         $this->validateCredentials($usuario, $password, $email);
         $this->validateAccountStatus($usuario);
 
+        Auth::login($usuario);
+
         $token = $this->generateToken($usuario);
         $this->recordSuccessfulLogin($email);
 

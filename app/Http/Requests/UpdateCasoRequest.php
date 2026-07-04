@@ -9,11 +9,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCasoRequest extends FormRequest
 {
+    public ?Caso $caso = null;
+
     public function authorize(): bool
     {
-        $caso = Caso::where('caso_numero_expediente', $this->route('expediente'))->firstOrFail();
+        $this->caso = Caso::where('caso_numero_expediente', $this->route('expediente'))->firstOrFail();
 
-        return $this->user()->can('update', $caso);
+        return $this->user()->can('update', $this->caso);
     }
 
     public function rules(): array
