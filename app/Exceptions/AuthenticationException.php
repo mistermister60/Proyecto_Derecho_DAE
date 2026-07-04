@@ -17,17 +17,4 @@ class AuthenticationException extends Exception
     }
 }
 
-class AccountInactiveException extends AuthenticationException
-{
-    protected $message = 'Su cuenta está desactivada.';
-}
 
-class InvalidCredentialsException extends AuthenticationException
-{
-    protected $message = 'Las credenciales proporcionadas son incorrectas.';
-}
-
-class RateLimitExceededException extends AuthenticationException
-{
-    protected $message = 'Demasiados intentos de inicio de sesión. Por favor, intente nuevamente más tarde.';
-}
