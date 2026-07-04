@@ -30,6 +30,8 @@ class AuthService
         $this->validateCredentials($usuario, $password, $email);
         $this->validateAccountStatus($usuario);
 
+        Auth::login($usuario);
+
         $token = $this->generateToken($usuario);
         $this->recordSuccessfulLogin($email);
 
@@ -68,7 +70,7 @@ class AuthService
 
     private function isValidPassword(string $hashedPassword, string $plainPassword): bool
     {
-        return Hash::verify($plainPassword, $hashedPassword);
+        return Hash::check($plainPassword, $hashedPassword);
     }
 
     private function validateAccountStatus(Usuario $usuario): void

@@ -69,7 +69,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 // NOTIFICACIONES PUSH INTEGRACIÓN
-definir async function subscribeToPushNotifications() {
+async function subscribeToPushNotifications() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
         console.log('Push notifications no soportadas');
         return false;

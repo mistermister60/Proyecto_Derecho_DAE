@@ -47,7 +47,7 @@ class PwaController extends Controller
                 return response()->json(['error' => 'Formato de suscripción inválido'], 422);
             }
 
-            $userId = $request->input('user_id');
+            $userId = auth()->id();
 
             $success = $this->pwaService->subscribeToPush($userId, $subscription);
 
@@ -60,7 +60,7 @@ class PwaController extends Controller
         } catch (\Exception $e) {
             Log::error('Error en suscripción push: '.$e->getMessage(), [
                 'exception' => $e,
-                'request' => $request->all(),
+                'usuario_id' => auth()->id(),
             ]);
 
             return response()->json(['error' => 'Error interno del servidor'], 500);
@@ -79,7 +79,7 @@ class PwaController extends Controller
                 return response()->json(['error' => 'Formato de suscripción inválido'], 422);
             }
 
-            $userId = $request->input('user_id');
+            $userId = auth()->id();
 
             $success = $this->pwaService->unsubscribeFromPush($userId, $subscription);
 
@@ -92,7 +92,7 @@ class PwaController extends Controller
         } catch (\Exception $e) {
             Log::error('Error en desuscripción push: '.$e->getMessage(), [
                 'exception' => $e,
-                'request' => $request->all(),
+                'usuario_id' => auth()->id(),
             ]);
 
             return response()->json(['error' => 'Error interno del servidor'], 500);

@@ -120,7 +120,7 @@ class CasoController extends Controller
 
     public function update(UpdateCasoRequest $request, string $expediente)
     {
-        $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+        $caso = $request->caso;
 
         $validated = $request->validated();
         if ($request->esDirector()) {
