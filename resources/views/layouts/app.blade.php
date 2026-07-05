@@ -151,12 +151,48 @@
                 </div>
 
                 {{-- Notificaciones --}}
-                <button class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                    </svg>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: #EF4444;"></span>
-                </button>
+                <div class="relative" x-data="{ openNotif: false }" @click.outside="openNotif = false">
+                    <button @click="openNotif = !openNotif" class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        @if(isset($notificacionesPendientes) && $notificacionesPendientes > 0)
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: #EF4444;"></span>
+                        @endif
+                    </button>
+
+                    {{-- Dropdown --}}
+                    <div x-show="openNotif" x-cloak x-transition
+                         class="absolute top-12 right-0 w-80 rounded-xl shadow-lg border py-1 z-50"
+                         style="background: #FFFFFF; border-color: #E5E7EB;">
+                        <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E5E7EB;">
+                            <p class="text-sm font-semibold" style="color: #111827;">Notificaciones</p>
+                            <span class="text-xs px-2 py-0.5 rounded-full" style="background: #EFF6FF; color: #2563EB;">
+                                {{ $notificacionesPendientes ?? 0 }} nueva(s)
+                            </span>
+                        </div>
+                        <div class="max-h-72 overflow-y-auto">
+                            @forelse($notificaciones ?? [] as $notif)
+                                <div class="px-4 py-3 flex gap-3 items-start transition-colors duration-100" style="border-bottom: 1px solid #F3F4F6;"
+                                     onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                                    <div class="flex items-center justify-center rounded-full shrink-0 mt-0.5" style="width: 8px; height: 8px; background: #2563EB;"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm" style="color: #374151;">{{ $notif['mensaje'] }}</p>
+                                        <p class="text-xs mt-1" style="color: #9CA3AF;">{{ $notif['fecha'] }}</p>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="px-4 py-8 text-center">
+                                    <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                    </svg>
+                                    <p class="text-sm" style="color: #9CA3AF;">No hay notificaciones</p>
+                                    <p class="text-xs mt-1" style="color: #D1D5DB;">Aparecerán aquí las actualizaciones de tus casos</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Usuario --}}
                 <div class="flex items-center gap-2 cursor-pointer" x-data="{ open: false }" @click.outside="open = false">
