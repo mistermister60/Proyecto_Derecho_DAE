@@ -151,8 +151,8 @@
                 </div>
 
                 {{-- Notificaciones --}}
-                <div class="relative" x-data="{ openNotif: false }" @click.outside="openNotif = false">
-                    <button @click="openNotif = !openNotif" class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                <div class="relative" x-data="{ openNotif: false }">
+                    <button @click="openNotif = !openNotif; $event.stopPropagation()" class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                         </svg>
@@ -162,7 +162,11 @@
                     </button>
 
                     {{-- Dropdown --}}
-                    <div x-show="openNotif" x-cloak x-transition
+                    <div x-show="openNotif" x-cloak x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                         @click.outside="openNotif = false" @keydown.escape.window="openNotif = false"
                          class="absolute top-12 right-0 w-80 rounded-xl shadow-lg border py-1 z-50"
                          style="background: #FFFFFF; border-color: #E5E7EB;">
                         <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E5E7EB;">
@@ -195,20 +199,26 @@
                 </div>
 
                 {{-- Usuario --}}
-                <div class="flex items-center gap-2 cursor-pointer" x-data="{ open: false }" @click.outside="open = false">
-                    <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
-                        {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
+                <div class="relative" x-data="{ open: false }">
+                    <div class="flex items-center gap-2 cursor-pointer" @click="open = !open">
+                        <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
+                            {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
+                        </div>
+                        <div class="text-sm" style="color: #111827;">
+                            <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
+                        </div>
+                        <svg :class="open ? 'rotate-180' : ''" class="transition-transform duration-200" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
                     </div>
-                    <div class="text-sm" style="color: #111827;">
-                        <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
-                    </div>
-                    <svg @click="open = !open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280; cursor: pointer;">
-                        <polyline points="6 9 12 15 18 9"/>
-                    </svg>
 
                     {{-- Dropdown menú --}}
-                    <div x-show="open" x-cloak
-                         class="absolute top-14 right-4 w-48 rounded-lg shadow-lg border py-1 z-50"
+                    <div x-show="open" x-cloak @click.outside="open = false" @keydown.escape.window="open = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute top-12 right-0 w-48 rounded-lg shadow-lg border py-1 z-50"
                          style="background: #FFFFFF; border-color: #E5E7EB;">
                         <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
                             <p class="text-xs" style="color: #9CA3AF;">{{ Auth::user()->email }}</p>

@@ -57,7 +57,7 @@
     </div>
 
     {{-- TAB: RESUMEN --}}
-    <div x-show="tab === 'resumen'" class="grid grid-cols-2 gap-6">
+    <div x-show="tab === 'resumen'" x-cloak class="grid grid-cols-2 gap-6">
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información del caso</h3>
             <dl class="space-y-3">
@@ -113,7 +113,7 @@
     </div>
 
     {{-- TAB: RELACIÓN DE HECHOS --}}
-    <div x-show="tab === 'hechos'" class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div x-show="tab === 'hechos'" x-cloak class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Relación de hechos</h3>
         <div class="prose prose-sm max-w-none" style="color: #374151;">
             <p>{{ $caso->caso_relacion_hechos }}</p>
@@ -166,7 +166,7 @@
     </div>
 
     {{-- TAB: DOCUMENTOS --}}
-    <div x-show="tab === 'documentos'" class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div x-show="tab === 'documentos'" x-cloak class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-semibold" style="color: #111827;">Documentos del caso</h3>
         </div>
@@ -219,7 +219,7 @@
     </div>
 
     {{-- TAB: BITÁCORA --}}
-    <div x-show="tab === 'bitacora'" class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div x-show="tab === 'bitacora'" x-cloak class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         
         {{-- Formulario para registrar nuevo seguimiento --}}
         <div class="mb-8 p-5 rounded-xl bg-gray-50 border border-gray-200" x-data="{ 
