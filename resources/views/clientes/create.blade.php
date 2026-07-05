@@ -5,14 +5,14 @@
 @section('content')
 <form action="{{ route('clientes.store') }}" method="POST">
     @csrf
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo Cliente</h1>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('clientes.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a href="{{ route('clientes.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center justify-center flex-1 sm:flex-none"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Cancelar
             </a>
-            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center justify-center flex-1 sm:flex-none"
                     style="background: #2563EB; color: white;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
                 Guardar Cliente
             </button>
@@ -21,24 +21,24 @@
 
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Datos personales</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Nombre completo</label>
-                <input type="text" name="nombre_completo" value="{{ old('nombre_completo') }}" required placeholder="Ej: María López" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <input type="text" name="nombre_completo" value="{{ old('nombre_completo') }}" required placeholder="Ej: María López" class="w-full rounded-lg px-3 py-2 text-sm outline-none min-h-[44px]" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('nombre_completo')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">DNI</label>
-                <input type="text" name="cliente_dni" value="{{ old('cliente_dni') }}" required placeholder="Ej: 12345678" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <input type="text" name="cliente_dni" value="{{ old('cliente_dni') }}" required placeholder="Ej: 12345678" class="w-full rounded-lg px-3 py-2 text-sm outline-none min-h-[44px]" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                 @error('cliente_dni')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Estado civil</label>
-                <select name="cliente_estado_civil" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+                <select name="cliente_estado_civil" required class="w-full rounded-lg px-3 py-2 text-sm outline-none min-h-[44px]" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar...</option>
                     <option value="Soltero/a" {{ old('cliente_estado_civil') == 'Soltero/a' ? 'selected' : '' }}>Soltero/a</option>
                     <option value="Casado/a" {{ old('cliente_estado_civil') == 'Casado/a' ? 'selected' : '' }}>Casado/a</option>
@@ -69,7 +69,7 @@
 
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información laboral y familiar</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Número de hijos</label>
                 <input type="number" name="cliente_numero_hijos" value="{{ old('cliente_numero_hijos', 0) }}" min="0" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">

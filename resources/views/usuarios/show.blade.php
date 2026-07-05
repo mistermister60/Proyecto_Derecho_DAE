@@ -5,9 +5,9 @@
 @section('content')
 <div>
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
         <div class="flex items-center gap-3">
-            <div class="flex items-center justify-center rounded-full" style="width: 48px; height: 48px; background: #1E3A5F; color: white; font-size: 18px; font-weight: 600;">
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 48px; height: 48px; background: #1E3A5F; color: white; font-size: 18px; font-weight: 600;">
                 {{ strtoupper(substr(explode(' ', $usuario->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', $usuario->usuario_nombre)[1] ?? '', 0, 1)) }}
             </div>
             <div>
@@ -15,8 +15,8 @@
                 <p class="text-sm" style="color: #6B7280;">{{ $usuario->email }}</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('usuarios.edit', $usuario->usuario_id) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ route('usuarios.edit', $usuario->usuario_id) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Editar
             </a>
@@ -24,7 +24,7 @@
                 <form action="{{ route('usuarios.destroy', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Desactivar usuario?" data-text="El usuario no podrá iniciar sesión." data-icon="warning" data-confirm-text="Sí, desactivar" style="display:inline;">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"
                             style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;"
                             onmouseover="this.style.background='#FECACA';" onmouseout="this.style.background='#FEE2E2';">
                         Desactivar
@@ -33,7 +33,7 @@
             @else
                 <form action="{{ route('usuarios.activar', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Activar usuario?" data-text="El usuario podrá iniciar sesión nuevamente." data-icon="question" data-confirm-text="Sí, activar" style="display:inline;">
                     @csrf
-                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"
                             style="background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0;"
                             onmouseover="this.style.background='#A7F3D0';" onmouseout="this.style.background='#D1FAE5';">
                         Activar
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {{-- Información del usuario --}}
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información del usuario</h3>

@@ -5,7 +5,7 @@
 @section('content')
 <div x-data="{ vista: 'tabla', search: '', filtroEstado: '', filtroTramite: '' }">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
         <div class="flex items-center gap-3">
             <div class="flex rounded-lg overflow-hidden" style="border: 1px solid #E5E7EB;">
                 <button @click="vista = 'tabla'"
@@ -23,22 +23,22 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
-            <select x-model="filtroEstado" class="text-sm rounded-lg px-3 py-1.5 outline-none" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            <select x-model="filtroEstado" class="text-sm rounded-lg px-3 py-1.5 outline-none w-full sm:w-auto" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
                 <option value="">Todos los estados</option>
                 @foreach ($estados as $estado)
                 <option value="{{ $estado->estado_nombre }}">{{ $estado->estado_nombre }}</option>
                 @endforeach
             </select>
 
-            <select x-model="filtroTramite" class="text-sm rounded-lg px-3 py-1.5 outline-none" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
+            <select x-model="filtroTramite" class="text-sm rounded-lg px-3 py-1.5 outline-none w-full sm:w-auto" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
                 <option value="">Todos los trámites</option>
                 @foreach ($tramites as $tramite)
                 <option value="{{ $tramite->tramite_nombre }}">{{ $tramite->tramite_nombre }}</option>
                 @endforeach
             </select>
 
-            <a href="{{ route('casos.create') }}" class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
+            <a href="{{ route('casos.create') }}" class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] w-full sm:w-auto"
                style="background: #2563EB; color: white;"
                onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -75,9 +75,9 @@
     </div>
 
     {{-- ==================== VISTA KANBAN ==================== --}}
-    <div x-show="vista === 'kanban'" class="flex gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
+    <div x-show="vista === 'kanban'" class="flex gap-3 md:gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
         @foreach ($columnas as $estado => [$color, $tarjetas])
-        <div class="flex flex-col rounded-xl shrink-0" style="width: 220px; background: #F3F4F6;">
+        <div class="flex flex-col rounded-xl shrink-0 min-w-[200px] md:min-w-[220px]" style="background: #F3F4F6;">
             <div class="flex items-center gap-2 px-3 py-3">
                 <span class="rounded-full" style="width: 8px; height: 8px; background: {{ $color }}; display: inline-block;"></span>
                 <span class="text-xs font-semibold uppercase tracking-wider" style="color: #6B7280;">{{ $estado }}</span>

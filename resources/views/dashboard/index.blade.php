@@ -5,7 +5,7 @@
 @section('content')
 <div x-data="dashboardData()" x-init="initCharts()">
     {{-- KPIs --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4 mb-6">
         <x-kpi-card titulo="Casos activos" :valor="$casosActivos" color="#2563EB"
             icono='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' />
 
@@ -24,23 +24,27 @@
     </div>
 
     {{-- Gráficas --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div class="col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+        <div class="lg:col-span-2 rounded-xl p-4 md:p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Casos por estado del pipeline</h3>
-            <canvas id="pipelineChart" height="200"></canvas>
+            <div class="overflow-x-auto">
+                <canvas id="pipelineChart" height="200"></canvas>
+            </div>
         </div>
 
-        <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+        <div class="rounded-xl p-4 md:p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Por tipo de trámite</h3>
-            <canvas id="tipoChart" height="200"></canvas>
+            <div class="overflow-x-auto">
+                <canvas id="tipoChart" height="200"></canvas>
+            </div>
         </div>
     </div>
 
     {{-- Audiencias + Carga procuradores --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {{-- Próximas audiencias --}}
         <div class="rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
-            <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid #E5E7EB;">
+            <div class="flex items-center justify-between px-4 py-3 md:px-5 md:py-4" style="border-bottom: 1px solid #E5E7EB;">
                 <h3 class="text-sm font-semibold" style="color: #111827;">Próximas audiencias</h3>
                 <a href="{{ route('agenda.index') }}" class="text-xs font-medium flex items-center gap-1 transition-colors" style="color: #2563EB;">
                     Ver todo
@@ -49,41 +53,41 @@
             </div>
             <div class="divide-y" style="border-color: #E5E7EB;">
                 @forelse ($proximasAudiencias as $aud)
-                <div class="flex items-center gap-4 px-5 py-3 transition-colors" style="cursor: pointer;" onclick="window.location='{{ route('casos.show', $aud->caso->caso_numero_expediente) }}'" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                <div class="flex items-center gap-3 md:gap-4 px-4 py-2.5 md:px-5 md:py-3 transition-colors" style="cursor: pointer;" onclick="window.location='{{ route('casos.show', $aud->caso->caso_numero_expediente) }}'" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
                     <div class="text-center shrink-0">
                         <div class="text-sm font-bold" style="color: #2563EB;">{{ \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') }}</div>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-medium" style="color: #111827;">{{ $aud->caso->caso_numero_expediente }}</span>
-                            <span class="text-xs px-1.5 py-0.5 rounded" style="background: #F3F4F6; color: #6B7280;">{{ $aud->audiencia_juzgado }}</span>
+                            <span class="text-xs px-1.5 py-0.5 rounded hidden sm:inline" style="background: #F3F4F6; color: #6B7280;">{{ $aud->audiencia_juzgado }}</span>
                         </div>
-                        <p class="text-xs mt-0.5" style="color: #6B7280;">{{ $aud->audiencia_tipo }} — {{ $aud->procurador->nombre_completo }}</p>
+                        <p class="text-xs mt-0.5 truncate" style="color: #6B7280;">{{ $aud->audiencia_tipo }} — {{ $aud->procurador->nombre_completo }}</p>
                     </div>
-                    <span class="text-xs font-medium" style="color: #9CA3AF;">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m') }}</span>
+                    <span class="text-xs font-medium shrink-0" style="color: #9CA3AF;">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m') }}</span>
                 </div>
                 @empty
-                <div class="px-5 py-8 text-center text-sm" style="color: #9CA3AF;">No hay audiencias programadas</div>
+                <div class="px-4 py-8 text-center text-sm" style="color: #9CA3AF;">No hay audiencias programadas</div>
                 @endforelse
             </div>
         </div>
 
         {{-- Carga por procurador --}}
         <div class="rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
-            <div class="px-5 py-4" style="border-bottom: 1px solid #E5E7EB;">
+            <div class="px-4 py-3 md:px-5 md:py-4" style="border-bottom: 1px solid #E5E7EB;">
                 <h3 class="text-sm font-semibold" style="color: #111827;">Carga por procurador</h3>
             </div>
             <div class="divide-y" style="border-color: #E5E7EB;">
                 @foreach ($procuradores as $proc)
-                <div class="flex items-center gap-3 px-5 py-3">
+                <div class="flex items-center gap-3 px-4 py-2.5 md:px-5 md:py-3">
                     <div class="flex items-center justify-center rounded-full shrink-0" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 11px; font-weight: 600;">
                         {{ strtoupper(substr($proc->procurador_nombre, 0, 1)) }}{{ strtoupper(substr($proc->procurador_apellido, 0, 1)) }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium" style="color: #111827;">{{ $proc->nombre_completo }}</p>
+                        <p class="text-sm font-medium truncate" style="color: #111827;">{{ $proc->nombre_completo }}</p>
                         <p class="text-xs" style="color: #9CA3AF;">Carnet {{ $proc->procurador_carnet }}</p>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right shrink-0">
                         <p class="text-sm font-bold" style="color: #111827;">{{ $proc->total_casos }}</p>
                         <p class="text-xs" style="color: #6B7280;">{{ $proc->activos }} activos</p>
                     </div>

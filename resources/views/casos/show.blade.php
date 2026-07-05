@@ -5,26 +5,26 @@
 @section('content')
 <div x-data="{ tab: 'resumen' }">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
         <div>
-            <h1 class="text-xl font-bold" style="color: #111827;">Expediente {{ $caso->caso_numero_expediente }}</h1>
+            <h1 class="text-lg md:text-xl font-bold" style="color: #111827;">Expediente {{ $caso->caso_numero_expediente }}</h1>
             <p class="text-sm mt-1" style="color: #6B7280;">
                 {{ $caso->cliente?->nombre_completo ?? 'Sin cliente' }}
                 <span class="mx-2">•</span>
                 {{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}
             </p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" />
             @php($esDirector = \App\Enums\RolEnum::equals(Auth::user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
             @if ($esDirector)
-                <a href="{{ route('casos.reasignar', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                <a href="{{ route('casos.reasignar', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center"
                    style="background: #A855F7; color: white;" onmouseover="this.style.background='#9333EA';" onmouseout="this.style.background='#A855F7';">
                     Reasignar
                 </a>
             @endif
             @if ($esDirector)
-            <a href="{{ route('casos.edit', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            <a href="{{ route('casos.edit', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;" onmouseover="this.style.background='#E5E7EB';" onmouseout="this.style.background='#F3F4F6';">
                 Editar
             </a>
@@ -33,23 +33,23 @@
     </div>
 
     {{-- Tabs --}}
-    <div class="flex gap-1 mb-5 rounded-lg" style="background: #F3F4F6; padding: 3px;">
-        <button @click="tab = 'resumen'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
+    <div class="flex gap-1 mb-5 rounded-lg overflow-x-auto flex-nowrap" style="background: #F3F4F6; padding: 3px;">
+        <button @click="tab = 'resumen'" class="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap"
                 :style="tab === 'resumen' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Resumen
         </button>
-        <button @click="tab = 'hechos'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
+        <button @click="tab = 'hechos'" class="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap"
                 :style="tab === 'hechos' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Relación de hechos
         </button>
-        <button @click="tab = 'documentos'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
+        <button @click="tab = 'documentos'" class="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap"
                 :style="tab === 'documentos' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             Documentos
         </button>
-        <button @click="tab = 'bitacora'" class="px-4 py-2 text-sm font-medium rounded-md transition-all"
+        <button @click="tab = 'bitacora'" class="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap"
                 :style="tab === 'bitacora' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             Bitácora
@@ -57,21 +57,21 @@
     </div>
 
     {{-- TAB: RESUMEN --}}
-    <div x-show="tab === 'resumen'" class="grid grid-cols-2 gap-6">
+    <div x-show="tab === 'resumen'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información del caso</h3>
             <dl class="space-y-3">
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Expediente</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_numero_expediente }}</dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Estado</dt><dd><x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" /></dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Tipo de trámite</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Parte representada</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_parte_representada }}</dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Juzgado</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_juzgado ?? 'Pendiente' }}</dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Fecha de interposición</dt><dd class="text-sm font-medium" style="color: #111827;">{{ \Carbon\Carbon::parse($caso->caso_fecha_interpuesta)->format('d/m/Y') }}</dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Fecha de asignación</dt><dd class="text-sm font-medium" style="color: #111827;">{{ \Carbon\Carbon::parse($caso->caso_fecha_asignacion)->format('d/m/Y') }}</dd></div>
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Admisible</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_admisible ? 'Sí' : 'No' }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Expediente</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_numero_expediente }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Estado</dt><dd><x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" /></dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Tipo de trámite</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Parte representada</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_parte_representada }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Juzgado</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_juzgado ?? 'Pendiente' }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Fecha de interposición</dt><dd class="text-sm font-medium" style="color: #111827;">{{ \Carbon\Carbon::parse($caso->caso_fecha_interpuesta)->format('d/m/Y') }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Fecha de asignación</dt><dd class="text-sm font-medium" style="color: #111827;">{{ \Carbon\Carbon::parse($caso->caso_fecha_asignacion)->format('d/m/Y') }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Admisible</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->caso_admisible ? 'Sí' : 'No' }}</dd></div>
 
-                <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Cantidad de hijos</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->cliente?->cliente_numero_hijos ?? 0 }}</dd></div>
-                <div class="flex justify-between flex-col sm:flex-row gap-1"><dt class="text-sm" style="color: #6B7280;">Nombres de los hijos</dt><dd class="text-sm font-medium text-right" style="color: #111827;">{{ $caso->cliente?->cliente_nombres_hijos ?? 'Ninguno' }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Cantidad de hijos</dt><dd class="text-sm font-medium" style="color: #111827;">{{ $caso->cliente?->cliente_numero_hijos ?? 0 }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1"><dt class="text-sm" style="color: #6B7280;">Nombres de los hijos</dt><dd class="text-sm font-medium text-right" style="color: #111827;">{{ $caso->cliente?->cliente_nombres_hijos ?? 'Ninguno' }}</dd></div>
             </dl>
         </div>
 
@@ -171,7 +171,7 @@
             <h3 class="text-sm font-semibold" style="color: #111827;">Documentos del caso</h3>
         </div>
         @forelse ($caso->documentos as $doc)
-        <div class="flex items-center gap-4 p-3 rounded-lg mb-2" style="border: 1px solid #E5E7EB;">
+        <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg mb-2" style="border: 1px solid #E5E7EB;">
             <div class="flex items-center justify-center rounded-lg shrink-0" style="width: 40px; height: 40px; background: #F3F4F6;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
@@ -182,14 +182,16 @@
                 <p class="text-xs mt-1" style="color: #9CA3AF;">{{ $doc->documento_descripcion }}</p>
                 @endif
             </div>
-            <a href="{{ route('documentos.download', [$caso->caso_numero_expediente, $doc->documento_id]) }}"
-               class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background: #EFF6FF; color: #2563EB;">
-                Descargar
-            </a>
-            <form method="POST" action="{{ route('documentos.destroy', [$caso->caso_numero_expediente, $doc->documento_id]) }}" onsubmit="return confirm('¿Eliminar este documento?')">
-                @csrf @method('DELETE')
-                <button type="submit" class="text-xs px-2 py-1.5 rounded-lg" style="color: #EF4444; background: #FEF2F2;">Eliminar</button>
-            </form>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <a href="{{ route('documentos.download', [$caso->caso_numero_expediente, $doc->documento_id]) }}"
+                   class="text-xs px-3 py-1.5 rounded-lg font-medium min-h-[44px] inline-flex items-center justify-center flex-1 sm:flex-none" style="background: #EFF6FF; color: #2563EB;">
+                    Descargar
+                </a>
+                <form method="POST" action="{{ route('documentos.destroy', [$caso->caso_numero_expediente, $doc->documento_id]) }}" onsubmit="return confirm('¿Eliminar este documento?')" class="flex-1 sm:flex-none">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="text-xs px-2 py-1.5 rounded-lg min-h-[44px] w-full" style="color: #EF4444; background: #FEF2F2;">Eliminar</button>
+                </form>
+            </div>
         </div>
         @empty
         <div class="py-8 text-center">
@@ -253,45 +255,45 @@
                     {{-- Botones de Plantillas Rápidas --}}
                     <div class="md:col-span-2">
                         <span class="block text-xs font-medium text-gray-700 mb-1">Plantillas rápidas (Clic para aplicar)</span>
-                        <div class="flex flex-wrap gap-1.5">
+                        <div class="flex flex-nowrap md:flex-wrap gap-1.5 overflow-x-auto pb-1">
                             {{-- Presentado al Juzgado --}}
                             <button type="button" @click="aplicarPlantilla('YA FUE PRESENTADO AL JUZGADO', 'Presentación')" 
-                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-gray-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                 Presentado al Juzgado
                             </button>
 
                             {{-- Admitida (Hoy) --}}
                             <button type="button" @click="aplicarPlantilla('ADMITIDA EN FECHA {{ now()->format('d/m/Y') }}', 'Admisión')" 
-                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-green-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                 Admitida (Hoy)
                             </button>
 
                             {{-- Espera Audiencia --}}
                             <button type="button" @click="aplicarPlantilla('EN ESPERA DE SEÑALAMIENTO DE AUDIENCIA POR PARTE DEL JUZGADO', 'Audiencia')" 
-                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-amber-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 Espera Audiencia
                             </button>
 
                             {{-- Emplazado --}}
                             <button type="button" @click="aplicarPlantilla('YA FUE EMPLAZADO EL DEMANDANTE POR PARTE DEL JUZGADO', 'Notificación')" 
-                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-blue-500"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                                 Emplazado
                             </button>
 
                             {{-- Confirió / Presentó Poder --}}
                             <button type="button" @click="aplicarPlantilla('SE CONFIRIO PODER POR PARTE DE LA DEMANDANTE Y SE PRESENTO PODER YA ME NOTIFIQUE AL JUZGADO EL DIA ', 'Notificación')" 
-                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-purple-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
                                 Confirió/Presentó Poder
                             </button>
 
                             {{-- Desde Cero --}}
                             <button type="button" @click="aplicarPlantilla('CASO QUE SE LLEVARA DESDE CERO', 'Inicio')" 
-                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-indigo-500"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                                 Desde Cero
                             </button>

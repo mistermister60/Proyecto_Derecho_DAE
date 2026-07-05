@@ -6,14 +6,14 @@
 <form action="{{ route('casos.store') }}" method="POST">
     @csrf
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo caso</h1>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('casos.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a href="{{ route('casos.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center justify-center flex-1 sm:flex-none"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Cancelar
             </a>
-            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex-1 sm:flex-none"
                     style="background: #2563EB; color: white;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
                 Guardar caso
             </button>
@@ -39,7 +39,7 @@
     {{-- Sección: Tipo de trámite --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Tipo de trámite</h3>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Tipo de trámite</label>
                 <select name="tipo_tramite_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
@@ -72,7 +72,7 @@
     {{-- Sección: Asignación --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Asignación</h3>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Procurador asignado</label>
                 <select name="procurador_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">

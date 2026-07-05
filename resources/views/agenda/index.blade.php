@@ -5,13 +5,13 @@
 @section('content')
 <div x-data="{ mes: {{ now()->month }}, año: {{ now()->year }} }">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
         <h1 class="text-xl font-bold" style="color: #111827;">Agenda de audiencias</h1>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Calendario --}}
-        <div class="col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+        <div class="col-span-1 lg:col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <div class="flex items-center justify-between mb-4">
                 <button @click="mes = mes === 1 ? 12 : mes - 1; if(mes === 12) año--"
                         class="p-1.5 rounded-lg transition-colors" style="border: 1px solid #E5E7EB;"
@@ -87,6 +87,7 @@
     {{-- Todas las audiencias --}}
     <div class="rounded-xl p-5 mt-6" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Todas las audiencias</h3>
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr style="border-bottom: 1px solid #E5E7EB;">
@@ -125,6 +126,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 @endsection

@@ -6,14 +6,14 @@
 <form action="{{ route('demandados.update', $demandado->demandado_dni) }}" method="POST">
     @csrf
     @method('PUT')
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 class="text-xl font-bold" style="color: #111827;">Editar Demandado</h1>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('demandados.show', $demandado->demandado_dni) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a href="{{ route('demandados.show', $demandado->demandado_dni) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center justify-center flex-1 sm:flex-none"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Cancelar
             </a>
-            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center justify-center flex-1 sm:flex-none"
                     style="background: #2563EB; color: white;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
                 Guardar cambios
             </button>
@@ -22,7 +22,7 @@
 
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Datos personales</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Nombre</label>
                 <input type="text" name="demandado_nombre" value="{{ old('demandado_nombre', $demandado->demandado_nombre) }}" required placeholder="Ej: María" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
@@ -77,7 +77,7 @@
 
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información laboral</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Profesión</label>
                 <input type="text" name="demandado_profesion" value="{{ old('demandado_profesion', $demandado->demandado_profesion) }}" placeholder="Ej: Abogado" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">

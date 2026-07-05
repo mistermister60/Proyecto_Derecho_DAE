@@ -18,9 +18,9 @@
     }
 }">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
         <h1 class="text-xl font-bold" style="color: #111827;">Demandados</h1>
-        <a href="{{ route('demandados.create') }}" class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
+        <a href="{{ route('demandados.create') }}" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px]"
            style="background: #2563EB; color: white;"
            onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

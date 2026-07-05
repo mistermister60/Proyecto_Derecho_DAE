@@ -16,9 +16,9 @@
     }
 }">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
         <h1 class="text-xl font-bold" style="color: #111827;">Usuarios del Sistema</h1>
-        <a href="{{ route('usuarios.create') }}" class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-blue-600 text-white hover:bg-blue-700">
+        <a href="{{ route('usuarios.create') }}" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all bg-blue-600 text-white hover:bg-blue-700 min-h-[44px]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Nuevo usuario
         </a>
@@ -44,6 +44,7 @@
 
     {{-- Tabla de usuarios --}}
     <div class="rounded-xl overflow-hidden" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+        <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
@@ -108,6 +109,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
     {{ $usuarios->links() }}

@@ -9,19 +9,19 @@
     @method('PUT')
     
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>
             <h1 class="text-xl font-bold" style="color: #111827;">Editar caso</h1>
             <p class="text-xs font-semibold mt-1" style="color: #6B7280;">
                 Expediente: <span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200" style="color: #111827;">{{ $caso->caso_numero_expediente }}</span>
             </p>
         </div>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center justify-center flex-1 sm:flex-none"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Cancelar
             </a>
-            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex-1 sm:flex-none"
                     style="background: #2563EB; color: white;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
                 Guardar cambios
             </button>

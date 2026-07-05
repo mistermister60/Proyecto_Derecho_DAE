@@ -6,24 +6,24 @@
 <form action="{{ route('casos.storeReasignacion', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>
             <h1 class="text-xl font-bold" style="color: #111827;">Reasignar caso</h1>
             <p class="text-sm mt-1" style="color: #6B7280;">Expediente {{ $caso->caso_numero_expediente }}</p>
         </div>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center justify-center flex-1 sm:flex-none"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Cancelar
             </a>
-            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] flex-1 sm:flex-none"
                     style="background: #A855F7; color: white;" onmouseover="this.style.background='#9333EA';" onmouseout="this.style.background='#A855F7';">
                 Confirmar reasignación
             </button>
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {{-- Información actual --}}
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información actual</h3>
@@ -35,7 +35,7 @@
         </div>
 
         {{-- Nueva asignación --}}
-        <div class="col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+        <div class="md:col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Nuevo procurador</h3>
 
             <input type="hidden" name="procurador_origen_id" value="{{ $caso->procurador_id }}">

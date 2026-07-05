@@ -18,11 +18,25 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @PwaHead
 </head>
-<body>
+<body x-data="{ sidebarOpen: false }">
 
 <div class="flex h-screen w-full overflow-hidden">
     {{-- ==================== SIDEBAR ==================== --}}
-    <aside class="flex flex-col shrink-0 h-full" style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08);">
+    {{-- Mobile overlay --}}
+    <div x-show="sidebarOpen" x-cloak
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         @click="sidebarOpen = false"
+         class="fixed inset-0 bg-black/50 z-40 md:hidden">
+    </div>
+
+    <aside class="flex flex-col shrink-0 h-full transition-transform duration-300 ease-in-out
+                  max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:w-60
+                  md:relative md:translate-x-0"
+           :class="sidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'"
+           style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08);">
 
         {{-- Logo --}}
         <div class="flex items-center gap-3 px-5 py-5" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -72,6 +86,7 @@
                     $isActive = str_starts_with($current, explode('.', $item['route'])[0]);
                 @endphp
                 <a href="{{ route($item['route']) }}"
+                   @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
                    style="{{ $isActive ? 'background: rgba(37,99,235,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65); hover:background: rgba(255,255,255,0.08);' }}"
                    onmouseover="this.style.background='{{ $isActive ? 'rgba(37,99,235,0.2)' : 'rgba(255,255,255,0.08)' }}'; this.style.color='#FFFFFF';"
@@ -115,6 +130,7 @@
         @if ($esDirector)
             <div class="px-3 pb-4">
                 <a href="{{ route('casos.create') }}"
+                   @click="sidebarOpen = false"
                    class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
                    style="background: #2563EB; color: white;"
                    onmouseover="this.style.background='#1d4ed8';"
@@ -132,14 +148,20 @@
     <div class="flex flex-col flex-1 h-full overflow-hidden">
 
         {{-- Topbar --}}
-        <header class="flex items-center justify-between shrink-0 px-6 py-3" style="background: #FFFFFF; border-bottom: 1px solid #E5E7EB;">
+        <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #FFFFFF; border-bottom: 1px solid #E5E7EB;">
             <div class="flex items-center gap-3">
-                <h1 class="text-lg font-semibold" style="color: #111827;">@yield('title', 'Dashboard')</h1>
+                {{-- Hamburger (mobile only) --}}
+                <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 rounded-lg transition-colors" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';" aria-label="Abrir menú">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <h1 class="text-base md:text-lg font-semibold" style="color: #111827;">@yield('title', 'Dashboard')</h1>
             </div>
 
-            <div class="flex items-center gap-4">
-                {{-- Buscador --}}
-                <div class="relative" x-data="{ search: '' }">
+            <div class="flex items-center gap-2 md:gap-4">
+                {{-- Buscador (hidden on mobile) --}}
+                <div class="relative hidden sm:block" x-data="{ search: '' }">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
@@ -204,10 +226,10 @@
                         <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
                             {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
                         </div>
-                        <div class="text-sm" style="color: #111827;">
+                        <div class="text-sm hidden md:block" style="color: #111827;">
                             <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
                         </div>
-                        <svg :class="open ? 'rotate-180' : ''" class="transition-transform duration-200" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
+                        <svg :class="open ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
                             <polyline points="6 9 12 15 18 9"/>
                         </svg>
                     </div>
@@ -236,7 +258,7 @@
         </header>
 
         {{-- Contenido dinámico --}}
-        <main class="flex-1 overflow-auto p-6">
+        <main class="flex-1 overflow-auto p-4 md:p-6">
             @yield('content')
         </main>
     </div>
