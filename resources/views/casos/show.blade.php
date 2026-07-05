@@ -16,7 +16,7 @@
         </div>
         <div class="flex items-center gap-2">
             <x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" />
-@php($esDirector = \App\Enums\RolEnum::equals(Auth::user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
+            @php($esDirector = \App\Enums\RolEnum::equals(Auth::user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
             @if ($esDirector)
                 <a href="{{ route('casos.reasignar', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
                    style="background: #A855F7; color: white;" onmouseover="this.style.background='#9333EA';" onmouseout="this.style.background='#A855F7';">
@@ -57,7 +57,7 @@
     </div>
 
     {{-- TAB: RESUMEN --}}
-    <div x-show="tab === 'resumen'" x-cloak class="grid grid-cols-2 gap-6">
+    <div x-show="tab === 'resumen'" class="grid grid-cols-2 gap-6">
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información del caso</h3>
             <dl class="space-y-3">
@@ -113,7 +113,7 @@
     </div>
 
     {{-- TAB: RELACIÓN DE HECHOS --}}
-    <div x-show="tab === 'hechos'" x-cloak class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div x-show="tab === 'hechos'" class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Relación de hechos</h3>
         <div class="prose prose-sm max-w-none" style="color: #374151;">
             <p>{{ $caso->caso_relacion_hechos }}</p>
@@ -166,7 +166,7 @@
     </div>
 
     {{-- TAB: DOCUMENTOS --}}
-    <div x-show="tab === 'documentos'" x-cloak class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div x-show="tab === 'documentos'" class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-semibold" style="color: #111827;">Documentos del caso</h3>
         </div>
@@ -219,7 +219,7 @@
     </div>
 
     {{-- TAB: BITÁCORA --}}
-    <div x-show="tab === 'bitacora'" x-cloak class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div x-show="tab === 'bitacora'" class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         
         {{-- Formulario para registrar nuevo seguimiento --}}
         <div class="mb-8 p-5 rounded-xl bg-gray-50 border border-gray-200" x-data="{ 
@@ -250,52 +250,52 @@
                         </select>
                     </div>
 
-                    {{-- Botones de Plantillas Rápidas basadas en image_a51ad7.png --}}
+                    {{-- Botones de Plantillas Rápidas --}}
                     <div class="md:col-span-2">
-<span class="block text-xs font-medium text-gray-700 mb-1">Plantillas rápidas (Clic para aplicar)</span>
-<div class="flex flex-wrap gap-1.5">
-    {{-- Presentado al Juzgado --}}
-    <button type="button" @click="aplicarPlantilla('YA FUE PRESENTADO AL JUZGADO', 'Presentación')" 
-            class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-gray-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Presentado al Juzgado
-    </button>
+                        <span class="block text-xs font-medium text-gray-700 mb-1">Plantillas rápidas (Clic para aplicar)</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {{-- Presentado al Juzgado --}}
+                            <button type="button" @click="aplicarPlantilla('YA FUE PRESENTADO AL JUZGADO', 'Presentación')" 
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-gray-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                Presentado al Juzgado
+                            </button>
 
-    {{-- Admitida (Hoy) --}}
-    <button type="button" @click="aplicarPlantilla('ADMITIDA EN FECHA {{ now()->format('d/m/Y') }}', 'Admisión')" 
-            class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-green-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Admitida (Hoy)
-    </button>
+                            {{-- Admitida (Hoy) --}}
+                            <button type="button" @click="aplicarPlantilla('ADMITIDA EN FECHA {{ now()->format('d/m/Y') }}', 'Admisión')" 
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-green-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                Admitida (Hoy)
+                            </button>
 
-    {{-- Espera Audiencia --}}
-    <button type="button" @click="aplicarPlantilla('EN ESPERA DE SEÑALAMIENTO DE AUDIENCIA POR PARTE DEL JUZGADO', 'Audiencia')" 
-            class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-amber-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Espera Audiencia
-    </button>
+                            {{-- Espera Audiencia --}}
+                            <button type="button" @click="aplicarPlantilla('EN ESPERA DE SEÑALAMIENTO DE AUDIENCIA POR PARTE DEL JUZGADO', 'Audiencia')" 
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-amber-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Espera Audiencia
+                            </button>
 
-    {{-- Emplazado --}}
-    <button type="button" @click="aplicarPlantilla('YA FUE EMPLAZADO EL DEMANDANTE POR PARTE DEL JUZGADO', 'Notificación')" 
-            class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-blue-500"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        Emplazado
-    </button>
+                            {{-- Emplazado --}}
+                            <button type="button" @click="aplicarPlantilla('YA FUE EMPLAZADO EL DEMANDANTE POR PARTE DEL JUZGADO', 'Notificación')" 
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-blue-500"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                Emplazado
+                            </button>
 
-    {{-- Confirió / Presentó Poder --}}
-    <button type="button" @click="aplicarPlantilla('SE CONFIRIO PODER POR PARTE DE LA DEMANDANTE Y SE PRESENTO PODER YA ME NOTIFIQUE AL JUZGADO EL DIA ', 'Notificación')" 
-            class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-purple-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
-        Confirió/Presentó Poder
-    </button>
+                            {{-- Confirió / Presentó Poder --}}
+                            <button type="button" @click="aplicarPlantilla('SE CONFIRIO PODER POR PARTE DE LA DEMANDANTE Y SE PRESENTO PODER YA ME NOTIFIQUE AL JUZGADO EL DIA ', 'Notificación')" 
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-purple-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+                                Confirió/Presentó Poder
+                            </button>
 
-    {{-- Desde Cero --}}
-    <button type="button" @click="aplicarPlantilla('CASO QUE SE LLEVARA DESDE CERO', 'Inicio')" 
-            class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-indigo-500"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        Desde Cero
-    </button>
-</div>
+                            {{-- Desde Cero --}}
+                            <button type="button" @click="aplicarPlantilla('CASO QUE SE LLEVARA DESDE CERO', 'Inicio')" 
+                                    class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5 text-indigo-500"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                Desde Cero
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -318,7 +318,7 @@
 
         <hr class="border-gray-200 mb-6" />
 
-        {{-- Historial de Seguimientos (Código existente modificado para mantener estructura) --}}
+        {{-- Historial de Seguimientos --}}
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Bitácora de seguimiento</h3>
 
         @forelse ($caso->seguimientos as $seg)
@@ -399,3 +399,5 @@
             </form>
         </div>
     </div>
+</div>
+@endsection
