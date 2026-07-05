@@ -60,7 +60,7 @@ class AuthenticationTest extends TestCase
 
         $response = $this->actingAs($user)->post('/logout');
 
-        $response->assertStatus(200);
-        $response->assertJson(['success' => true]);
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
     }
 }
