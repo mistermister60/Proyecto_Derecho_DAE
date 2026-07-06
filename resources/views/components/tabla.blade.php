@@ -1,3 +1,8 @@
+{{--
+    Componente: tabla
+    Propósito: Tabla HTML reutilizable con encabezados configurables y slot para filas. Muestra mensaje "sin datos" si el slot está vacío.
+    Props: $encabezados (array de strings para cabeceras), $sinDatos (texto alternativo), $slot (contenido de filas)
+--}}
 @props(['encabezados' => [], 'sinDatos' => 'No hay datos disponibles.'])
 
 <div class="w-full overflow-x-auto rounded-xl" style="border: 1px solid #E5E7EB; background: #FFFFFF;">

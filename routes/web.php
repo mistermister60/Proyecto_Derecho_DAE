@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * Rutas web del sistema DAE (Dirección de Asuntos Estudiantiles).
+ *
+ * Organización de rutas:
+ * - Autenticación: login/logout
+ * - Panel principal (Dashboard): /
+ * - Recursos protegidos por auth:
+ *   - Casos: CRUD completo + Kanban + reasignación
+ *   - Clientes, Demandados, Procuradores, Usuarios
+ *   - Audiencias, Entrevistas, Seguimiento, Documentos (anidados bajo casos)
+ *   - Agenda, Dashboard, Perfil
+ * - PWA: VAPID key, push subscription/unsubscription
+ * - Middleware role:Director en rutas administrativas (procuradores, usuarios, borrado/reasignación de casos)
+ */
+
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AudienciaController;
 use App\Http\Controllers\AuthController;

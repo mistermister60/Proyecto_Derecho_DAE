@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!--
+    Página de fallback offline para la PWA del Despacho de Abogados DAE.
+    Se muestra cuando el Service Worker no puede conectar a la red y no
+    hay una página cacheada disponible.
+
+    Incluye:
+    - Botón "Reintentar conexión" que verifica /api/health
+    - Detección automática del evento 'online' para redirigir al dashboard
+    - Diseño responsive con degradado y animaciones
+    - Media query para pantallas < 380px
+-->
 <html lang="es">
 <head>
     <meta charset="UTF-8">

@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: usuarios/edit
+    Propósito: Formulario de edición de usuario del sistema. Permite modificar nombre, email, contraseña y rol.
+    Variables: $usuario (modelo Usuario), $roles (Collection de modelos Rol), $procuradores (Collection de modelos Procurador)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Editar Usuario')
 

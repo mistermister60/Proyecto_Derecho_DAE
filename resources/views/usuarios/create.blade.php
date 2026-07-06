@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: usuarios/create
+    Propósito: Formulario para crear un nuevo usuario del sistema. Incluye nombre, email, contraseña, rol y procurador asociado opcional.
+    Variables: $roles (Collection de modelos Rol), $procuradores (Collection de modelos Procurador)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Crear Usuario')
 

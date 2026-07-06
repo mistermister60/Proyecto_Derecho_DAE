@@ -14,12 +14,27 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
+/**
+ * Tests de regresión y robustez del sistema (Sistema Inmunológico).
+ *
+ * Verifica los mecanismos de defensa de la aplicación: cabeceras de seguridad
+ * HTTP, registro de auditoría en el canal 'audit', y política de contraseñas
+ * seguras (A1). Actúa como un "sistema inmunológico" que detecta regresiones
+ * en la seguridad y estabilidad del sistema.
+ */
 class SistemaInmunologicoTest extends TestCase
 {
     use RefreshDatabase;
 
     // ── Headers de seguridad ───────────────────────────────────────────────
 
+    /**
+     * Verifica que las cabeceras de seguridad HTTP estén presentes en las respuestas.
+     *
+     * Comprueba que la aplicación envíe X-Frame-Options, X-Content-Type-Options,
+     * Referrer-Policy y Content-Security-Policy, y que NO se envíe
+     * X-XSS-Protection (desaconsejado por OWASP).
+     */
     public function test_cabeceras_de_seguridad_presentes(): void
     {
         $response = $this->get('/');
@@ -34,6 +49,12 @@ class SistemaInmunologicoTest extends TestCase
 
     // ── Canal audit registra creación ──────────────────────────────────────
 
+    /**
+     * Verifica que la creación de un caso registre una entrada en el canal de auditoría.
+     *
+     * Utiliza un mock de Log para interceptar la llamada al canal 'audit'
+     * y verifica que se ejecute el método info al crear un caso.
+     */
     public function test_creacion_de_caso_escribe_en_audit_log(): void
     {
         $mockLog = \Mockery::mock();
@@ -49,6 +70,12 @@ class SistemaInmunologicoTest extends TestCase
 
     // ── Canal audit registra modificación ─────────────────────────────────
 
+    /**
+     * Verifica que la modificación de un caso registre una entrada en el canal de auditoría.
+     *
+     * Crea un caso base, luego lo modifica y verifica que se registre
+     * una entrada info en el canal 'audit'.
+     */
     public function test_modificacion_de_caso_escribe_en_audit_log(): void
     {
         $caso = $this->crearCasoBase();
@@ -66,6 +93,12 @@ class SistemaInmunologicoTest extends TestCase
 
     // ── Política de contraseñas (A1) ───────────────────────────────────────
 
+    /**
+     * Verifica que una contraseña débil sea rechazada al crear un usuario.
+     *
+     * Failure path: intenta crear un usuario con contraseña 'abc123'
+     * (demasiado débil) y espera un error de validación en el campo 'contrasena'.
+     */
     public function test_password_debil_es_rechazado_en_crear_usuario(): void
     {
         $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Dir', 'rol_estado' => 'activo']);
@@ -87,6 +120,12 @@ class SistemaInmunologicoTest extends TestCase
             ->assertSessionHasErrors('contrasena');
     }
 
+    /**
+     * Verifica que una contraseña fuerte sea aceptada al crear un usuario.
+     *
+     * Happy path: crea un usuario con contraseña que cumple los requisitos
+     * (8+ caracteres, mayúscula, número) y espera una redirección exitosa.
+     */
     public function test_password_fuerte_es_aceptado(): void
     {
         $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Dir', 'rol_estado' => 'activo']);
@@ -109,6 +148,14 @@ class SistemaInmunologicoTest extends TestCase
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
+    /**
+     * Crea un caso base con datos mínimos para usar en los tests de auditoría.
+     *
+     * Crea un tipo de trámite, estado, cliente, procurador y retorna el caso
+     * creado con todos los datos básicos.
+     *
+     * @return Caso Caso creado con datos de prueba.
+     */
     private function crearCasoBase(): Caso
     {
         $tramite = TipoTramite::create(['tramite_nombre' => 'Civil', 'tramite_descripcion' => 'x', 'tramite_estado' => 'activo']);

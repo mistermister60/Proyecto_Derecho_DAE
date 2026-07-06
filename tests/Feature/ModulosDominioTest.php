@@ -18,18 +18,44 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
+/**
+ * Tests de integridad de los módulos del dominio.
+ *
+ * Verifica que los módulos principales (Audiencias, Documentos, Entrevistas)
+ * funcionen correctamente respetando las reglas de negocio: asignación de
+ * procuradores, permisos por rol y operaciones CRUD básicas.
+ */
 class ModulosDominioTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Usuario con rol Director usado en los escenarios de prueba.
+     */
     private Usuario $director;
 
+    /**
+     * Usuario con rol Procurador asignado al caso de prueba.
+     */
     private Usuario $procuradorA;
 
+    /**
+     * Usuario con rol Procurador NO asignado al caso (caso ajeno).
+     */
     private Usuario $procuradorB;
 
+    /**
+     * Caso de prueba creado durante setUp.
+     */
     private Caso $caso;
 
+    /**
+     * Configuración inicial de cada test.
+     *
+     * Crea los roles Director y Procurador, un estado de caso, un tipo de trámite,
+     * un cliente, dos procuradores, los usuarios correspondientes y un caso
+     * asignado al procuradorA.
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -89,6 +115,12 @@ class ModulosDominioTest extends TestCase
 
     // ── Audiencias ────────────────────────────────────────────────────────
 
+    /**
+     * Verifica que un procurador pueda agendar una audiencia en su propio caso.
+     *
+     * Happy path: el procurador asignado al caso crea una audiencia
+     * y se espera una redirección con los datos persistidos en la base de datos.
+     */
     public function test_procurador_puede_agendar_audiencia_en_su_caso(): void
     {
         $this->actingAs($this->procuradorA)
@@ -105,6 +137,12 @@ class ModulosDominioTest extends TestCase
         ]);
     }
 
+    /**
+     * Verifica que un procurador NO pueda agendar una audiencia en un caso ajeno.
+     *
+     * Failure path: el procuradorB no está asignado al caso,
+     * por lo que la solicitud debe ser rechazada con HTTP 403.
+     */
     public function test_procurador_no_puede_agendar_audiencia_en_caso_ajeno(): void
     {
         $this->actingAs($this->procuradorB)
@@ -115,6 +153,12 @@ class ModulosDominioTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * Verifica que el Director pueda eliminar cualquier audiencia.
+     *
+     * Happy path: el Director tiene permiso para eliminar audiencias
+     * independientemente del procurador asignado al caso.
+     */
     public function test_director_puede_eliminar_audiencia(): void
     {
         $audiencia = Audiencia::create([
@@ -134,6 +178,12 @@ class ModulosDominioTest extends TestCase
 
     // ── Documentos ────────────────────────────────────────────────────────
 
+    /**
+     * Verifica que un procurador pueda subir un documento a su caso.
+     *
+     * Happy path: sube un archivo PDF válido con descripción
+     * y verifica que se persista en la base de datos.
+     */
     public function test_procurador_puede_subir_documento_a_su_caso(): void
     {
         Storage::fake('local');
@@ -152,6 +202,12 @@ class ModulosDominioTest extends TestCase
         ]);
     }
 
+    /**
+     * Verifica que se rechacen archivos con tipo MIME no permitido.
+     *
+     * Failure path: intenta subir un archivo .exe (application/octet-stream)
+     * y espera que la validación falle con un error en el campo 'archivo'.
+     */
     public function test_documento_rechaza_mime_no_permitido(): void
     {
         Storage::fake('local');
@@ -164,6 +220,12 @@ class ModulosDominioTest extends TestCase
             ->assertSessionHasErrors('archivo');
     }
 
+    /**
+     * Verifica que un procurador NO pueda subir documentos a un caso ajeno.
+     *
+     * Failure path: el procuradorB intenta subir un documento al caso de procuradorA
+     * y la solicitud debe ser rechazada con HTTP 403.
+     */
     public function test_procurador_no_puede_subir_documento_a_caso_ajeno(): void
     {
         Storage::fake('local');
@@ -175,6 +237,12 @@ class ModulosDominioTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * Verifica que al eliminar un documento también se borre el archivo del disco.
+     *
+     * Happy path: crea un documento con archivo en disco, lo elimina como Director
+     * y verifica que tanto el registro como el archivo físico desaparezcan.
+     */
     public function test_eliminar_documento_borra_el_archivo_del_disco(): void
     {
         Storage::fake('local');
@@ -201,6 +269,12 @@ class ModulosDominioTest extends TestCase
 
     // ── Entrevistas ───────────────────────────────────────────────────────
 
+    /**
+     * Verifica que un procurador pueda registrar una entrevista en su caso.
+     *
+     * Happy path: crea una entrevista con fecha y relación de hechos,
+     * espera redirección y persistencia en la base de datos.
+     */
     public function test_procurador_puede_registrar_entrevista_en_su_caso(): void
     {
         $this->actingAs($this->procuradorA)
@@ -216,6 +290,12 @@ class ModulosDominioTest extends TestCase
         ]);
     }
 
+    /**
+     * Verifica que un procurador NO pueda registrar entrevistas en un caso ajeno.
+     *
+     * Failure path: el procuradorB intenta registrar una entrevista
+     * en el caso de procuradorA y recibe HTTP 403.
+     */
     public function test_procurador_no_puede_registrar_entrevista_en_caso_ajeno(): void
     {
         $this->actingAs($this->procuradorB)
@@ -226,6 +306,12 @@ class ModulosDominioTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * Verifica que el Director pueda eliminar cualquier entrevista.
+     *
+     * Happy path: el Director elimina una entrevista existente
+     * y verifica que desaparezca de la base de datos.
+     */
     public function test_director_puede_eliminar_entrevista(): void
     {
         $entrevista = Entrevista::create([

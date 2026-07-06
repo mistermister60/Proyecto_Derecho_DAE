@@ -2,9 +2,14 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Form request para validar las credenciales de inicio de sesión.
+ *
+ * Valida que el email tenga un formato correcto y que la contraseña
+ * cumpla con la longitud mínima antes de intentar la autenticación.
+ */
 class LoginCredentialsRequest extends FormRequest
 {
     /**
@@ -18,7 +23,7 @@ class LoginCredentialsRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
@@ -29,7 +34,7 @@ class LoginCredentialsRequest extends FormRequest
     }
 
     /**
-     * Get custom messages for validator errors.
+     * Get the custom validation error messages.
      *
      * @return array<string, string>
      */

@@ -1,4 +1,10 @@
 <x-guest-layout>
+{{--
+    Vista: auth/register
+    Propósito: Formulario de registro de nuevo usuario en el sistema de gestión de casos.
+    Variables: $errors (errores de validación del formulario)
+    @extends: guest-layout
+--}}
     <form method="POST" action="{{ route('register') }}">
         @csrf
 

@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: procuradores/edit
+    Propósito: Formulario de edición de datos del procurador. Permite modificar información personal, carnet profesional, género, email y dirección.
+    Variables: $procurador (modelo Procurador)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Editar Procurador')
 

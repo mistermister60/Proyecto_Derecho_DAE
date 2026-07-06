@@ -5,9 +5,27 @@ namespace App\Http\Controllers;
 use App\Enums\RolEnum;
 use App\Models\Audiencia;
 use Carbon\Carbon;
+use Illuminate\View\View;
 
+/**
+ * Controlador para la agenda de audiencias.
+ *
+ * Muestra el calendario de audiencias con filtro por rol: los procuradores
+ * ven solo sus propias audiencias, mientras que los directores ven todas.
+ * Las audiencias se agrupan por mes para visualización calendario.
+ */
 class AgendaController extends Controller
 {
+    /**
+     * Lista las audiencias ordenadas por fecha y hora.
+     *
+     * Aplica eager loading de relaciones (caso, cliente, tipoTrámite, procurador).
+     * Filtra por procurador autenticado si el rol es PROCURADOR.
+     * Agrupa resultados por mes (Y-m) para el calendario y extrae las
+     * próximas 10 audiencias desde la fecha actual.
+     *
+     * @return View Vista agenda con audiencias, agrupación por mes y próximas
+     */
     public function index()
     {
         // 1. Iniciamos la consulta con tus relaciones y ordenamientos originales

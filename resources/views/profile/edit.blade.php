@@ -1,4 +1,11 @@
 <x-app-layout>
+{{--
+    Vista: profile/edit
+    Propósito: Página de edición del perfil del usuario autenticado. Incluye tres secciones: actualizar información de perfil, cambiar contraseña y eliminar cuenta.
+    Variables: $user (modelo Usuario autenticado)
+    @extends: app-layout
+    @include: profile.partials.update-profile-information-form, update-password-form, delete-user-form
+--}}
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Profile') }}

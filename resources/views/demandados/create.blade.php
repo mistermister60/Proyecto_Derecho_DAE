@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: demandados/create
+    Propósito: Formulario para crear un nuevo demandado. Incluye datos personales, estado civil e información laboral.
+    Variables: ninguna (formulario vacío)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Crear Demandado')
 

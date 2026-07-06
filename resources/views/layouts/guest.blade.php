@@ -1,3 +1,8 @@
+{{--
+    Vista: layouts/guest
+    Propósito: Layout público para páginas de autenticación (login, registro, recuperación de contraseña). Incluye el logo de la aplicación y un contenedor centrado con el slot $slot.
+    Variables: $slot (contenido principal de la vista)
+--}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -8,7 +13,14 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Procurador Legal">
         <link rel="manifest" href="/manifest.json">
+
+        {{-- Íconos de la aplicación (balanza de la justicia) --}}
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png">
+        <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48x48.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 

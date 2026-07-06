@@ -1,3 +1,8 @@
+{{--
+    Componente: nav-link
+    Propósito: Enlace de navegación con estado activo. Renderiza un borde inferior indicador cuando la ruta coincide.
+    Props: $active (bool), $attributes (href), $slot (texto)
+--}}
 @props(['active'])
 
 @php

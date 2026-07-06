@@ -1,3 +1,8 @@
+{{--
+    Vista: profile/partials/update-profile-information-form
+    Propósito: Formulario parcial para actualizar nombre y correo electrónico del perfil. Incluye verificación de email si aplica.
+    Variables: $user (modelo Usuario autenticado)
+--}}
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">

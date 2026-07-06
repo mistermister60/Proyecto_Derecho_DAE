@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: casos/index
+    Propósito: Listado de casos con dos vistas intercambiables: tabla (con paginación y filtros) y kanban (columnas por estado del pipeline).
+    Variables: $casos (paginator de modelos Caso), $estados (Collection de estados del pipeline), $tramites (Collection de tipos de trámite), $columnas (array agrupado por estado para vista kanban)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Casos')
 

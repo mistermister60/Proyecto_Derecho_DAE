@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: casos/create
+    Propósito: Formulario para crear un nuevo caso. Incluye selección de cliente, tipo de trámite, parte representada, procurador asignado, juzgado y relación de hechos.
+    Variables: $clientes (Collection de modelos Cliente activos), $procuradores (Collection de modelos Procurador activos), $tramites (Collection de tipos de trámite activos)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Nuevo caso')
 

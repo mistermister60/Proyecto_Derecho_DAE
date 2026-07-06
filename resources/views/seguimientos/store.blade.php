@@ -1,4 +1,8 @@
-{{-- Formulario para registrar nuevo seguimiento estilo Foro --}}
+{{--
+    Vista: seguimientos/store
+    Propósito: Formulario parcial para agregar un nuevo seguimiento a la bitácora de un caso. Incluye selector de tipo de evento, plantillas rápidas y campo de descripción. Se incluye en la vista casos/show.
+    Variables: $caso (modelo Caso, para obtener caso_id y asociar el seguimiento)
+--}}
 <div class="mb-8 p-6 rounded-xl border border-gray-200 shadow-sm" style="background: #FFFFFF;" x-data="{ 
     descripcion: '',
     tipo: 'Trámite',

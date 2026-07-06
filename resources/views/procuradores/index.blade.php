@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: procuradores/index
+    Propósito: Listado de procuradores con buscador en vivo y filtro activo/inactivo. Muestra tarjetas con iniciales, nombre, DNI, teléfono y conteo de casos asignados.
+    Variables: $procuradores (paginator de modelos Procurador)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Procuradores') 
 

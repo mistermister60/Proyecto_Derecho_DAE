@@ -9,10 +9,23 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
+/**
+ * Tests del campo 'cliente_nombres_hijos' en el módulo de Clientes.
+ *
+ * Verifica que el campo de nombres de hijos se persista correctamente
+ * tanto en la creación como en la actualización de un cliente,
+ * asegurando que el modelo maneje adecuadamente este campo de texto.
+ */
 class ClienteNombresHijosTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Verifica que al crear un cliente se persistan los nombres de los hijos.
+     *
+     * Happy path: crea un cliente con dos hijos especificando sus nombres
+     * y verifica que el campo 'cliente_nombres_hijos' se almacene correctamente.
+     */
     public function test_store_persiste_nombres_de_hijos(): void
     {
         $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Director', 'rol_estado' => 'activo']);
@@ -38,6 +51,13 @@ class ClienteNombresHijosTest extends TestCase
         ]);
     }
 
+    /**
+     * Verifica que al actualizar un cliente se persistan los nombres de los hijos.
+     *
+     * Happy path: crea un cliente sin hijos, luego lo actualiza agregando
+     * número de hijos y sus nombres, verificando que el campo se almacene
+     * correctamente en la base de datos.
+     */
     public function test_update_persiste_nombres_de_hijos(): void
     {
         $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Director', 'rol_estado' => 'activo']);

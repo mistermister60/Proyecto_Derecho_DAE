@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: casos/show
+    Propósito: Detalle completo de un caso con pestañas de Resumen, Relación de hechos, Documentos y Bitácora. Permite registrar entrevistas, subir documentos, agendar audiencias y agregar seguimientos.
+    Variables: $caso (modelo Caso con relaciones: cliente, demandado, procurador, estado, tipoTramite, entrevistas, documentos, seguimientos, audiencias)
+    @extends: layouts.app
+    @section: title, content
+--}}
 
 @section('title', "Caso {$caso->caso_numero_expediente}")
 

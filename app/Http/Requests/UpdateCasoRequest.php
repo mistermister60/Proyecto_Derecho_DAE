@@ -5,12 +5,32 @@ namespace App\Http\Requests;
 use App\Enums\CasoEstadoEnum;
 use App\Enums\RolEnum;
 use App\Models\Caso;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Form request para actualizar un caso legal existente.
+ *
+ * Incluye lógica de autorización basada en policies de Laravel y validación
+ * condicional: los usuarios con rol de Director tienen reglas adicionales
+ * que el resto de los usuarios no pueden modificar.
+ */
 class UpdateCasoRequest extends FormRequest
 {
+    /**
+     * Instancia del caso que se está actualizando, resuelta durante la autorización.
+     */
     public ?Caso $caso = null;
 
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * Resuelve el caso a partir del parámetro de ruta 'expediente' y
+     * delega la autorización a la CasoPolicy.
+     *
+     *
+     * @throws ModelNotFoundException
+     */
     public function authorize(): bool
     {
         $this->caso = Caso::where('caso_numero_expediente', $this->route('expediente'))->firstOrFail();
@@ -18,6 +38,15 @@ class UpdateCasoRequest extends FormRequest
         return $this->user()->can('update', $this->caso);
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * Las reglas base aplican a todos los usuarios. Si el usuario autenticado
+     * tiene rol de Director, se agregan reglas adicionales (cliente, demandado,
+     * tipo_trámite, procurador, fecha, observaciones, admisibilidad y estado).
+     *
+     * @return array<string, string>
+     */
     public function rules(): array
     {
         $comunes = [
@@ -39,11 +68,14 @@ class UpdateCasoRequest extends FormRequest
             'caso_fecha_interpuesta' => 'nullable|date',
             'caso_observaciones_director' => 'nullable|string',
             'caso_admisible' => 'boolean',
-            // Sustitucion de string magico por validacion estricta basada en Enum
+            // Sustitución de string mágico por validación estricta basada en Enum
             'caso_estado' => 'required|in:'.implode(',', CasoEstadoEnum::values()),
         ]);
     }
 
+    /**
+     * Determine if the authenticated user has the Director role.
+     */
     public function esDirector(): bool
     {
         return RolEnum::equals($this->user()?->rol?->rol_nombre, RolEnum::DIRECTOR);

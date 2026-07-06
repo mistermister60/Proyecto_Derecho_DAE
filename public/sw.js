@@ -1,9 +1,33 @@
+/**
+ * Service Worker — Aplicación PWA del Despacho de Abogados DAE.
+ *
+ * Proporciona soporte offline con estrategias de caché diferenciadas:
+ * - Cache-First para assets estáticos (CSS, JS, imágenes)
+ * - Network-First para navegación (páginas HTML)
+ * - Network-First para peticiones API con fallback a caché
+ *
+ * Estrategias:
+ *   STATIC_CACHE (Cache-First):   CSS, JS, manifest, logo. Expira a los 7 días.
+ *   Navegación (Network-First):   Páginas HTML. Fallback a offline.html.
+ *   API (Network-First):          Endpoints /api/*. Fallback a JSON error 503.
+ *
+ * El SW se auto-activa (skipWaiting) y reclama clientes existentes (claim)
+ * para garantizar que la última versión siempre esté activa.
+ *
+ * @version 1.0
+ * @see  /public/offline.html  Página de fallback offline
+ */
+
 // use strict;
 
 const CACHE_NAME = "pwa-app-v1";
 const OFFLINE_URL = '/offline.html';
 
-// Assets to cache on first install
+/**
+ * Assets estáticos precacheados durante la instalación del SW.
+ * Incluye rutas de navegación principales y recursos compartidos.
+ * @type {string[]}
+ */
 const STATIC_CACHE = [
     OFFLINE_URL,
     '/',
@@ -20,7 +44,10 @@ const STATIC_CACHE = [
     '/logo.png'
 ];
 
-// APIs to cache with network-first strategy
+/**
+ * Endpoints API que se cachean con estrategia Network-First.
+ * @type {string[]}
+ */
 const API_CACHE = [
     '/api/casos',
     '/api/clientes',
@@ -31,7 +58,11 @@ const API_CACHE = [
     '/api/seguimientos'
 ];
 
-// Install event - cache static assets
+/**
+ * Evento 'install' — Precachea los assets estáticos y fuerza la activación.
+ * Si falla algún asset, la instalación se completa parcialmente (los exitsos
+ * quedan cacheados, los fallidos se intentarán en el próximo fetch).
+ */
 self.addEventListener("install", (event) => {
     console.log('[SW] Instalando Service Worker');
 
@@ -51,8 +82,14 @@ self.addEventListener("install", (event) => {
     );
 });
 
-// Fetch event - implementar estrategia de cache
-
+/**
+ * Evento 'fetch' — Intercepta todas las peticiones y aplica la estrategia
+ * de caché correspondiente según el tipo de recurso:
+ *
+ *   navigate  → networkFirstNavigate()  → offline.html como fallback
+ *   /api/*    → networkFirstAPI()       → JSON 503 como fallback
+ *   estático  → cacheFirstStatic()      → expira a los 7 días
+ */
 self.addEventListener("fetch", (event) => {
     const request = event.request;
     const url = new URL(request.url);
@@ -81,7 +118,15 @@ self.addEventListener("fetch", (event) => {
     );
 });
 
-// Función para navegación con network-first
+/**
+ * Estrategia Network-First para navegación (páginas HTML).
+ * Intenta la red primero. Si falla, sirve desde caché. Si no hay nada
+ * en caché, muestra offline.html para rutas principales.
+ *
+ * @param {Request} request  Petición original
+ * @param {URL} url          URL parseada de la petición
+ * @returns {Promise<Response>}
+ */
 async function networkFirstNavigate(request, url) {
     try {
         const networkResponse = await fetch(request);
@@ -120,7 +165,15 @@ async function networkFirstNavigate(request, url) {
     }
 }
 
-// Función para API con network-first
+/**
+ * Estrategia Network-First para peticiones API.
+ * Intenta la red primero. Si falla, sirve respuesta cacheada.
+ * Si no hay caché, devuelve JSON error 503 ("Servicio no disponible offline").
+ *
+ * @param {Request} request  Petición original
+ * @param {URL} url          URL parseada de la petición
+ * @returns {Promise<Response>}
+ */
 async function networkFirstAPI(request, url) {
     try {
         const networkResponse = await fetch(request);
@@ -157,7 +210,15 @@ async function networkFirstAPI(request, url) {
     }
 }
 
-// Función para archivos estáticos con cache-first
+/**
+ * Estrategia Cache-First para assets estáticos (CSS, JS, imágenes).
+ * Sirve desde caché si está disponible y vigente (< 7 días).
+ * Si expiró, intenta red. Si no hay caché ni red, devuelve 404.
+ *
+ * @param {Request} request  Petición original
+ * @param {URL} url          URL parseada de la petición
+ * @returns {Promise<Response>}
+ */
 async function cacheFirstStatic(request, url) {
     const cache = await caches.open(CACHE_NAME);
     
@@ -202,7 +263,11 @@ async function cacheFirstStatic(request, url) {
     }
 }
 
-// Active event - limpiar caches viejos
+/**
+ * Evento 'activate' — Limpia versiones anteriores de la caché.
+ * Elimina cualquier cache cuyo nombre no coincida con CACHE_NAME.
+ * Reclama todos los clientes (pestañas) para que usen el nuevo SW.
+ */
 self.addEventListener('activate', (event) => {
     console.log('[SW] Activando nuevo Service Worker');
     
@@ -223,7 +288,11 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Función para verificar conexión
+/**
+ * Evento 'message' — Escucha mensajes desde la aplicación (cliente).
+ * Responde al tipo CHECK_CONNECTION verificando /api/health.
+ * La respuesta se envía de vuelta a través del MessageChannel.
+ */
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'CHECK_CONNECTION') {
         const messageChannel = event.ports[0];

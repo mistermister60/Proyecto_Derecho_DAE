@@ -2,15 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUsuariosRequest;
+use App\Http\Requests\UpdateUsuariosRequest;
 use App\Models\Procurador;
 use App\Models\Rol;
 use App\Models\Usuario;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
+/**
+ * Controlador para la gestión de usuarios del sistema.
+ *
+ * CRUD completo de usuarios con filtro por estado (activo/inactivo) y
+ * búsqueda por nombre o email. La actualización de contraseña es condicional:
+ * solo se valida y procesa si se envía un nuevo valor. Usa la regla de
+ * validación Password de Laravel para reforzar seguridad.
+ */
 class UsuariosController extends Controller
 {
+    /**
+     * Lista los usuarios con paginación, búsqueda y filtro por estado.
+     *
+     * Incluye relaciones con rol y procurador. Filtra por estado 'activo'
+     * o 'inactivo' si el parámetro está presente. Busca por nombre o email.
+     *
+     * @param  Request  $request  Contiene parámetros opcionales 'search' y 'estado'
+     * @return View Vista index con usuarios paginados
+     */
     public function index(Request $request)
     {
         $search = trim($request->query('search', ''));
@@ -32,6 +53,14 @@ class UsuariosController extends Controller
         return view('usuarios.index', compact('usuarios', 'estado'));
     }
 
+    /**
+     * Muestra el formulario de creación de un nuevo usuario.
+     *
+     * Carga el catálogo de roles y la lista de procuradores activos
+     * para los campos select del formulario.
+     *
+     * @return View Vista create con roles y procuradores
+     */
     public function create()
     {
         $roles = Rol::all();
@@ -40,15 +69,19 @@ class UsuariosController extends Controller
         return view('usuarios.create', compact('roles', 'procuradores'));
     }
 
-    public function store(Request $request)
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * Valida los datos incluyendo la regla Password (mínimo 8 caracteres,
+     * mayúsculas, minúsculas y números). Encripta la contraseña con Hash::make()
+     * y asigna estado 'activo' por defecto.
+     *
+     * @param  Request  $request  Datos del usuario con confirmación de contraseña
+     * @return RedirectResponse Redirección al índice con mensaje
+     */
+    public function store(StoreUsuariosRequest $request)
     {
-        $validated = $request->validate([
-            'rol_id' => 'required|exists:roles,rol_id',
-            'procurador_id' => 'nullable|exists:procuradores,procurador_id',
-            'usuario_nombre' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:usuarios,email',
-            'contrasena' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-        ]);
+        $validated = $request->validated();
 
         $validated['usuario_estado'] = 'activo';
         $validated['contrasena'] = Hash::make($validated['contrasena']); // 🔐 Encriptada
@@ -59,6 +92,16 @@ class UsuariosController extends Controller
             ->with('success', 'Usuario registrado exitosamente.');
     }
 
+    /**
+     * Muestra los detalles de un usuario con sus relaciones.
+     *
+     * Realiza eager loading de rol y procurador asociado.
+     *
+     * @param  string  $id  ID numérico del usuario
+     * @return View Vista show con usuario y relaciones
+     *
+     * @throws ModelNotFoundException Si el ID no existe
+     */
     public function show(string $id)
     {
         $usuario = Usuario::with(['rol', 'procurador'])
@@ -68,6 +111,16 @@ class UsuariosController extends Controller
         return view('usuarios.show', compact('usuario'));
     }
 
+    /**
+     * Muestra el formulario de edición de un usuario.
+     *
+     * Carga el catálogo de roles y procuradores activos para los selects.
+     *
+     * @param  string  $id  ID numérico del usuario
+     * @return View Vista edit con datos del usuario, roles y procuradores
+     *
+     * @throws ModelNotFoundException Si el ID no existe
+     */
     public function edit(string $id)
     {
         $usuario = Usuario::where('usuario_id', $id)->firstOrFail();
@@ -77,23 +130,24 @@ class UsuariosController extends Controller
         return view('usuarios.edit', compact('usuario', 'roles', 'procuradores'));
     }
 
-    public function update(Request $request, string $id)
+    /**
+     * Actualiza los datos de un usuario existente.
+     *
+     * La validación de contraseña es condicional: solo se aplica la regla
+     * Password si el campo 'contrasena' está presente. Si se envía nueva
+     * contraseña, se encripta antes de actualizar.
+     *
+     * @param  Request  $request  Datos actualizados del usuario
+     * @param  string  $id  ID numérico del usuario
+     * @return RedirectResponse Redirección a vista show con mensaje
+     *
+     * @throws ModelNotFoundException Si el ID no existe
+     */
+    public function update(UpdateUsuariosRequest $request, string $id)
     {
         $usuario = Usuario::where('usuario_id', $id)->firstOrFail();
 
-        $rules = [
-            'rol_id' => 'required|exists:roles,rol_id',
-            'procurador_id' => 'nullable|exists:procuradores,procurador_id',
-            'usuario_nombre' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:usuarios,email,'.$usuario->usuario_id.',usuario_id',
-        ];
-
-        // Solo validar y actualizar contraseña si se envía una nueva
-        if ($request->filled('contrasena')) {
-            $rules['contrasena'] = [Password::min(8)->mixedCase()->numbers()];
-        }
-
-        $validated = $request->validate($rules);
+        $validated = $request->validated();
 
         if ($request->filled('contrasena')) {
             $validated['contrasena'] = Hash::make($request->contrasena);
@@ -105,6 +159,17 @@ class UsuariosController extends Controller
             ->with('success', 'Usuario actualizado exitosamente.');
     }
 
+    /**
+     * Desactiva un usuario (eliminación lógica).
+     *
+     * Cambia el estado del usuario a 'inactivo'. El registro se conserva
+     * en la base de datos para integridad histórica.
+     *
+     * @param  string  $id  ID numérico del usuario
+     * @return RedirectResponse Redirección al índice con mensaje
+     *
+     * @throws ModelNotFoundException Si el ID no existe
+     */
     public function destroy(string $id)
     {
         $usuario = Usuario::where('usuario_id', $id)->firstOrFail();
@@ -114,6 +179,16 @@ class UsuariosController extends Controller
             ->with('success', 'Usuario desactivado exitosamente. El registro se conserva en el sistema.');
     }
 
+    /**
+     * Reactiva un usuario previamente desactivado.
+     *
+     * Cambia el estado del usuario a 'activo'.
+     *
+     * @param  string  $id  ID numérico del usuario
+     * @return RedirectResponse Redirección a vista show con mensaje
+     *
+     * @throws ModelNotFoundException Si el ID no existe
+     */
     public function activar(string $id)
     {
         $usuario = Usuario::where('usuario_id', $id)->firstOrFail();

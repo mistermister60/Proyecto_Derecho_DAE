@@ -1,4 +1,12 @@
 @extends('layouts.app')
+{{--
+    Vista: dashboard/index
+    Propósito: Panel principal con KPIs (casos activos, nuevos del mes, audiencias, cerrados, atrasados), gráficas de pipeline y tipo de trámite, próximas audiencias y carga de trabajo por procurador.
+    Variables: $casosActivos, $nuevosEsteMes, $audienciasEstaSemana, $cerrados, $atrasados (conteos), $proximasAudiencias (Collection), $procuradores (Collection con total_casos y activos), $pipelineLabels, $pipelineData, $pipelineColors, $tipoLabels, $tipoData (arrays para Chart.js)
+    @extends: layouts.app
+    @section: content
+    @push: scripts
+--}}
 
 @section('title', 'Dashboard')
 

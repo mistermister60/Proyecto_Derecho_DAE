@@ -1,3 +1,8 @@
+{{--
+    Vista: profile/partials/delete-user-form
+    Propósito: Formulario parcial para eliminar la cuenta del usuario autenticado. Incluye modal de confirmación con ingreso de contraseña.
+    Variables: $user (modelo Usuario autenticado)
+--}}
 <section class="space-y-6">
     <header>
         <h2 class="text-lg font-medium text-gray-900">

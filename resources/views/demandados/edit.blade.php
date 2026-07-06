@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: demandados/edit
+    Propósito: Formulario de edición de datos del demandado. Permite modificar información personal, estado civil y datos laborales.
+    Variables: $demandado (modelo Demandado)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Editar Demandado')
 

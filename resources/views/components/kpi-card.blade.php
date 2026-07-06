@@ -1,3 +1,8 @@
+{{--
+    Componente: kpi-card
+    Propósito: Tarjeta de indicador clave (KPI) para el dashboard. Muestra título, valor numérico, icono SVG y texto opcional.
+    Props: $titulo (nombre del indicador), $valor (número), $icono (SVG), $color (hex color), $subtexto (texto secundario)
+--}}
 @props(['titulo', 'valor', 'icono', 'color' => '#2563EB', 'subtexto' => null])
 
 <div class="rounded-xl p-5 transition-shadow duration-200"

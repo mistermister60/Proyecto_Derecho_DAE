@@ -1,3 +1,8 @@
+{{--
+    Componente: estado-badge
+    Propósito: Badge visual con color y punto indicador según el estado del caso. Los colores están mapeados en un array interno.
+    Props: $estado (string: Activo, Inactivo, Entrevista, Admitido, Cerrado, etc.)
+--}}
 @props(['estado'])
 
 @php
