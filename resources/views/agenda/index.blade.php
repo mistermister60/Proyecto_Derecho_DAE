@@ -12,7 +12,7 @@
 @php
     $audienciasJson = $audiencias->map(fn($a) => [
         'audiencia_fecha' => $a->audiencia_fecha,
-        'audiencia_hora' => $a->audiencia_hora?->format('H:i'),
+        'audiencia_hora' => $a->audiencia_hora ? \Carbon\Carbon::parse($a->audiencia_hora)->format('H:i') : null,
         'audiencia_tipo' => $a->audiencia_tipo,
         'audiencia_juzgado' => $a->audiencia_juzgado,
         'audiencia_estado' => $a->audiencia_estado,

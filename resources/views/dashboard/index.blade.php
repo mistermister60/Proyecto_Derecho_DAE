@@ -53,7 +53,7 @@
         {{-- Próximas audiencias --}}
         <div class="rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <div class="flex items-center justify-between px-4 py-3 md:px-5 md:py-4" style="border-bottom: 1px solid #E5E7EB;">
-                <h3 class="text-sm font-semibold" style="color: #111827;">Próximas audiencias</h3>
+                <h3 class="text-sm font-semibold" style="color: #111827;">Próximas audiencias</h3>  
                 <a href="{{ route('agenda.index') }}" class="text-xs font-medium flex items-center gap-1 transition-colors" style="color: #2563EB;">
                     Ver todo
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
