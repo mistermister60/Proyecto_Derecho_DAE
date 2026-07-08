@@ -22,6 +22,28 @@
            onmouseover="this.style.background='#DBEAFE';" onmouseout="this.style.background='#EEF2F6';">
             Editar Usuario
         </a>
+
+<a href="{{ route('procuradores.constancia', $procurador->procurador_dni) }}"
+   target="_blank"
+   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center"
+   style="background: #DC2626; color: white; border: 1px solid #B91C1C;"
+   onmouseover="this.style.background='#B91C1C';"
+   onmouseout="this.style.background='#DC2626';">
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="w-4 h-4 mr-2"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor">
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+
+    Constancia PDF
+</a>
+
             @endif
             <a href="{{ route('procuradores.edit', $procurador->procurador_dni) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
