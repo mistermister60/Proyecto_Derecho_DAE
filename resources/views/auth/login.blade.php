@@ -1,3 +1,8 @@
+{{--
+    Vista: auth/login
+    Propósito: Formulario de inicio de sesión del sistema. Autentica al usuario mediante correo electrónico y contraseña.
+    Variables: $errors (errores de validación del formulario)
+--}}
 <!DOCTYPE html>
 <html lang="es">
 <head>

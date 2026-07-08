@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: clientes/edit
+    Propósito: Formulario de edición de datos del cliente. Permite modificar información personal, estado civil, datos laborales y salario.
+    Variables: $cliente (modelo Cliente)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Editar Cliente')
 

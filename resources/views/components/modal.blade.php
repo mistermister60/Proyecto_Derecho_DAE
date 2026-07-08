@@ -1,3 +1,8 @@
+{{--
+    Componente: modal
+    Propósito: Ventana modal con Alpine.js. Incluye backdrop semitransparente, encabezado con título, botón de cierre y cuerpo con slot. Se activa con eventos window personalizados.
+    Props: $id (identificador único), $titulo (texto del encabezado), $maxWidth (clase de ancho máximo), $slot (contenido del cuerpo)
+--}}
 @props(['id', 'titulo' => '', 'maxWidth' => 'max-w-lg'])
 
 <div x-data="{ show: false }"

@@ -1,3 +1,8 @@
+{{--
+    Vista: profile/partials/update-password-form
+    Propósito: Formulario parcial para actualizar la contraseña del usuario autenticado. Requiere contraseña actual, contraseña nueva y confirmación.
+    Variables: $user (modelo Usuario autenticado)
+--}}
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">

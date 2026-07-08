@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: procuradores/create
+    Propósito: Formulario para crear un nuevo procurador. Incluye datos personales, carnet profesional, fecha de nacimiento, género, email y dirección.
+    Variables: ninguna (formulario vacío)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Crear Procurador')
 

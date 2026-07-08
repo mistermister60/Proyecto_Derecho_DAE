@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: clientes/index
+    Propósito: Listado de clientes con buscador en vivo y filtro activo/inactivo. Muestra tarjetas con iniciales, nombre, DNI, teléfono y conteo de casos.
+    Variables: $clientes (paginator de modelos Cliente)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Clientes')
 

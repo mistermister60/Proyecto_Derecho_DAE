@@ -1,9 +1,28 @@
 @extends('layouts.app')
+{{--
+    Vista: agenda/index
+    Propósito: Calendario de audiencias con vista mensual interactiva. Incluye lista de próximas audiencias y tabla completa de todas las audiencias registradas.
+    Variables: $audiencias (Collection de modelos Audiencia), $proximas (Collection de audiencias próximas), $esDirector (bool), $esProcurador (bool)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Agenda')
 
+@php
+    $audienciasJson = $audiencias->map(fn($a) => [
+        'audiencia_fecha' => $a->audiencia_fecha,
+        'audiencia_hora' => $a->audiencia_hora ? \Carbon\Carbon::parse($a->audiencia_hora)->format('H:i') : null,
+        'audiencia_tipo' => $a->audiencia_tipo,
+        'audiencia_juzgado' => $a->audiencia_juzgado,
+        'audiencia_estado' => $a->audiencia_estado,
+        'expediente' => $a->caso?->caso_numero_expediente,
+        'procurador_nombre' => $a->procurador?->nombre_completo,
+    ])->values();
+@endphp
+
 @section('content')
-<div x-data="{ mes: {{ now()->month }}, año: {{ now()->year }} }">
+<div x-data="agendaApp()">
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
         <h1 class="text-xl font-bold" style="color: #111827;">Agenda de audiencias</h1>
@@ -13,13 +32,13 @@
         {{-- Calendario --}}
         <div class="col-span-1 lg:col-span-2 rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <div class="flex items-center justify-between mb-4">
-                <button @click="mes = mes === 1 ? 12 : mes - 1; if(mes === 12) año--"
+                <button @click="mesAnterior()"
                         class="p-1.5 rounded-lg transition-colors" style="border: 1px solid #E5E7EB;"
                         onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
-                <h3 class="text-sm font-semibold" style="color: #111827;" x-text="`${['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][mes - 1]} ${año}`"></h3>
-                <button @click="mes = mes === 12 ? 1 : mes + 1; if(mes === 1) año++"
+                <h3 class="text-sm font-semibold" style="color: #111827;" x-text="`${nombreMes} ${año}`"></h3>
+                <button @click="mesSiguiente()"
                         class="p-1.5 rounded-lg transition-colors" style="border: 1px solid #E5E7EB;"
                         onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -33,30 +52,23 @@
                 @endforeach
             </div>
 
-            {{-- Días del calendario --}}
+            {{-- Días del calendario (renderizado 100% con Alpine.js para navegación interactiva entre meses) --}}
             <div class="grid grid-cols-7 gap-1">
-                @php
-                    $primerDia = now()->startOfMonth();
-                    $diaSemanaInicio = ($primerDia->dayOfWeekIso - 1); // 0 = lunes
-                    $diasEnMes = now()->daysInMonth;
-                @endphp
-                @for ($i = 0; $i < $diaSemanaInicio; $i++)
-                <div></div>
-                @endfor
-                @for ($dia = 1; $dia <= $diasEnMes; $dia++)
-                @php
-                    $fechaActual = now()->setDay($dia)->toDateString();
-                    $tieneAudiencia = $audiencias->first(fn($a) => $a->audiencia_fecha == $fechaActual);
-                    $esHoy = $fechaActual === now()->toDateString();
-                @endphp
-                <div class="text-center py-2 rounded-lg text-sm relative {{ $esHoy ? 'font-bold' : '' }}"
-                     style="{{ $esHoy ? 'background: #2563EB; color: white;' : ($tieneAudiencia ? 'background: #EFF6FF; color: #2563EB;' : 'color: #374151;') }}">
-                    {{ $dia }}
-                    @if ($tieneAudiencia)
-                    <span class="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full" style="width: 4px; height: 4px; background: #2563EB; display: inline-block;"></span>
-                    @endif
-                </div>
-                @endfor
+                {{-- Celdas vacías antes del día 1 --}}
+                <template x-for="(_, idx) in offsetDias" :key="'o'+idx">
+                    <div></div>
+                </template>
+                {{-- Días del mes --}}
+                <template x-for="dia in diasMes" :key="dia">
+                    <div class="text-center py-2 rounded-lg text-sm relative"
+                         :class="esHoy(dia) ? 'font-bold' : ''"
+                         :style="diaStyle(dia)">
+                        <span x-text="dia"></span>
+                        <span x-show="tieneAudiencia(dia)"
+                              class="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full"
+                              style="width: 4px; height: 4px; background: #2563EB; display: inline-block;"></span>
+                    </div>
+                </template>
             </div>
         </div>
 
@@ -129,4 +141,62 @@
         </div>
     </div>
 </div>
+
+<script>
+    function agendaApp() {
+        return {
+            mes: {{ now()->month }},
+            año: {{ now()->year }},
+            audiencias: {{ Js::from($audienciasJson) }},
+            meses: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+
+            get nombreMes() {
+                return this.meses[this.mes - 1];
+            },
+
+            get diasEnMes() {
+                return new Date(this.año, this.mes, 0).getDate();
+            },
+
+            get primerDiaSemana() {
+                const d = new Date(this.año, this.mes - 1, 1);
+                return d.getDay() === 0 ? 6 : d.getDay() - 1;
+            },
+
+            get offsetDias() {
+                return Array.from({ length: this.primerDiaSemana });
+            },
+
+            get diasMes() {
+                return Array.from({ length: this.diasEnMes }, (_, i) => i + 1);
+            },
+
+            mesAnterior() {
+                if (this.mes === 1) { this.mes = 12; this.año--; }
+                else { this.mes--; }
+            },
+
+            mesSiguiente() {
+                if (this.mes === 12) { this.mes = 1; this.año++; }
+                else { this.mes++; }
+            },
+
+            tieneAudiencia(dia) {
+                const fecha = `${this.año}-${String(this.mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+                return this.audiencias.some(a => a.audiencia_fecha === fecha);
+            },
+
+            esHoy(dia) {
+                const hoy = new Date();
+                return dia === hoy.getDate() && this.mes === hoy.getMonth() + 1 && this.año === hoy.getFullYear();
+            },
+
+            diaStyle(dia) {
+                if (this.esHoy(dia)) return 'background: #2563EB; color: white;';
+                if (this.tieneAudiencia(dia)) return 'background: #EFF6FF; color: #2563EB;';
+                return 'color: #374151;';
+            }
+        }
+    }
+</script>
 @endsection

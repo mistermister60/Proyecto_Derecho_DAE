@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: demandados/show
+    Propósito: Detalle completo de un demandado con información personal, laboral y lista de casos asociados. Permite editar, activar o desactivar el demandado.
+    Variables: $demandado (modelo Demandado con relación casos)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', $demandado->nombre_completo)
 

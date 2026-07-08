@@ -4,13 +4,28 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Form request para almacenar un nuevo caso legal.
+ *
+ * Valida los datos necesarios para crear un caso en el sistema,
+ * incluyendo las relaciones con cliente, tipo de trámite y procurador,
+ * así como los detalles descriptivos del caso.
+ */
 class StoreCasoRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, string>
+     */
     public function rules(): array
     {
         return [

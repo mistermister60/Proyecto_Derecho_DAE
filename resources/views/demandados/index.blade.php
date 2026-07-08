@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: demandados/index
+    Propósito: Listado de demandados con buscador en vivo y filtro activo/inactivo. Muestra tarjetas con iniciales, nombre, DNI, teléfono y conteo de casos asociados.
+    Variables: $demandados (paginator de modelos Demandado)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Demandados')
 

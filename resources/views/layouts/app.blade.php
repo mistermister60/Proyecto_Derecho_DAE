@@ -1,16 +1,24 @@
+{{--
+    Vista: layouts/app
+    Propósito: Layout principal del sistema autenticado. Incluye sidebar de navegación lateral con iconos SVG, topbar con buscador, notificaciones y menú de usuario. El sidebar se adapta según el rol (procurador ve menos opciones). Contiene el slot @yield('content') para el contenido dinámico.
+    Variables: $notificaciones (colección de notificaciones del usuario), $notificacionesPendientes (conteo de notificaciones sin leer)
+    @yield: title, content
+    @stack: scripts
+--}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#6777ef">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Procurador Legal">
-    <link rel="apple-touch-icon" href="/logo.png">
-    <link rel="manifest" href="/manifest.json">
+
+    {{-- Íconos de la aplicación (balanza de la justicia) — PWA y favicon --}}
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48x48.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
 
     <title>@yield('title', 'Consultorio Jurídico - USAP') | Consultorio Jurídico</title>
 
@@ -18,7 +26,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @PwaHead
 </head>
-<body x-data="{ sidebarOpen: false }">
+<body x-data="{ sidebarOpen: false, openNotif: false, openUser: false }">
 
 <div class="flex h-screen w-full overflow-hidden">
     {{-- ==================== SIDEBAR ==================== --}}
@@ -38,13 +46,19 @@
            :class="sidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'"
            style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08);">
 
-        {{-- Logo --}}
+        {{-- Logo: Balanza de la justicia --}}
         <div class="flex items-center gap-3 px-5 py-5" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div class="flex items-center justify-center rounded-lg shrink-0" style="width: 36px; height: 36px; background: rgba(37,99,235,0.9);">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 20V10"/>
-                    <path d="M18 20V4"/>
-                    <path d="M6 20v-4"/>
+                <svg width="20" height="20" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <g transform="translate(256,260)" fill="white" stroke="white" stroke-width="12">
+                        <polygon points="0,-80 -120,80 120,80" fill="none" stroke="white" stroke-width="14" stroke-linejoin="round"/>
+                        <line x1="-140" y1="-20" x2="140" y2="-20" stroke="white" stroke-width="14" stroke-linecap="round"/>
+                        <line x1="0" y1="-80" x2="0" y2="-20" stroke="white" stroke-width="14" stroke-linecap="round"/>
+                        <line x1="-140" y1="-20" x2="-140" y2="30" stroke="white" stroke-width="8" stroke-linecap="round"/>
+                        <ellipse cx="-140" cy="40" rx="50" ry="14" fill="white"/>
+                        <line x1="140" y1="-20" x2="140" y2="30" stroke="white" stroke-width="8" stroke-linecap="round"/>
+                        <ellipse cx="140" cy="40" rx="50" ry="14" fill="white"/>
+                    </g>
                 </svg>
             </div>
             <div>
@@ -172,86 +186,93 @@
                            onblur="this.style.borderColor='#E5E7EB'; this.style.width='220px';">
                 </div>
 
-                {{-- Notificaciones --}}
-                <div class="relative" x-data="{ openNotif: false }">
-                    <button @click="openNotif = !openNotif; $event.stopPropagation()" class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                        </svg>
-                        @if(isset($notificacionesPendientes) && $notificacionesPendientes > 0)
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: #EF4444;"></span>
-                        @endif
-                    </button>
+                {{-- Dropdowns compartidos (mismo scope Alpine) --}}
+                                 <div class="contents" 
+                                      @keydown.escape.window="openNotif = false; openUser = false">
 
-                    {{-- Dropdown --}}
-                    <div x-show="openNotif" x-cloak x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                         @click.outside="openNotif = false" @keydown.escape.window="openNotif = false"
-                         class="absolute top-12 right-0 w-80 rounded-xl shadow-lg border py-1 z-50"
-                         style="background: #FFFFFF; border-color: #E5E7EB;">
-                        <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E5E7EB;">
-                            <p class="text-sm font-semibold" style="color: #111827;">Notificaciones</p>
-                            <span class="text-xs px-2 py-0.5 rounded-full" style="background: #EFF6FF; color: #2563EB;">
-                                {{ $notificacionesPendientes ?? 0 }} nueva(s)
-                            </span>
-                        </div>
-                        <div class="max-h-72 overflow-y-auto">
-                            @forelse($notificaciones ?? [] as $notif)
-                                <div class="px-4 py-3 flex gap-3 items-start transition-colors duration-100" style="border-bottom: 1px solid #F3F4F6;"
-                                     onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
-                                    <div class="flex items-center justify-center rounded-full shrink-0 mt-0.5" style="width: 8px; height: 8px; background: #2563EB;"></div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm" style="color: #374151;">{{ $notif['mensaje'] }}</p>
-                                        <p class="text-xs mt-1" style="color: #9CA3AF;">{{ $notif['fecha'] }}</p>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="px-4 py-8 text-center">
-                                    <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                                    </svg>
-                                    <p class="text-sm" style="color: #9CA3AF;">No hay notificaciones</p>
-                                    <p class="text-xs mt-1" style="color: #D1D5DB;">Aparecerán aquí las actualizaciones de tus casos</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Usuario --}}
-                <div class="relative" x-data="{ open: false }">
-                    <div class="flex items-center gap-2 cursor-pointer" @click="open = !open">
-                        <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
-                            {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
-                        </div>
-                        <div class="text-sm hidden md:block" style="color: #111827;">
-                            <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
-                        </div>
-                        <svg :class="open ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-
-                    {{-- Dropdown menú --}}
-                    <div x-show="open" x-cloak @click.outside="open = false" @keydown.escape.window="open = false"
-                         x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute top-12 right-0 w-48 rounded-lg shadow-lg border py-1 z-50"
-                         style="background: #FFFFFF; border-color: #E5E7EB;">
-                        <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
-                            <p class="text-xs" style="color: #9CA3AF;">{{ Auth::user()->email }}</p>
-                            <p class="text-xs font-medium mt-0.5" style="color: #6B7280;">{{ Auth::user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
-                        </div>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
-                                Cerrar sesión
+                    {{-- Notificaciones --}}
+                    <div class="relative">
+                            <button @click="openNotif = !openNotif; openUser = false" class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                </svg>
+                                @if(isset($notificacionesPendientes) && $notificacionesPendientes > 0)
+                                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: #EF4444;"></span>
+                                @endif
                             </button>
-                        </form>
+
+                        {{-- Dropdown --}}
+                        <div x-show="openNotif" x-cloak
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                             @click.outside="openNotif = false"
+                             class="absolute top-12 right-0 w-80 rounded-xl shadow-lg border py-1 z-50"
+                             style="background: #FFFFFF; border-color: #E5E7EB;">
+                            <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E5E7EB;">
+                                <p class="text-sm font-semibold" style="color: #111827;">Notificaciones</p>
+                                <span class="text-xs px-2 py-0.5 rounded-full" style="background: #EFF6FF; color: #2563EB;">
+                                    {{ $notificacionesPendientes ?? 0 }} nueva(s)
+                                </span>
+                            </div>
+                            <div class="max-h-72 overflow-y-auto">
+                                @forelse($notificaciones ?? [] as $notif)
+                                    <div class="px-4 py-3 flex gap-3 items-start transition-colors duration-100" style="border-bottom: 1px solid #F3F4F6;"
+                                         onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                                        <div class="flex items-center justify-center rounded-full shrink-0 mt-0.5" style="width: 8px; height: 8px; background: #2563EB;"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm" style="color: #374151;">{{ $notif['mensaje'] }}</p>
+                                            <p class="text-xs mt-1" style="color: #9CA3AF;">{{ $notif['fecha'] }}</p>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="px-4 py-8 text-center">
+                                        <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                        </svg>
+                                        <p class="text-sm" style="color: #9CA3AF;">No hay notificaciones</p>
+                                        <p class="text-xs mt-1" style="color: #D1D5DB;">Aparecerán aquí las actualizaciones de tus casos</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Usuario --}}
+                    <div class="relative">
+                            <button @click="openUser = !openUser; openNotif = false" class="flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors duration-150" style="background: transparent; border: none;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                                 <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
+                                     {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
+                                 </div>
+                                 <div class="text-sm hidden md:block" style="color: #111827;">
+                                     <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
+                                 </div>
+                                 <svg :class="openUser ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
+                                     <polyline points="6 9 12 15 18 9"/>
+                                 </svg>
+                             </button>
+
+                        {{-- Dropdown menú --}}
+                        <div x-show="openUser" x-cloak
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                             @click.outside="openUser = false"
+                             class="absolute top-12 right-0 w-48 rounded-lg shadow-lg border py-1 z-50"
+                             style="background: #FFFFFF; border-color: #E5E7EB;">
+                            <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
+                                <p class="text-xs" style="color: #9CA3AF;">{{ Auth::user()->email }}</p>
+                                <p class="text-xs font-medium mt-0.5" style="color: #6B7280;">{{ Auth::user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
+                            </div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -333,7 +354,5 @@
     });
 </script>
 <x:mobile-navigation />
-
-@RegisterServiceWorkerScript
 </body>
 </html>

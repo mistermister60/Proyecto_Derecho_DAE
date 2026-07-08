@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: procuradores/show
+    Propósito: Detalle completo de un procurador con información personal, carnet, email y lista de casos asignados. Permite editar el usuario asociado, activar o desactivar el procurador.
+    Variables: $procurador (modelo Procurador con relaciones usuario y casos)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', $procurador->nombre_completo)
 

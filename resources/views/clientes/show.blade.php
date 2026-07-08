@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: clientes/show
+    Propósito: Detalle completo de un cliente con información personal, laboral, hijos y lista de casos asociados. Permite editar, activar o desactivar el cliente.
+    Variables: $cliente (modelo Cliente con relación casos)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', $cliente->nombre_completo)
 

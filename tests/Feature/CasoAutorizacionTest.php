@@ -13,22 +13,56 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
+/**
+ * Tests de autorización y permisos del módulo de Casos.
+ *
+ * Verifica las reglas de negocio para la autorización de casos:
+ * C1 - escalación de privilegios en actualización,
+ * C2 - validación de longitud máxima de campos (varchar 50),
+ * C4 - restricción de destroy y reasignación solo para Director.
+ * Asegura que procuradores solo puedan modificar sus propios casos
+ * y que el Director tenga acceso completo.
+ */
 class CasoAutorizacionTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Usuario con rol Director para pruebas de permisos elevados.
+     */
     private Usuario $director;
 
+    /**
+     * Usuario con rol Procurador asignado al caso de prueba.
+     */
     private Usuario $procuradorA;
 
+    /**
+     * Usuario con rol Procurador NO asignado al caso (usuario ajeno).
+     */
     private Usuario $procuradorB;
 
+    /**
+     * Caso de prueba asignado al procuradorA.
+     */
     private Caso $casoDeA;
 
+    /**
+     * ID del estado "Entrevista" creado durante setUp.
+     */
     private int $estadoEntrevistaId;
 
+    /**
+     * ID del estado "Admitido" creado durante setUp.
+     */
     private int $estadoAdmitidoId;
 
+    /**
+     * Configuración inicial de cada test.
+     *
+     * Crea roles, estados de caso, trámite, cliente, procuradores,
+     * usuarios y un caso asignado al procuradorA.
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -90,6 +124,15 @@ class CasoAutorizacionTest extends TestCase
         ]);
     }
 
+    /**
+     Genera el payload estándar que un procurador enviaría al actualizar un caso.
+     *
+     * Permite fusionar datos adicionales para probar escenarios específicos
+     * como inyección de campos restringidos.
+     *
+     * @param  array  $extra  Datos adicionales para fusionar con el payload base.
+     * @return array Payload combinado para la solicitud de actualización.
+     */
     private function payloadProcurador(array $extra = []): array
     {
         return array_merge([
@@ -102,6 +145,12 @@ class CasoAutorizacionTest extends TestCase
 
     // ── C1: escalación de privilegios en update ──────────────────────────────
 
+    /**
+     * Verifica que un procurador pueda actualizar los campos permitidos de su caso.
+     *
+     * Happy path: el procuradorA actualiza estado, juzgado y relación de hechos
+     * de su caso asignado, esperando una redirección exitosa.
+     */
     public function test_procurador_puede_actualizar_campos_permitidos_de_su_caso(): void
     {
         $response = $this->actingAs($this->procuradorA)
@@ -115,6 +164,13 @@ class CasoAutorizacionTest extends TestCase
         ]);
     }
 
+    /**
+     * Verifica que un procurador NO pueda cambiar el procurador asignado
+     * ni modificar las observaciones del director ni el estado del caso.
+     *
+     * Security test: intenta escalar privilegios enviando campos restringidos
+     * y verifica que los valores originales se conserven.
+     */
     public function test_procurador_no_puede_cambiar_procurador_ni_observaciones_del_director(): void
     {
         $procuradorOriginal = $this->casoDeA->procurador_id;
@@ -133,6 +189,12 @@ class CasoAutorizacionTest extends TestCase
         $this->assertSame('activo', $this->casoDeA->caso_estado);
     }
 
+    /**
+     * Verifica que un procurador NO pueda actualizar un caso que no le pertenece.
+     *
+     * Failure path: el procuradorB intenta actualizar el caso de procuradorA
+     * y recibe un error HTTP 403 Forbidden.
+     */
     public function test_procurador_no_puede_actualizar_caso_ajeno(): void
     {
         $this->actingAs($this->procuradorB)
@@ -140,6 +202,12 @@ class CasoAutorizacionTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * Verifica que un procurador NO pueda ver los detalles de un caso ajeno.
+     *
+     * Failure path: el procuradorB intenta acceder al show del caso de procuradorA
+     * y recibe un error HTTP 403 Forbidden.
+     */
     public function test_procurador_no_puede_ver_caso_ajeno(): void
     {
         $this->actingAs($this->procuradorB)
@@ -147,6 +215,12 @@ class CasoAutorizacionTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * Verifica que el Director pueda actualizar todos los campos de cualquier caso.
+     *
+     * Happy path: el Director modifica procurador asignado, observaciones
+     * y estado del caso, esperando que todos los cambios se persistan.
+     */
     public function test_director_puede_actualizar_todos_los_campos(): void
     {
         $this->actingAs($this->director)
@@ -168,6 +242,12 @@ class CasoAutorizacionTest extends TestCase
 
     // ── C4: destroy y reasignar solo Director ────────────────────────────────
 
+    /**
+     * Verifica que un procurador NO pueda desactivar ni su propio caso.
+     *
+     * Failure path: el procuradorA intenta eliminar (desactivar) su propio caso
+     * y recibe HTTP 403, verificando que el caso permanezca activo.
+     */
     public function test_procurador_no_puede_desactivar_ni_su_propio_caso(): void
     {
         $this->actingAs($this->procuradorA)
@@ -177,6 +257,12 @@ class CasoAutorizacionTest extends TestCase
         $this->assertDatabaseHas('casos', ['caso_id' => $this->casoDeA->caso_id, 'caso_estado' => 'activo']);
     }
 
+    /**
+     * Verifica que un procurador NO pueda acceder a la página de reasignación.
+     *
+     * Failure path: el procuradorA intenta acceder a la ruta de reasignar
+     * su caso y recibe HTTP 403 Forbidden.
+     */
     public function test_procurador_no_puede_acceder_a_reasignacion(): void
     {
         $this->actingAs($this->procuradorA)
@@ -184,6 +270,12 @@ class CasoAutorizacionTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * Verifica que el Director pueda desactivar (eliminar) un caso.
+     *
+     * Happy path: el Director elimina el caso y verifica que su estado
+     * cambie a 'inactivo'.
+     */
     public function test_director_puede_desactivar_caso(): void
     {
         $this->actingAs($this->director)
@@ -195,6 +287,12 @@ class CasoAutorizacionTest extends TestCase
 
     // ── C2: validación alineada al esquema (varchar 50) ──────────────────────
 
+    /**
+     * Verifica que la creación de un caso rechace 'parte_representada' con más de 50 caracteres.
+     *
+     * Failure path: envía un valor de 51 caracteres en el campo
+     * 'caso_parte_representada' y espera un error de validación.
+     */
     public function test_store_rechaza_parte_representada_mayor_a_50_caracteres(): void
     {
         $this->actingAs($this->director)
@@ -209,6 +307,12 @@ class CasoAutorizacionTest extends TestCase
             ->assertSessionHasErrors('caso_parte_representada');
     }
 
+    /**
+     * Verifica que la actualización de un caso rechace 'parte_representada' con más de 50 caracteres.
+     *
+     * Failure path: intenta actualizar con un valor de 51 caracteres
+     * y espera un error de validación en 'caso_parte_representada'.
+     */
     public function test_update_rechaza_parte_representada_mayor_a_50_caracteres(): void
     {
         $this->actingAs($this->procuradorA)

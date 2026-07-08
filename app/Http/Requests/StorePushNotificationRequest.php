@@ -4,18 +4,28 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Form request para almacenar una suscripción de notificación push.
+ *
+ * Valida que el payload de suscripción sea un string válido y que
+ * el usuario asociado exista en la tabla `usuarios`.
+ */
 class StorePushNotificationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * Las notificaciones push están permitidas para todos los usuarios autenticados.
      */
     public function authorize(): bool
     {
-        return true; // Push notifications are allowed for all authenticated users
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
@@ -26,7 +36,9 @@ class StorePushNotificationRequest extends FormRequest
     }
 
     /**
-     * Get custom messages for validator errors.
+     * Get the custom validation error messages.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {

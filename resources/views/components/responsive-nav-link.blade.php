@@ -1,3 +1,8 @@
+{{--
+    Componente: responsive-nav-link
+    Propósito: Enlace de navegación para menú responsive mobile. Usa borde lateral izquierdo para indicar el estado activo.
+    Props: $active (bool), $attributes (href), $slot (texto)
+--}}
 @props(['active'])
 
 @php

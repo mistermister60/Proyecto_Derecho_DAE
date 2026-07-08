@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: clientes/create
+    Propósito: Formulario para crear un nuevo cliente. Incluye datos personales, estado civil, información laboral y familiar (hijos, profesión, salario).
+    Variables: ninguna (formulario vacío)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Crear Cliente')
 

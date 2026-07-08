@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: usuarios/index
+    Propósito: Listado de usuarios del sistema con tabla, buscador en vivo y filtro activo/inactivo. Muestra nombre, email, rol, procurador asociado y acciones de editar/activar/desactivar.
+    Variables: $usuarios (paginator de modelos Usuario), $estado (string para filtro), $roles (Collection)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Usuarios')
 

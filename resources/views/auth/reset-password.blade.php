@@ -1,4 +1,10 @@
 <x-guest-layout>
+{{--
+    Vista: auth/reset-password
+    Propósito: Formulario para restablecer la contraseña usando un token enviado por correo.
+    Variables: $request (contiene el token y el email del usuario), $errors (errores de validación)
+    @extends: guest-layout
+--}}
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 

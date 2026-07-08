@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: casos/reasignar
+    Propósito: Permite al Director reasignar un caso a otro procurador. Muestra información actual del caso y una lista de procuradores disponibles con radio buttons.
+    Variables: $caso (modelo Caso con relaciones cliente y procurador), $procuradores (Collection de modelos Procurador activos)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Reasignar caso')
 

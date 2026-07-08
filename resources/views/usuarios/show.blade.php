@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: usuarios/show
+    Propósito: Detalle completo de un usuario del sistema con información personal, rol, procurador asociado y actividad reciente (casos). Permite editar, activar o desactivar el usuario.
+    Variables: $usuario (modelo Usuario con relaciones rol, procurador)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', $usuario->usuario_nombre)
 

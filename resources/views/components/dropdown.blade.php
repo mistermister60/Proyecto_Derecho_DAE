@@ -1,3 +1,8 @@
+{{--
+    Componente: dropdown
+    Propósito: Menú desplegable con Alpine.js. Se usa para el menú de usuario y notificaciones. Soporta alineación izquierda, derecha o superior.
+    Props: $align (right|left|top), $width (ancho del menú), $contentClasses, $trigger (slot), $content (slot)
+--}}
 @props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-white'])
 
 @php

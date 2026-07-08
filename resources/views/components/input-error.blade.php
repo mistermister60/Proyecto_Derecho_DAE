@@ -1,3 +1,8 @@
+{{--
+    Componente: input-error
+    Propósito: Muestra los errores de validación de un campo del formulario. Renderiza una lista con role="alert".
+    Props: $messages (array de mensajes de error)
+--}}
 @props(['messages'])
 
 @if ($messages)

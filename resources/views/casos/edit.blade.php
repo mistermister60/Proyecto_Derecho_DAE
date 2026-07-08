@@ -1,4 +1,11 @@
 @extends('layouts.app')
+{{--
+    Vista: casos/edit
+    Propósito: Formulario de edición de caso. Permite modificar partes involucradas, tipo de trámite, estado del pipeline, procurador asignado, fechas y relación de hechos. Los campos críticos son solo editables por el Director.
+    Variables: $caso (modelo Caso), $estados (Collection de estados del pipeline), $tramites (Collection de tipos de trámite), $clientes (Collection de modelos Cliente), $demandados (Collection de modelos Demandado), $procuradores (Collection de modelos Procurador)
+    @extends: layouts.app
+    @section: content
+--}}
 
 @section('title', 'Editar Caso — ' . $caso->caso_numero_expediente)
 
