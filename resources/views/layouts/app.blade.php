@@ -65,7 +65,7 @@
                 <div style="color: #FFFFFF; font-size: 12px; font-weight: 600; line-height: 1.2;">
                     Consultorio Jurídico
                 </div>
-                <div style="color: rgba(255,255,255,0.55); font-size: 10.5px; line-height: 1.4;">
+                <div style="color: rgba(201,169,97,0.7); font-size: 10.5px; line-height: 1.4;">
                     Univ. de San Pedro Sula
                 </div>
             </div>
@@ -102,9 +102,9 @@
                 <a href="{{ route($item['route']) }}"
                    @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
-                   style="{{ $isActive ? 'background: rgba(37,99,235,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65); hover:background: rgba(255,255,255,0.08);' }}"
-                   onmouseover="this.style.background='{{ $isActive ? 'rgba(37,99,235,0.2)' : 'rgba(255,255,255,0.08)' }}'; this.style.color='#FFFFFF';"
-                   onmouseout="this.style.background='{{ $isActive ? 'rgba(37,99,235,0.2)' : 'transparent' }}'; this.style.color='{{ $isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)' }}';">
+                   style="{{ $isActive ? 'background: rgba(201,169,97,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65); hover:background: rgba(201,169,97,0.08);' }}"
+                   onmouseover="this.style.background='{{ $isActive ? 'rgba(201,169,97,0.2)' : 'rgba(201,169,97,0.08)' }}'; this.style.color='#FFFFFF';"
+                   onmouseout="this.style.background='{{ $isActive ? 'rgba(201,169,97,0.2)' : 'transparent' }}'; this.style.color='{{ $isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)' }}';">
                     @if ($item['icon'] === 'dashboard')
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -146,9 +146,9 @@
                 <a href="{{ route('casos.create') }}"
                    @click="sidebarOpen = false"
                    class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
-                   style="background: #2563EB; color: white;"
-                   onmouseover="this.style.background='#1d4ed8';"
-                   onmouseout="this.style.background='#2563EB';">
+                   style="background: #c9a961; color: #1a2c50;"
+                   onmouseover="this.style.background='#b89651';"
+                   onmouseout="this.style.background='#c9a961';">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
@@ -162,7 +162,7 @@
     <div class="flex flex-col flex-1 h-full overflow-hidden">
 
         {{-- Topbar --}}
-        <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #FFFFFF; border-bottom: 1px solid #E5E7EB;">
+        <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB;">
             <div class="flex items-center gap-3">
                 {{-- Hamburger (mobile only) --}}
                 <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 rounded-lg transition-colors" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';" aria-label="Abrir menú">
