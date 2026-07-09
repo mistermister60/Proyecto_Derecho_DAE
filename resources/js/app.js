@@ -50,23 +50,46 @@ window.addEventListener('offline', () => {
 // PWA Installation
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevenir el mini-infobar nativo de Chrome para usar nuestro botón personalizado
     e.preventDefault();
     deferredPrompt = e;
-    
-    // Mostrar botón de instalación después de un cierto tiempo o acción específica
-    setTimeout(() => {
-        if (deferredPrompt && document.getElementById('install-pwa-button')) {
-            document.getElementById('install-pwa-button').style.display = 'block';
-        }
-    }, 30000); // Mostrar después de 30 segundos
+
+    // Mostrar el botón de instalación (si existe en el DOM)
+    const installBtn = document.getElementById('install-pwa-button');
+    if (installBtn) {
+        installBtn.classList.remove('hidden');
+        installBtn.classList.add('inline-flex');
+        installBtn.addEventListener('click', triggerInstall);
+    }
 });
 
 window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
-    if (document.getElementById('install-pwa-button')) {
-        document.getElementById('install-pwa-button').style.display = 'none';
+    const installBtn = document.getElementById('install-pwa-button');
+    if (installBtn) {
+        installBtn.classList.add('hidden');
+        installBtn.classList.remove('inline-flex');
     }
 });
+
+// Función para disparar el prompt de instalación
+function triggerInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+            console.log('Usuario aceptó la instalación de la PWA');
+        } else {
+            console.log('Usuario canceló la instalación de la PWA');
+        }
+        deferredPrompt = null;
+        const installBtn = document.getElementById('install-pwa-button');
+        if (installBtn) {
+            installBtn.classList.add('hidden');
+            installBtn.classList.remove('inline-flex');
+        }
+    });
+}
 
 // NOTIFICACIONES PUSH INTEGRACIÓN
 async function subscribeToPushNotifications() {

@@ -15,6 +15,7 @@ class AudienciaSeeder extends Seeder
 
         if (empty($casos)) {
             $this->command->warn(' No hay casos activos para crear audiencias.');
+
             return;
         }
 

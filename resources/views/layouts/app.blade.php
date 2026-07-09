@@ -282,6 +282,9 @@
         <main class="flex-1 overflow-auto p-4 md:p-6">
             @yield('content')
         </main>
+
+        {{-- Pie de página con créditos y botón de instalación PWA --}}
+        <x:app-footer />
     </div>
 </div>
 

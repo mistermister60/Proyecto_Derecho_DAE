@@ -24,11 +24,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandadoController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\EntrevistaController;
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
-use App\Http\Controllers\PDFController;
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
 Route::get('/', function () {
@@ -100,7 +100,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/casos/{expediente}/reasignar', [CasoController::class, 'reasignar'])->name('casos.reasignar');
         Route::post('/casos/{expediente}/reasignar', [CasoController::class, 'storeReasignacion'])->name('casos.storeReasignacion');
 
-        });
+    });
     Route::get('/casos/{expediente}', [CasoController::class, 'show'])->name('casos.show');
     Route::get('/casos/{expediente}/pdf-seguimiento', [PDFController::class, 'seguimiento'])->name('casos.pdf-seguimiento');
 
