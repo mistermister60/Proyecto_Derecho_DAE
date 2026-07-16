@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginCredentialsRequest;
 use App\Services\AuthService;
+use App\Mail\CodigoVerificacionMail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 /**
  * Controlador para la autenticación de usuarios en el sistema DAE.
@@ -52,13 +55,45 @@ class AuthController extends BaseController
                 $request->input('contrasena')
             );
 
-            return redirect()->intended(route('dashboard'));
+            // 1. Generamos un código aleatorio de 6 dígitos
+        $codigo2FA = rand(100000, 999999);
+
+        // 2. Guardamos los datos temporalmente en la sesión para validarlos después
+        session([
+            'two_factor_code' => $codigo2FA,
+            'two_factor_expires_at' => Carbon::now()->addMinutes(15),
+            'two_factor_email' => $request->input('email')
+        ]);
+
+        // 3. Enviamos el correo real utilizando el módulo que creaste
+        Mail::to($request->input('email'))->send(new CodigoVerificacionMail($codigo2FA));
+
+        // 4. Redirigimos al usuario a la vista para escribir el código
+        return redirect()->route('auth.two-factor');
 
         } catch (AuthenticationException $e) {
             return back()->withErrors([
                 'email' => $e->getMessage(),
             ])->onlyInput('email');
         }
+    }
+
+    public function verifyTwoFactor(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'code' => 'required|numeric',
+        ]);
+
+        if ($request->input('code') == session('two_factor_code') && 
+            \Carbon\Carbon::now()->isBefore(session('two_factor_expires_at'))) {
+            
+            // Si el código es correcto y no ha expirado, limpiamos la sesión y entra al sistema
+            session()->forget(['two_factor_code', 'two_factor_expires_at']);
+            
+            return redirect()->intended(route('dashboard'));
+        }
+
+        return back()->withErrors(['code' => 'El código de verificación es inválido o ha expirado.']);
     }
 
     /**

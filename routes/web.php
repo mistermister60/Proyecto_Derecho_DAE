@@ -84,6 +84,14 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// === NUEVAS RUTAS DE DOBLE FACTOR (2FA) ===
+Route::get('/verify-two-factor', function () {
+    return view('auth.two-factor');
+})->name('auth.two-factor');
+
+Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
+// ==========================================
+
 // Rutas protegidas (requieren autenticación)
 Route::middleware('auth')->group(function () {
 

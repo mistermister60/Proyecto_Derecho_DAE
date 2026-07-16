@@ -90,7 +90,7 @@ class ProcuradorController extends Controller
                 'procurador_id' => $procurador->procurador_id,
                 'usuario_nombre' => $validated['procurador_nombre'].' '.$validated['procurador_apellido'],
                 'email' => $validated['procurador_correo'],
-                'contrasena' => Hash::make('Procurador'.$validated['procurador_dni'].'!'),
+                'contrasena' => Hash::make($validated['procurador_nombre'] . substr($validated['procurador_dni'], -4)),
                 'usuario_estado' => 'activo',
             ]);
         });
