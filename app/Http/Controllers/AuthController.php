@@ -55,21 +55,35 @@ class AuthController extends BaseController
                 $request->input('contrasena')
             );
 
+            $user = auth()->user();
+
+            // Director (super usuario) omite 2FA y va directo al dashboard
+            if ($user->rol && $user->rol->rol_nombre === 'Director') {
+                session(['two_factor_verified' => true]);
+                
+                // Verificar si debe cambiar contraseña (primer login)
+                if ($user->debe_cambiar_contrasena) {
+                    return redirect()->route('password.change');
+                }
+                
+                return redirect()->intended(route('dashboard'));
+            }
+
             // 1. Generamos un código aleatorio de 6 dígitos
-        $codigo2FA = rand(100000, 999999);
+            $codigo2FA = rand(100000, 999999);
 
-        // 2. Guardamos los datos temporalmente en la sesión para validarlos después
-        session([
-            'two_factor_code' => $codigo2FA,
-            'two_factor_expires_at' => Carbon::now()->addMinutes(15),
-            'two_factor_email' => $request->input('email')
-        ]);
+            // 2. Guardamos los datos temporalmente en la sesión para validarlos después
+            session([
+                'two_factor_code' => $codigo2FA,
+                'two_factor_expires_at' => Carbon::now()->addMinutes(15),
+                'two_factor_email' => $request->input('email')
+            ]);
 
-        // 3. Enviamos el correo real utilizando el módulo que creaste
-        Mail::to($request->input('email'))->send(new CodigoVerificacionMail($codigo2FA));
+            // 3. Enviamos el correo real utilizando el módulo que creaste
+            Mail::to($request->input('email'))->send(new CodigoVerificacionMail($codigo2FA));
 
-        // 4. Redirigimos al usuario a la vista para escribir el código
-        return redirect()->route('auth.two-factor');
+            // 4. Redirigimos al usuario a la vista para escribir el código
+            return redirect()->route('auth.two-factor');
 
         } catch (AuthenticationException $e) {
             return back()->withErrors([
