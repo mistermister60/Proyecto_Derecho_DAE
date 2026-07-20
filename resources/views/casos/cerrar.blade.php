@@ -16,7 +16,7 @@
             <div>
                 <label class="text-sm font-medium mb-2 block" style="color: #374151;">Tipo de resolución</label>
                 <p class="text-xs mb-3" style="color: #9CA3AF;">Selecciona cómo se resolvió el caso</p>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <label class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all duration-150"
                            style="border: 2px solid #E5E7EB; background: #FAFAFA;"
                            onmouseover="this.style.borderColor='#2563EB'"
@@ -58,6 +58,17 @@
                         <div>
                             <p class="text-sm font-medium" style="color: #111827;">Desistido</p>
                             <p class="text-xs" style="color: #6B7280;">Desistimiento del proceso</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all duration-150"
+                           style="border: 2px solid #E5E7EB; background: #FAFAFA;"
+                           onmouseover="this.style.borderColor='#7C3AED'"
+                           onmouseout="this.style.borderColor='#E5E7EB'">
+                        <input type="radio" name="resolucion_tipo" value="desestimado" required class="w-4 h-4 accent-violet-600">
+                        <div>
+                            <p class="text-sm font-medium" style="color: #111827;">Desestimado</p>
+                            <p class="text-xs" style="color: #6B7280;">Desestimado por el consultorio</p>
                         </div>
                     </label>
                 </div>

@@ -136,6 +136,7 @@
                             @case('perdido') ❌ Perdido — Sentencia desfavorable @break
                             @case('conciliado') 🤝 Conciliado — Acuerdo entre partes @break
                             @case('desistido') 📄 Desistido — Desistimiento del proceso @break
+                            @case('desestimado') 🏛️ Desestimado — Por el consultorio jurídico @break
                         @endswitch
                     </p>
                 </div>

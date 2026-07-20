@@ -210,7 +210,7 @@ class CasoController extends Controller
         Gate::authorize('delete', $caso);
 
         $validated = $request->validate([
-            'resolucion_tipo' => 'required|in:ganado,perdido,conciliado,desistido',
+            'resolucion_tipo' => 'required|in:ganado,perdido,conciliado,desistido,desestimado',
             'resolucion_fecha' => 'required|date',
             'resolucion_notas' => 'nullable|string|max:2000',
         ]);

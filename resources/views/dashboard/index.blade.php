@@ -48,6 +48,16 @@
         </div>
     </div>
 
+    {{-- Resoluciones --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+        <div class="rounded-xl p-4 md:p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+            <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Resoluciones (casos cerrados)</h3>
+            <div class="overflow-x-auto">
+                <canvas id="resolucionesChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
     {{-- Audiencias + Carga procuradores --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {{-- Próximas audiencias --}}
@@ -143,6 +153,30 @@ function dashboardData() {
                     datasets: [{
                         data: @json($tipoData),
                         backgroundColor: ['#1E3A5F', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#6B7280', font: { size: 10 }, boxWidth: 10, padding: 8 }
+                        }
+                    },
+                    cutout: '65%',
+                }
+            });
+
+            // Resoluciones chart
+            new Chart(document.getElementById('resolucionesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: @json($resolucionesLabels),
+                    datasets: [{
+                        data: @json($resolucionesData),
+                        backgroundColor: @json($resolucionesColors),
                         borderWidth: 0,
                     }]
                 },

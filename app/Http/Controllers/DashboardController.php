@@ -86,12 +86,24 @@ class DashboardController extends Controller
             ->pluck('total', 'tipo_tramite_id');
         $tipoData = $tramites->map(fn ($t) => $tipoCounts[$t->tipo_tramite_id] ?? 0);
 
+        // Datos para gráfica de resoluciones (casos cerrados)
+        $resolucionesLabels = ['Ganado', 'Perdido', 'Conciliado', 'Desistido', 'Desestimado'];
+        $resolucionesValues = Caso::where('caso_estado', 'cerrado')
+            ->whereNotNull('resolucion_tipo')
+            ->selectRaw('resolucion_tipo, COUNT(*) as total')
+            ->groupBy('resolucion_tipo')
+            ->pluck('total', 'resolucion_tipo');
+        $resolucionesData = collect(['ganado', 'perdido', 'conciliado', 'desistido', 'desestimado'])
+            ->map(fn ($key) => $resolucionesValues[$key] ?? 0);
+        $resolucionesColors = ['#2563EB', '#DC2626', '#16A34A', '#F59E0B', '#7C3AED'];
+
         return view('dashboard.index', compact(
             'casosActivos', 'cerrados', 'totalCasos',
             'nuevosEsteMes', 'audienciasEstaSemana', 'atrasados',
             'proximasAudiencias', 'procuradores',
             'pipelineLabels', 'pipelineData', 'pipelineColors',
-            'tipoLabels', 'tipoData'
+            'tipoLabels', 'tipoData',
+            'resolucionesLabels', 'resolucionesData', 'resolucionesColors'
         ));
     }
 }
