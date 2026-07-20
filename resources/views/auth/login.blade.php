@@ -52,6 +52,10 @@
                            placeholder="••••••••">
                 </div>
 
+                <div class="mb-5 text-right">
+                    <a href="{{ route('password.request') }}" class="text-sm" style="color: #1E3A5F; text-decoration: none; font-weight: 500;">¿Olvidaste tu contraseña?</a>
+                </div>
+
                  <button type="submit" class="w-full py-3 md:py-2.5 rounded-lg text-sm font-medium transition-all bg-[#1E3A5F] text-white hover:bg-[#16304F] min-h-[44px]">
                     Entrar
                 </button>

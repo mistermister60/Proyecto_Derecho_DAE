@@ -27,17 +27,34 @@
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
                 Editar
             </a>
+            @if (session('temp_password'))
+                <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm" style="background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E;">
+                    <strong>Contraseña temporal:</strong>
+                    <code class="px-2 py-1 rounded bg-white/50 font-mono text-sm" style="color: #1E3A5F; font-weight: 600;">{{ session('temp_password') }}</code>
+                    <span class="text-xs ml-2" style="color: #92400E;">(Cópiala y envíala al usuario de forma segura)</span>
+                </div>
+            @endif
             @if ($usuario->usuario_estado === 'activo')
-                <form action="{{ route('usuarios.destroy', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Desactivar usuario?" data-text="El usuario no podrá iniciar sesión." data-icon="warning" data-confirm-text="Sí, desactivar" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"
-                            style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;"
-                            onmouseover="this.style.background='#FECACA';" onmouseout="this.style.background='#FEE2E2';">
-                        Desactivar
-                    </button>
-                </form>
-            @else
+                            <form action="{{ route('usuarios.destroy', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Desactivar usuario?" data-text="El usuario no podrá iniciar sesión." data-icon="warning" data-confirm-text="Sí, desactivar" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"
+                                        style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;"
+                                        onmouseover="this.style.background='#FECACA';" onmouseout="this.style.background='#FEE2E2';">
+                                    Desactivar
+                                </button>
+                            </form>
+               
+                            {{-- Botón: Resetear contraseña (Admin) --}}
+                            <form action="{{ route('usuarios.resetPassword', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Restablecer contraseña?" data-text="Se generará una contraseña temporal. El usuario deberá cambiarla en su primer ingreso. Se conservan todos sus datos." data-icon="question" data-confirm-text="Sí, restablecer" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"
+                                        style="background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;"
+                                        onmouseover="this.style.background='#FDE68A';" onmouseout="this.style.background='#FEF3C7';">
+                                    Restablecer Contraseña
+                                </button>
+                            </form>
+                        @else
                 <form action="{{ route('usuarios.activar', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Activar usuario?" data-text="El usuario podrá iniciar sesión nuevamente." data-icon="question" data-confirm-text="Sí, activar" style="display:inline;">
                     @csrf
                     <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"

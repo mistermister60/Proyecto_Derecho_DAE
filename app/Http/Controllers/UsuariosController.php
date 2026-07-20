@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -196,5 +197,36 @@ class UsuariosController extends Controller
 
         return redirect()->route('usuarios.show', $id)
             ->with('success', 'Usuario reactivado exitosamente.');
+    }
+
+    /**
+     * Restablece la contraseña de un usuario por el Administrador (Director).
+     *
+     * Genera una contraseña temporal segura, la asigna al usuario y activa
+     * la bandera 'debe_cambiar_contrasena' para que el usuario sea forzado
+     * a cambiarla en su primer inicio de sesión (flujo OTP + cambio obligatorio).
+     * Conserva toda la información del usuario (rol, procurador, datos personales).
+     *
+     * @param  string  $id  ID numérico del usuario
+     * @return RedirectResponse Redirección a vista show con la contraseña temporal
+     *
+     * @throws ModelNotFoundException Si el ID no existe
+     */
+    public function resetPassword(string $id): RedirectResponse
+    {
+        $usuario = Usuario::where('usuario_id', $id)->firstOrFail();
+
+        // Generar contraseña temporal segura (12 caracteres, mayúsculas, minúsculas, números, símbolos)
+        $tempPassword = Str::random(12);
+        // Asegurar que cumpla con la política: mayúscula, minúscula, número, símbolo
+        $tempPassword = 'P@ss' . Str::random(8) . rand(100, 999);
+
+        $usuario->contrasena = Hash::make($tempPassword);
+        $usuario->debe_cambiar_contrasena = true; // Forzar cambio en primer login
+        $usuario->save();
+
+        return redirect()->route('usuarios.show', $id)
+            ->with('success', 'Contraseña restablecida por el administrador.')
+            ->with('temp_password', $tempPassword); // Mostrar en la vista para que el admin la copie
     }
 }

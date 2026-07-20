@@ -24,10 +24,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandadoController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\EntrevistaController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\PwaController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
 
@@ -85,6 +87,14 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// === RECUPERACIÓN DE CONTRASEÑA (Auto-servicio por email) ===
+Route::get('/olvide-mi-contrasena', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/olvide-mi-contrasena', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+Route::get('/restablecer-contrasena/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update');
+// =============================================================
+
 // === NUEVAS RUTAS DE DOBLE FACTOR (2FA) ===
 Route::get('/verify-two-factor', function () {
     return view('auth.two-factor');
@@ -92,6 +102,14 @@ Route::get('/verify-two-factor', function () {
 
 Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
 // ==========================================
+
+// === RUTAS DE RECUPERACIÓN DE CONTRASEÑA (Auto-servicio por Email) ===
+Route::get('/olvide-mi-contrasena', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/olvide-mi-contrasena', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+Route::get('/restablecer-contrasena/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update');
+// ======================================================================
 
 // === RUTAS DE CAMBIO DE CONTRASEÑA OBLIGATORIO (Primer inicio) ===
 Route::middleware('auth')->group(function () {
@@ -141,6 +159,7 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
         Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/{id}/activar', [UsuariosController::class, 'activar'])->name('usuarios.activar');
+        Route::post('/usuarios/{id}/reset-password', [UsuariosController::class, 'resetPassword'])->name('usuarios.reset-password');
         Route::get('/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
     });
 
