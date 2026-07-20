@@ -193,6 +193,26 @@ class CasoService
     }
 
     /**
+     * Cerrar un caso con resolución.
+     *
+     * Marca el caso como 'cerrado' y registra el tipo de resolución,
+     * la fecha y las notas correspondientes.
+     *
+     * @param  Caso  $caso  Modelo del caso a cerrar.
+     * @param  array<string, mixed>  $data  Datos de resolución (resolucion_tipo, resolucion_fecha, resolucion_notas).
+     * @return bool True si el cierre fue exitoso.
+     */
+    public function closeCaso(Caso $caso, array $data): bool
+    {
+        return $caso->update([
+            'caso_estado' => 'cerrado',
+            'resolucion_tipo' => $data['resolucion_tipo'],
+            'resolucion_fecha' => $data['resolucion_fecha'] ?? now()->toDateString(),
+            'resolucion_notas' => $data['resolucion_notas'] ?? null,
+        ]);
+    }
+
+    /**
      * Reasignar un caso a un nuevo procurador con registro de auditoría.
      *
      * Ejecuta toda la operación dentro de una transacción de base de datos:

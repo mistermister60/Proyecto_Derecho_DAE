@@ -172,6 +172,56 @@ class CasoController extends Controller
     }
 
     /**
+     * Muestra el formulario de cierre de caso con resolución.
+     *
+     * Verifica permiso 'delete' mediante Gate (solo Director).
+     *
+     * @param  string  $expediente  Número de expediente del caso
+     * @return View Vista cerrar con el caso
+     *
+     * @throws AuthorizationException Si no tiene permiso 'delete'
+     * @throws ModelNotFoundException Si el expediente no existe
+     */
+    public function cerrar(string $expediente)
+    {
+        $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+        Gate::authorize('delete', $caso);
+
+        return view('casos.cerrar', compact('caso'));
+    }
+
+    /**
+     * Procesa el cierre de un caso con resolución.
+     *
+     * Valida los datos de resolución (tipo, fecha, notas) y delega
+     * el cierre en CasoService::closeCaso(). Verifica permiso 'delete'
+     * mediante Gate (solo Director).
+     *
+     * @param  Request  $request  Datos de resolución
+     * @param  string  $expediente  Número de expediente del caso
+     * @return RedirectResponse Redirección a vista show con mensaje
+     *
+     * @throws AuthorizationException Si no tiene permiso 'delete'
+     * @throws ModelNotFoundException Si el expediente no existe
+     */
+    public function storeCerrar(Request $request, string $expediente)
+    {
+        $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+        Gate::authorize('delete', $caso);
+
+        $validated = $request->validate([
+            'resolucion_tipo' => 'required|in:ganado,perdido,conciliado,desistido',
+            'resolucion_fecha' => 'required|date',
+            'resolucion_notas' => 'nullable|string|max:2000',
+        ]);
+
+        $this->casoService->closeCaso($caso, $validated);
+
+        return redirect()->route('casos.show', $expediente)
+            ->with('success', 'Caso cerrado exitosamente con resolución.');
+    }
+
+    /**
      * Desactiva un caso (eliminación lógica).
      *
      * Verifica permiso 'delete' mediante Gate y delega la desactivación

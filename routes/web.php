@@ -123,6 +123,8 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::put('/casos/{expediente}', [CasoController::class, 'update'])->name('casos.update');
     Route::middleware('role:Director')->group(function () {
         Route::delete('/casos/{expediente}', [CasoController::class, 'destroy'])->name('casos.destroy');
+        Route::get('/casos/{expediente}/cerrar', [CasoController::class, 'cerrar'])->name('casos.cerrar');
+        Route::post('/casos/{expediente}/cerrar', [CasoController::class, 'storeCerrar'])->name('casos.storeCerrar');
         Route::get('/casos/{expediente}/reasignar', [CasoController::class, 'reasignar'])->name('casos.reasignar');
         Route::post('/casos/{expediente}/reasignar', [CasoController::class, 'storeReasignacion'])->name('casos.storeReasignacion');
 

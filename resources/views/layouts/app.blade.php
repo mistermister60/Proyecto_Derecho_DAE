@@ -162,7 +162,7 @@
     </aside>
 
     {{-- ==================== CONTENIDO PRINCIPAL ==================== --}}
-    <div class="flex flex-col flex-1 h-full overflow-hidden">
+    <div class="flex flex-col flex-1 h-full">
 
         {{-- Topbar --}}
         <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB; view-transition-name: header;">

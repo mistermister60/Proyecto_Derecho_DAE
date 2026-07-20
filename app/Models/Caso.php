@@ -68,6 +68,9 @@ class Caso extends Model
         'caso_admisible',
         'caso_fecha_asignacion',
         'caso_estado',
+        'resolucion_tipo',
+        'resolucion_fecha',
+        'resolucion_notas',
     ];
 
     protected function casts(): array
@@ -76,6 +79,7 @@ class Caso extends Model
             'caso_admisible' => 'boolean',
             'caso_fecha_interpuesta' => 'date',
             'caso_fecha_asignacion' => 'date',
+            'resolucion_fecha' => 'date',
         ];
     }
 

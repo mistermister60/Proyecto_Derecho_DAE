@@ -36,6 +36,12 @@
                 Editar
             </a>
             @endif
+            @if ($esDirector && $caso->caso_estado !== 'cerrado')
+                <a href="{{ route('casos.cerrar', $caso->caso_numero_expediente) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center"
+                   style="background: #DC2626; color: white;" onmouseover="this.style.background='#B91C1C';" onmouseout="this.style.background='#DC2626';">
+                    Cerrar caso
+                </a>
+            @endif
         </div>
     </div>
 
@@ -115,6 +121,35 @@
         <div class="col-span-2 rounded-xl p-5" style="background: #FEF9E7; border: 1px solid #FDE68A;">
             <h3 class="text-sm font-semibold mb-2" style="color: #92400E;">Observaciones del Director</h3>
             <p class="text-sm" style="color: #78350F;">{{ $caso->caso_observaciones_director }}</p>
+        </div>
+        @endif
+
+        @if ($caso->caso_estado === 'cerrado' && $caso->resolucion_tipo)
+        <div class="col-span-2 rounded-xl p-5" style="background: #F0FDF4; border: 1px solid #BBF7D0;">
+            <h3 class="text-sm font-semibold mb-3" style="color: #166534;">Resolución del caso</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-xs font-medium" style="color: #6B7280;">Tipo</p>
+                    <p class="text-sm font-semibold mt-1" style="color: #111827;">
+                        @switch($caso->resolucion_tipo)
+                            @case('ganado') ✅ Ganado — Sentencia favorable @break
+                            @case('perdido') ❌ Perdido — Sentencia desfavorable @break
+                            @case('conciliado') 🤝 Conciliado — Acuerdo entre partes @break
+                            @case('desistido') 📄 Desistido — Desistimiento del proceso @break
+                        @endswitch
+                    </p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium" style="color: #6B7280;">Fecha de resolución</p>
+                    <p class="text-sm font-semibold mt-1" style="color: #111827;">{{ \Carbon\Carbon::parse($caso->resolucion_fecha)->format('d/m/Y') }}</p>
+                </div>
+            </div>
+            @if ($caso->resolucion_notas)
+            <div class="mt-3 pt-3" style="border-top: 1px solid #BBF7D0;">
+                <p class="text-xs font-medium mb-1" style="color: #6B7280;">Notas</p>
+                <p class="text-sm" style="color: #374151;">{{ $caso->resolucion_notas }}</p>
+            </div>
+            @endif
         </div>
         @endif
     </div>
