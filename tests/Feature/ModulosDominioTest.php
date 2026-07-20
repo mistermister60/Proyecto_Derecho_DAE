@@ -88,16 +88,19 @@ class ModulosDominioTest extends TestCase
             'rol_id' => $rolDir->rol_id, 'procurador_id' => null,
             'usuario_nombre' => 'Director', 'email' => 'dir@test.hn',
             'contrasena' => Hash::make('Segura8!'), 'usuario_estado' => 'activo',
+            'debe_cambiar_contrasena' => false,
         ]);
         $this->procuradorA = Usuario::create([
             'rol_id' => $rolProc->rol_id, 'procurador_id' => $procA->procurador_id,
             'usuario_nombre' => 'ProcA', 'email' => 'proca@test.hn',
             'contrasena' => Hash::make('Segura8!'), 'usuario_estado' => 'activo',
+            'debe_cambiar_contrasena' => false,
         ]);
         $this->procuradorB = Usuario::create([
             'rol_id' => $rolProc->rol_id, 'procurador_id' => $procB->procurador_id,
             'usuario_nombre' => 'ProcB', 'email' => 'procb@test.hn',
             'contrasena' => Hash::make('Segura8!'), 'usuario_estado' => 'activo',
+            'debe_cambiar_contrasena' => false,
         ]);
 
         $this->caso = Caso::create([
@@ -123,7 +126,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_procurador_puede_agendar_audiencia_en_su_caso(): void
     {
-        $this->actingAs($this->procuradorA)
+        $this->actingAsAuthenticated($this->procuradorA)
             ->post(route('audiencias.store', $this->caso->caso_numero_expediente), [
                 'audiencia_fecha' => '2026-08-15',
                 'audiencia_tipo' => 'Audiencia inicial',
@@ -145,7 +148,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_procurador_no_puede_agendar_audiencia_en_caso_ajeno(): void
     {
-        $this->actingAs($this->procuradorB)
+        $this->actingAsAuthenticated($this->procuradorB)
             ->post(route('audiencias.store', $this->caso->caso_numero_expediente), [
                 'audiencia_fecha' => '2026-08-15',
                 'audiencia_tipo' => 'Audiencia',
@@ -169,7 +172,7 @@ class ModulosDominioTest extends TestCase
             'audiencia_estado' => 'pendiente',
         ]);
 
-        $this->actingAs($this->director)
+        $this->actingAsAuthenticated($this->director)
             ->delete(route('audiencias.destroy', [$this->caso->caso_numero_expediente, $audiencia->audiencia_id]))
             ->assertRedirect();
 
@@ -188,7 +191,7 @@ class ModulosDominioTest extends TestCase
     {
         Storage::fake('local');
 
-        $this->actingAs($this->procuradorA)
+        $this->actingAsAuthenticated($this->procuradorA)
             ->post(route('documentos.store', $this->caso->caso_numero_expediente), [
                 'archivo' => UploadedFile::fake()->create('poder.pdf', 100, 'application/pdf'),
                 'documento_descripcion' => 'Poder notarial',
@@ -212,7 +215,7 @@ class ModulosDominioTest extends TestCase
     {
         Storage::fake('local');
 
-        $this->actingAs($this->procuradorA)
+        $this->actingAsAuthenticated($this->procuradorA)
             ->from(route('casos.show', $this->caso->caso_numero_expediente))
             ->post(route('documentos.store', $this->caso->caso_numero_expediente), [
                 'archivo' => UploadedFile::fake()->create('script.exe', 10, 'application/octet-stream'),
@@ -230,7 +233,7 @@ class ModulosDominioTest extends TestCase
     {
         Storage::fake('local');
 
-        $this->actingAs($this->procuradorB)
+        $this->actingAsAuthenticated($this->procuradorB)
             ->post(route('documentos.store', $this->caso->caso_numero_expediente), [
                 'archivo' => UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf'),
             ])
@@ -259,7 +262,7 @@ class ModulosDominioTest extends TestCase
             'documento_estado' => 'activo',
         ]);
 
-        $this->actingAs($this->director)
+        $this->actingAsAuthenticated($this->director)
             ->delete(route('documentos.destroy', [$this->caso->caso_numero_expediente, $doc->documento_id]))
             ->assertRedirect();
 
@@ -267,7 +270,7 @@ class ModulosDominioTest extends TestCase
         $this->assertDatabaseMissing('documentos', ['documento_id' => $doc->documento_id]);
     }
 
-    // ── Entrevistas ───────────────────────────────────────────────────────
+    // ── Entrevistas ──────────────────────────────────────────────────────
 
     /**
      * Verifica que un procurador pueda registrar una entrevista en su caso.
@@ -277,7 +280,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_procurador_puede_registrar_entrevista_en_su_caso(): void
     {
-        $this->actingAs($this->procuradorA)
+        $this->actingAsAuthenticated($this->procuradorA)
             ->post(route('entrevistas.store', $this->caso->caso_numero_expediente), [
                 'entrevista_fecha' => '2026-07-10',
                 'entrevista_relacion_hechos' => 'Cliente relata separación de hecho desde 2024.',
@@ -298,7 +301,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_procurador_no_puede_registrar_entrevista_en_caso_ajeno(): void
     {
-        $this->actingAs($this->procuradorB)
+        $this->actingAsAuthenticated($this->procuradorB)
             ->post(route('entrevistas.store', $this->caso->caso_numero_expediente), [
                 'entrevista_fecha' => '2026-07-10',
                 'entrevista_relacion_hechos' => 'Hechos.',
@@ -322,7 +325,7 @@ class ModulosDominioTest extends TestCase
             'entrevista_estado' => 'activo',
         ]);
 
-        $this->actingAs($this->director)
+        $this->actingAsAuthenticated($this->director)
             ->delete(route('entrevistas.destroy', [$this->caso->caso_numero_expediente, $entrevista->entrevista_id]))
             ->assertRedirect();
 

@@ -21,6 +21,29 @@ class ClienteNombresHijosTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * Crea y retorna un usuario con rol Director para usar en los tests.
+     *
+     * @return Usuario Usuario director creado para la sesión de prueba.
+     */
+    private function director(): Usuario
+    {
+        $rol = Rol::firstOrCreate(
+            ['rol_nombre' => 'Director'],
+            ['rol_descripcion' => 'Director', 'rol_estado' => 'activo']
+        );
+
+        return Usuario::create([
+            'rol_id' => $rol->rol_id,
+            'procurador_id' => null,
+            'usuario_nombre' => 'Director',
+            'email' => 'director@test.hn',
+            'contrasena' => Hash::make('Segura8!'),
+            'usuario_estado' => 'activo',
+            'debe_cambiar_contrasena' => false,
+        ]);
+    }
+
+    /**
      * Verifica que al crear un cliente se persistan los nombres de los hijos.
      *
      * Happy path: crea un cliente con dos hijos especificando sus nombres
@@ -28,22 +51,19 @@ class ClienteNombresHijosTest extends TestCase
      */
     public function test_store_persiste_nombres_de_hijos(): void
     {
-        $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Director', 'rol_estado' => 'activo']);
-        $director = Usuario::create([
-            'rol_id' => $rol->rol_id, 'procurador_id' => null,
-            'usuario_nombre' => 'Director', 'email' => 'director@test.hn',
-            'contrasena' => Hash::make('secret123'), 'usuario_estado' => 'activo',
-        ]);
+        $director = $this->director();
+        $this->actingAsAuthenticated($director);
 
-        $this->actingAs($director)->post(route('clientes.store'), [
-            'nombre_completo' => 'Juan Pérez',
-            'cliente_dni' => '0501199900022',
-            'cliente_estado_civil' => 'Casado',
-            'cliente_telefono' => '9999-1111',
-            'cliente_direccion' => 'San Pedro Sula',
-            'cliente_numero_hijos' => 2,
-            'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
-        ])->assertRedirect(route('clientes.index'));
+        $this->post(route('clientes.store'), [
+                'nombre_completo' => 'Juan Pérez',
+                'cliente_dni' => '0501199900022',
+                'cliente_estado_civil' => 'Casado',
+                'cliente_telefono' => '9999-1111',
+                'cliente_direccion' => 'San Pedro Sula',
+                'cliente_numero_hijos' => 2,
+                'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
+            ])
+            ->assertRedirect(route('clientes.index'));
 
         $this->assertDatabaseHas('clientes', [
             'cliente_dni' => '0501199900022',
@@ -60,29 +80,31 @@ class ClienteNombresHijosTest extends TestCase
      */
     public function test_update_persiste_nombres_de_hijos(): void
     {
-        $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Director', 'rol_estado' => 'activo']);
-        $director = Usuario::create([
-            'rol_id' => $rol->rol_id, 'procurador_id' => null,
-            'usuario_nombre' => 'Director', 'email' => 'director@test.hn',
-            'contrasena' => Hash::make('secret123'), 'usuario_estado' => 'activo',
-        ]);
+        $director = $this->director();
+        $this->actingAsAuthenticated($director);
 
         $cliente = Cliente::create([
-            'cliente_nombre' => 'Juan', 'cliente_apellido' => 'Pérez', 'cliente_dni' => '0501199900022',
-            'cliente_estado_civil' => 'Soltero', 'cliente_telefono' => '9999-1111',
-            'cliente_direccion' => 'SPS', 'cliente_numero_hijos' => 0, 'cliente_estado' => 'activo',
+            'cliente_nombre' => 'Juan',
+            'cliente_apellido' => 'Pérez',
+            'cliente_dni' => '0501199900022',
+            'cliente_estado_civil' => 'Soltero',
+            'cliente_telefono' => '9999-1111',
+            'cliente_direccion' => 'SPS',
+            'cliente_numero_hijos' => 0,
+            'cliente_estado' => 'activo',
         ]);
 
-        $this->actingAs($director)->put(route('clientes.update', ['identidad' => $cliente->cliente_dni]), [
-            'cliente_nombre' => 'Juan',
-            'cliente_apellido' => 'Pérez Modificado',
-            'cliente_dni' => '0501199900022',
-            'cliente_estado_civil' => 'Casado',
-            'cliente_telefono' => '9999-1111',
-            'cliente_direccion' => 'San Pedro Sula',
-            'cliente_numero_hijos' => 2,
-            'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez', // Campo auditado[cite: 1]
-        ])->assertRedirect(route('clientes.show', $cliente->cliente_dni));
+        $this->put(route('clientes.update', ['identidad' => $cliente->cliente_dni]), [
+                'cliente_nombre' => 'Juan',
+                'cliente_apellido' => 'Pérez Modificado',
+                'cliente_dni' => '0501199900022',
+                'cliente_estado_civil' => 'Casado',
+                'cliente_telefono' => '9999-1111',
+                'cliente_direccion' => 'San Pedro Sula',
+                'cliente_numero_hijos' => 2,
+                'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez', // Campo auditado
+            ])
+            ->assertRedirect(route('clientes.show', $cliente->cliente_dni));
 
         $this->assertDatabaseHas('clientes', [
             'cliente_id' => $cliente->cliente_id,

@@ -36,65 +36,88 @@ class AuthenticationTest extends TestCase
     }
 
     /**
-     * Verifica que la pantalla de inicio de sesión se renderice correctamente.
-     *
-     * Happy path: la ruta GET /login debe retornar HTTP 200.
+     * Test: La pantalla de login se puede renderizar.
      */
     public function test_login_screen_can_be_rendered(): void
     {
         $response = $this->get('/login');
 
         $response->assertStatus(200);
+        $response->assertViewIs('auth.login');
     }
 
     /**
-     * Verifica que un usuario pueda autenticarse con credenciales válidas.
+     * Test: Los usuarios pueden autenticarse usando la pantalla de login.
      *
-     * Happy path: envía email y contraseña correctos,
-     * espera que el usuario quede autenticado y sea redirigido al dashboard.
+     * Ahora simula el flujo completo: login -> 2FA -> dashboard
      */
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->create([
+            'email' => 'test@example.com',
+            'contrasena' => bcrypt('password'),
+            'usuario_estado' => 'activo',
+            'rol_id' => 2, // Procurador
+            'debe_cambiar_contrasena' => false,
+        ]);
 
-        $response = $this->post('/login', [
+        // POST login con credenciales válidas
+        // Esto redirige a /verify-two-factor (ruta GET)
+        $response = $this->from('/login')->post('/login', [
             'email' => $user->email,
             'contrasena' => 'password',
         ]);
 
+        // Debe redirigir a la verificación 2FA (no al dashboard directamente)
+        $response->assertRedirect(route('auth.two-factor'));
+
+        // Simular verificación 2FA exitosa
+        $code = session('two_factor_code');
+        $this->assertNotNull($code, 'El código 2FA debe estar en sesión');
+
+        $response2 = $this->from(route('auth.two-factor'))->post(route('auth.two-factor.verify'), [
+            'code' => $code,
+        ]);
+
+        // Ahora debe redirigir al dashboard
+        $response2->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
     }
 
     /**
-     * Verifica que un usuario NO pueda autenticarse con una contraseña incorrecta.
-     *
-     * Failure path: envía la contraseña equivocada y espera
-     * que el usuario permanezca como invitado (no autenticado).
+     * Test: Los usuarios NO pueden autenticarse con contraseña inválida.
      */
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->create([
+            'email' => 'test@example.com',
+            'contrasena' => bcrypt('password'),
+            'usuario_estado' => 'activo',
+            'rol_id' => 2,
+        ]);
 
-        $this->post('/login', [
+        $response = $this->from('/login')->post('/login', [
             'email' => $user->email,
             'contrasena' => 'wrong-password',
         ]);
 
         $this->assertGuest();
+        $response->assertSessionHasErrors('email');
     }
 
     /**
-     * Verifica que un usuario autenticado pueda cerrar sesión.
-     *
-     * Happy path: usuario autenticado envía POST a /logout,
-     * espera redirección al login y estado de invitado.
+     * Test: Los usuarios pueden cerrar sesión.
      */
     public function test_users_can_logout(): void
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->create([
+            'usuario_estado' => 'activo',
+            'rol_id' => 2,
+        ]);
 
-        $response = $this->actingAs($user)->post('/logout');
+        $this->actingAsAuthenticated($user);
+
+        $response = $this->post('/logout');
 
         $response->assertRedirect(route('login'));
         $this->assertGuest();
