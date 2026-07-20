@@ -17,12 +17,22 @@ class SecurityHeadersMiddleware
 
         if (method_exists($response, 'header')) {
             $response->header('X-Frame-Options', 'DENY');
-            // X-XSS-Protection fue eliminado de navegadores modernos; la protección real es la CSP.
             $response->header('X-Content-Type-Options', 'nosniff');
             $response->header('Referrer-Policy', 'strict-origin-when-cross-origin');
-            // CSP: unsafe-inline en style-src necesario para Tailwind inline styles + Alpine.js.
-            // unsafe-eval eliminado (ya no se usa). script-src solo permite scripts externos del bundle.
-            $response->header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.bunny.net; font-src 'self' https://fonts.bunny.net data:; img-src 'self' data:; frame-ancestors 'none';");
+            
+            // CSP optimizado para producción Laravel Cloud + Vite + PWA + Alpine.js
+            // Permite: scripts propios, inline (View Transitions), módulos ES, SW, fuentes, imágenes
+            $csp = "default-src 'self'; " .
+                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.bunny.net; " .
+                   "style-src 'self' 'unsafe-inline' https://fonts.bunny.net; " .
+                   "font-src 'self' https://fonts.bunny.net data:; " .
+                   "img-src 'self' data: https:; " .
+                   "connect-src 'self' https://fonts.bunny.net; " .
+                   "frame-ancestors 'none'; " .
+                   "worker-src 'self' blob:; " .
+                   "manifest-src 'self';";
+
+            $response->header('Content-Security-Policy', $csp);
         }
 
         return $response;
