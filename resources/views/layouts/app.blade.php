@@ -20,6 +20,9 @@
     <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
 
+    {{-- View Transitions API para MPA (Emil Kowalski approach) --}}
+    <meta name="view-transition" content="same-origin">
+
     <title>@yield('title', 'Consultorio Jurídico - USAP') | Consultorio Jurídico</title>
 
     @fonts
@@ -28,7 +31,7 @@
 </head>
 <body x-data="{ sidebarOpen: false, openNotif: false, openUser: false }">
 
-<div class="flex h-screen w-full overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden" style="view-transition-name: root;">
     {{-- ==================== SIDEBAR ==================== --}}
     {{-- Mobile overlay --}}
     <div x-show="sidebarOpen" x-cloak
@@ -44,7 +47,7 @@
                   max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:w-60
                   md:relative md:translate-x-0"
            :class="sidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'"
-           style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08);">
+           style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08); view-transition-name: sidebar;">
 
         {{-- Logo: Balanza de la justicia --}}
         <div class="flex items-center gap-3 px-5 py-5" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -162,7 +165,7 @@
     <div class="flex flex-col flex-1 h-full overflow-hidden">
 
         {{-- Topbar --}}
-        <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB;">
+        <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB; view-transition-name: header;">
             <div class="flex items-center gap-3">
                 {{-- Hamburger (mobile only) --}}
                 <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 rounded-lg transition-colors" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';" aria-label="Abrir menú">
@@ -279,7 +282,7 @@
         </header>
 
         {{-- Contenido dinámico --}}
-        <main class="flex-1 overflow-auto p-4 md:p-6">
+        <main class="flex-1 overflow-auto p-4 md:p-6" style="view-transition-name: main-content;">
             @yield('content')
         </main>
 
@@ -295,6 +298,68 @@
 
 @stack('scripts')
 <script>
+    // View Transitions API for MPA Navigation (Emil Kowalski approach)
+    if (!document.startViewTransition) {
+        // Polyfill check - View Transitions not supported
+        document.documentElement.classList.add('no-view-transitions');
+    } else {
+        // Add view-transition-name to main content for smooth transitions
+        document.documentElement.classList.add('view-transitions-enabled');
+    }
+
+    // Handle same-origin navigation with View Transitions
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+
+        const url = new URL(link.href);
+        
+        // Only handle same-origin links
+        if (url.origin !== window.location.origin) return;
+        
+        // Skip links with specific attributes
+        if (link.hasAttribute('target') || link.hasAttribute('download') || link.hasAttribute('data-no-transition')) return;
+        
+        // Skip anchor links on same page
+        if (url.pathname === window.location.pathname && url.hash) return;
+
+        // Skip if modifier keys pressed
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        // Skip non-GET links
+        if (link.getAttribute('method') && link.getAttribute('method').toUpperCase() !== 'GET') return;
+
+        e.preventDefault();
+
+        // Check if View Transitions API is supported
+        if (!document.startViewTransition) {
+            window.location.href = link.href;
+            return;
+        }
+
+        // Start View Transition
+        document.startViewTransition(async () => {
+            // Add loading class for visual feedback
+            document.documentElement.classList.add('view-transition-active');
+            
+            try {
+                // Navigate to the new page
+                window.location.href = link.href;
+            } finally {
+                // The transition will complete after navigation
+                // This cleanup runs on the new page load
+            }
+        });
+    });
+
+    // Handle page restoration (back/forward navigation)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            // Page was restored from bfcache
+            document.documentElement.classList.remove('view-transition-active');
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         // Alertas de sesión (Success/Error)
         @if (session('success'))
@@ -318,6 +383,9 @@
                 });
             }
         @endif
+
+        // Remove view-transition-active class after page load
+        document.documentElement.classList.remove('view-transition-active');
 
         // Escuchador global de confirmaciones SweetAlert2
         document.addEventListener('submit', function (e) {
