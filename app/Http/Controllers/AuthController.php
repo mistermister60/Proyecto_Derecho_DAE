@@ -87,8 +87,9 @@ class AuthController extends BaseController
         if ($request->input('code') == session('two_factor_code') && 
             \Carbon\Carbon::now()->isBefore(session('two_factor_expires_at'))) {
             
-            // Si el código es correcto y no ha expirado, limpiamos la sesión y entra al sistema
+            // Si el código es correcto y no ha expirado, limpiamos la sesión y marcamos como verificado
             session()->forget(['two_factor_code', 'two_factor_expires_at']);
+            session(['two_factor_verified' => true]);
             
             return redirect()->intended(route('dashboard'));
         }

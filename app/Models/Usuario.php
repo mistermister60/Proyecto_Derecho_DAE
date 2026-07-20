@@ -53,6 +53,7 @@ class Usuario extends Model implements AuthenticatableContract, AuthorizableCont
         'email',
         'contrasena',
         'usuario_estado',
+        'debe_cambiar_contrasena',
         'push_notification_token',
         'push_subscription',
     ];

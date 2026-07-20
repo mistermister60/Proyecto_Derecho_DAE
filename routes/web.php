@@ -24,6 +24,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandadoController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\EntrevistaController;
+use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\PwaController;
@@ -92,8 +93,15 @@ Route::get('/verify-two-factor', function () {
 Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
 // ==========================================
 
-// Rutas protegidas (requieren autenticación)
+// === RUTAS DE CAMBIO DE CONTRASEÑA OBLIGATORIO (Primer inicio) ===
 Route::middleware('auth')->group(function () {
+    Route::get('/cambiar-contrasena', [PasswordChangeController::class, 'showChangeForm'])->name('password.change');
+    Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.update');
+});
+// ================================================================
+
+// Rutas protegidas (requieren autenticación, 2FA verificado y contraseña cambiada)
+Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
