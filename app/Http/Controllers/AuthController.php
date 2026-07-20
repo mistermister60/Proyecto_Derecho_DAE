@@ -55,11 +55,12 @@ class AuthController extends BaseController
                 $request->input('contrasena')
             );
 
-            $user = auth()->user();
+            // Cargar usuario con rol para verificar si es Director
+            $user = \App\Models\Usuario::with('rol')->where('email', $request->input('email'))->first();
 
             // Director (super usuario) omite 2FA y va directo al dashboard
-            if ($user->rol && $user->rol->rol_nombre === 'Director') {
-                session(['two_factor_verified' => true]);
+            if ($user && $user->rol && $user->rol->rol_nombre === 'Director') {
+                \Illuminate\Support\Facades\Session::put('two_factor_verified', true);
                 
                 // Verificar si debe cambiar contraseña (primer login)
                 if ($user->debe_cambiar_contrasena) {
