@@ -386,6 +386,8 @@
 
         // Remove view-transition-active class after page load
         document.documentElement.classList.remove('view-transition-active');
+        // Make page visible (removes opacity:0 from CSS)
+        document.documentElement.classList.add('view-transition-ready');
 
         // Escuchador global de confirmaciones SweetAlert2
         document.addEventListener('submit', function (e) {

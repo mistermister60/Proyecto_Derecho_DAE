@@ -14,11 +14,13 @@ class ResetPasswordMail extends Mailable
 
     public $token;
     public $nombre;
+    public $email;
 
-    public function __construct($token, $nombre)
+    public function __construct($token, $nombre, $email)
     {
         $this->token = $token;
         $this->nombre = $nombre;
+        $this->email = $email;
     }
 
     public function envelope(): Envelope

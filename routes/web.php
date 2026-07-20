@@ -103,18 +103,10 @@ Route::get('/verify-two-factor', function () {
 Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
 // ==========================================
 
-// === RUTAS DE RECUPERACIÓN DE CONTRASEÑA (Auto-servicio por Email) ===
-Route::get('/olvide-mi-contrasena', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('/olvide-mi-contrasena', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-
-Route::get('/restablecer-contrasena/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update');
-// ======================================================================
-
 // === RUTAS DE CAMBIO DE CONTRASEÑA OBLIGATORIO (Primer inicio) ===
 Route::middleware('auth')->group(function () {
     Route::get('/cambiar-contrasena', [PasswordChangeController::class, 'showChangeForm'])->name('password.change');
-    Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.update');
+    Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.change.update');
 });
 // ================================================================
 

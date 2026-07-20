@@ -23,7 +23,12 @@ class EnsureTwoFactorVerified
                 return $next($request);
             }
 
-            return redirect()->route('login')->withErrors(['error' => 'Debes completar la verificación de dos factores.']);
+            // Si no hay código 2FA en sesión (expirado o nunca generado), forzar re-login
+            if (!session()->has('two_factor_code')) {
+                return redirect()->route('login');
+            }
+
+            return redirect()->route('auth.two-factor');
         }
 
         return $next($request);

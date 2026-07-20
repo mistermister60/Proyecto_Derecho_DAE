@@ -86,6 +86,7 @@ class UsuariosController extends Controller
 
         $validated['usuario_estado'] = 'activo';
         $validated['contrasena'] = Hash::make($validated['contrasena']); // 🔐 Encriptada
+        $validated['debe_cambiar_contrasena'] = ($validated['rol_id'] ?? 1) !== 1; // Forzar cambio solo si NO es Director
 
         Usuario::create($validated);
 
@@ -217,7 +218,6 @@ class UsuariosController extends Controller
         $usuario = Usuario::where('usuario_id', $id)->firstOrFail();
 
         // Generar contraseña temporal segura (12 caracteres, mayúsculas, minúsculas, números, símbolos)
-        $tempPassword = Str::random(12);
         // Asegurar que cumpla con la política: mayúscula, minúscula, número, símbolo
         $tempPassword = 'P@ss' . Str::random(8) . rand(100, 999);
 

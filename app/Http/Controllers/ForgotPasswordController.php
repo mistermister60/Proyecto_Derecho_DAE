@@ -52,7 +52,7 @@ class ForgotPasswordController extends BaseController
         );
 
         // Enviar email con el token
-        Mail::to($usuario->email)->send(new ResetPasswordMail($token, $usuario->usuario_nombre));
+        Mail::to($usuario->email)->send(new ResetPasswordMail($token, $usuario->usuario_nombre, $usuario->email));
 
         return back()->with('status', 'Hemos enviado un enlace de restablecimiento a tu correo institucional.');
     }

@@ -25,7 +25,7 @@
             </div>
         @endif
 
-        <form action="{{ route('password.update') }}" method="POST">
+        <form action="{{ route('password.change.update') }}" method="POST">
             @csrf
 
             <div style="margin-bottom: 18px;">

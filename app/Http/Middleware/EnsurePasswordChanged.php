@@ -20,8 +20,8 @@ class EnsurePasswordChanged
         if (auth()->check() && auth()->user()->debe_cambiar_contrasena) {
             // Rutas permitidas sin haber cambiado la contraseña
             $rutasPermitidas = [
-                'password.change',      // formulario de cambio
-                'password.update',      // procesar el cambio
+                'password.change',          // formulario de cambio
+                'password.change.update', // procesar el cambio
                 'logout',                // cerrar sesión
                 'auth.two-factor',      // vista 2FA
                 'auth.two-factor.verify', // validar 2FA

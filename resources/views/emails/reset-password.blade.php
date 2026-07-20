@@ -28,7 +28,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto 30px;">
                     <tr>
                         <td style="border-radius: 8px; background: #1e3a8a;">
-                            <a href="{{ url('/restablecer-contrasena/' . $token . '?email=' . urlencode(request()->get('email', ''))) }}" 
+                            <a href="{{ url('/restablecer-contrasena/' . $token . '?email=' . urlencode($email)) }}" 
                                style="display: inline-block; padding: 14px 32px; color: white; text-decoration: none; font-weight: bold; font-size: 16px; border-radius: 8px;">
                                 Restablecer Mi Contraseña
                             </a>
