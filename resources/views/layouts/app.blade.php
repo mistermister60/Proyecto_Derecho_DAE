@@ -165,7 +165,7 @@
     <div class="flex flex-col flex-1 h-full">
 
         {{-- Topbar --}}
-        <header class="flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3" style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB; view-transition-name: header;">
+        <header class="relative z-50 flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3"    style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB; view-transition-name: header;">
             <div class="flex items-center gap-3">
                 {{-- Hamburger (mobile only) --}}
                 <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 rounded-lg transition-colors" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';" aria-label="Abrir menú">
