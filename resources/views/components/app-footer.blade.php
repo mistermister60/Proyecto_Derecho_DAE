@@ -8,7 +8,7 @@
 
 <footer class="mt-auto border-t px-4 py-3 print:hidden"
         style="background: #FFFFFF; border-color: #E5E7EB;">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm">
         {{-- Créditos académicos --}}
         <div class="flex items-center gap-2 text-gray-500">
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,9 +23,9 @@
 
         {{-- Botón instalar PWA (oculto por defecto, se muestra vía JS) --}}
         <button id="install-pwa-button"
-                class="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
+                class="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-white transition-colors hover:opacity-90"
                 style="background: #1D4ED8;">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
             </svg>
             <span>Instalar aplicación</span>

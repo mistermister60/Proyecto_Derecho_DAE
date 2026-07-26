@@ -65,10 +65,10 @@
                 </svg>
             </div>
             <div>
-                <div style="color: #FFFFFF; font-size: 12px; font-weight: 600; line-height: 1.2;">
+                <div class="text-xs font-semibold leading-tight text-white">
                     Consultorio Jurídico
                 </div>
-                <div style="color: rgba(201,169,97,0.7); font-size: 10.5px; line-height: 1.4;">
+                <div class="text-2xs text-amber-300/70 leading-normal">
                     Univ. de San Pedro Sula
                 </div>
             </div>
@@ -104,8 +104,8 @@
                 @endphp
                 <a href="{{ route($item['route']) }}"
                    @click="sidebarOpen = false"
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150"
-                   style="{{ $isActive ? 'background: rgba(201,169,97,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65); hover:background: rgba(201,169,97,0.08);' }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-base transition-all duration-150"
+                   style="{{ $isActive ? 'background: rgba(201,169,97,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65);' }}"
                    onmouseover="this.style.background='{{ $isActive ? 'rgba(201,169,97,0.2)' : 'rgba(201,169,97,0.08)' }}'; this.style.color='#FFFFFF';"
                    onmouseout="this.style.background='{{ $isActive ? 'rgba(201,169,97,0.2)' : 'transparent' }}'; this.style.color='{{ $isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)' }}';">
                     @if ($item['icon'] === 'dashboard')
