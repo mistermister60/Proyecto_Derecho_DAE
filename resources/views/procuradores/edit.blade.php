@@ -79,16 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-            <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Género</label>
-                <select name="procurador_genero" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
-                    <option value="">Seleccionar...</option>
-                    <option value="Masculino" {{ old('procurador_genero', $procurador->procurador_genero) == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                    <option value="Femenino" {{ old('procurador_genero', $procurador->procurador_genero) == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                </select>
-                @error('procurador_genero')
-                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-                @enderror
+            <div class="sm:col-span-2 flex justify-center">
+                <div style="width: 50%;">
+                    <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Género</label>
+                    <select name="procurador_genero" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                        <option value="">Seleccionar...</option>
+                        <option value="Masculino" {{ old('procurador_genero', $procurador->procurador_genero) == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                        <option value="Femenino" {{ old('procurador_genero', $procurador->procurador_genero) == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                    </select>
+                    @error('procurador_genero')
+                    <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
         </div>
     </div>
