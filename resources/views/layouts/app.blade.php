@@ -51,8 +51,8 @@
 
         {{-- Logo: Balanza de la justicia --}}
         <div class="flex items-center gap-3 px-5 py-5" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <div class="flex items-center justify-center rounded-lg shrink-0" style="width: 36px; height: 36px; background: rgba(37,99,235,0.9);">
-                <svg width="20" height="20" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <div class="flex items-center justify-center rounded-lg shrink-0" style="width: 48px; height: 48px; background: rgba(37,99,235,0.9);">
+                <svg width="28" height="28" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <g transform="translate(256,260)" fill="white" stroke="white" stroke-width="12">
                         <polygon points="0,-80 -120,80 120,80" fill="none" stroke="white" stroke-width="14" stroke-linejoin="round"/>
                         <line x1="-140" y1="-20" x2="140" y2="-20" stroke="white" stroke-width="14" stroke-linecap="round"/>
@@ -64,11 +64,11 @@
                     </g>
                 </svg>
             </div>
-            <div>
+            <div class="flex flex-col">
                 <div class="text-xs font-semibold leading-tight text-white">
                     Consultorio Jurídico
                 </div>
-                <div class="text-2xs text-amber-300/70 leading-normal">
+                <div class="text-xs font-medium text-amber-300 leading-normal">
                     Univ. de San Pedro Sula
                 </div>
             </div>
