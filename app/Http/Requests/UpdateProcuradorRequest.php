@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 /**
  * Form request para actualizar un procurador existente.
@@ -21,14 +22,18 @@ class UpdateProcuradorRequest extends FormRequest
         return auth()->check();
     }
 
-    @php
-    // Convert YYYY-MM-DD (from type="date") to DD/MM/YYYY for validation
-    $this->merge([
-        'procurador_fecha_nacimiento' => $this->procurador_fecha_nacimiento 
-            ? \Carbon\Carbon::parse($this->procurador_fecha_nacimiento)->format('d/m/Y') 
-            : $this->procurador_fecha_nacimiento,
-    ]);
-@endphp
+    /**
+     * Preparar los datos para la validación.
+     * Convierte YYYY-MM-DD (de type="date") a DD/MM/YYYY para validación.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->procurador_fecha_nacimiento) {
+            $this->merge([
+                'procurador_fecha_nacimiento' => Carbon::parse($this->procurador_fecha_nacimiento)->format('d/m/Y'),
+            ]);
+        }
+    }
 
     /**
      * Get the validation rules that apply to the request.

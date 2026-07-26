@@ -71,13 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 @enderror
             </div>
             <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Carnet profesional</label>
-                <input type="text" name="procurador_carnet" value="{{ old('procurador_carnet') }}" placeholder="CAR-00123" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
-                @error('procurador_carnet')
-                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-            <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de nacimiento</label>
                 <input type="date" name="procurador_fecha_nacimiento" id="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento') }}" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_fecha_nacimiento')
