@@ -21,6 +21,15 @@ class StoreProcuradorRequest extends FormRequest
         return auth()->check();
     }
 
+    @php
+    // Convert YYYY-MM-DD (from type="date") to DD/MM/YYYY for validation
+    $this->merge([
+        'procurador_fecha_nacimiento' => $this->procurador_fecha_nacimiento 
+            ? \Carbon\Carbon::parse($this->procurador_fecha_nacimiento)->format('d/m/Y') 
+            : $this->procurador_fecha_nacimiento,
+    ]);
+@endphp
+
     /**
      * Get the validation rules that apply to the request.
      *

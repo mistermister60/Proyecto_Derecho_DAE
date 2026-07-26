@@ -10,6 +10,26 @@
 @section('title', 'Editar Procurador')
 
 @section('content')
+{{-- Toast de éxito --}}
+@if (session('success'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+        icon: 'success',
+        title: '¡Procurador actualizado!',
+        text: '{{ session("success") }}',
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        timerProgressBar: true,
+        background: '#1E3A5F',
+        color: '#fff',
+        iconColor: '#FCD34D'
+    });
+});
+</script>
+@endif
 <form action="{{ route('procuradores.update', $procurador->procurador_dni) }}" method="POST">
     @csrf
     @method('PUT')
@@ -60,7 +80,7 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de nacimiento</label>
-                <input type="text" name="procurador_fecha_nacimiento" id="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento', $procurador->procurador_fecha_nacimiento) }}" required placeholder="DD/MM/AAAA" maxlength="10" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                <input type="date" name="procurador_fecha_nacimiento" id="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento', $procurador->procurador_fecha_nacimiento) }}" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_fecha_nacimiento')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
@@ -102,19 +122,19 @@
 </form>
 
 <script>
-// Formato automático fecha DD/MM/AAAA
 document.addEventListener('DOMContentLoaded', function() {
-    const fechaInput = document.getElementById('procurador_fecha_nacimiento');
-    if (fechaInput) {
-        fechaInput.addEventListener('input', function(e) {
+    // Formato DNI: 0801-1990-00123 (auto-guiones)
+    const dniInput = document.getElementById('procurador_dni');
+    if (dniInput) {
+        dniInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) value = value.slice(0,2) + '/' + value.slice(2);
-            if (value.length >= 5) value = value.slice(0,5) + '/' + value.slice(5,9);
-            e.target.value = value.slice(0,10);
+            if (value.length >= 4) value = value.slice(0,4) + '-' + value.slice(4);
+            if (value.length >= 9) value = value.slice(0,9) + '-' + value.slice(9,14);
+            e.target.value = value.slice(0,15);
         });
     }
 
-    // Formato automático teléfono +504 XXXX-XXXX
+    // Formato Teléfono: +504 XXXX-XXXX
     const telefonoInput = document.getElementById('procurador_telefono');
     if (telefonoInput) {
         telefonoInput.addEventListener('input', function(e) {
@@ -128,17 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 value = '+' + value;
             }
             e.target.value = value.slice(0,16);
-        });
-    }
-
-    // Formato DNI con guiones 0801-1990-00123
-    const dniInput = document.getElementById('procurador_dni');
-    if (dniInput) {
-        dniInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 4) value = value.slice(0,4) + '-' + value.slice(4);
-            if (value.length >= 9) value = value.slice(0,9) + '-' + value.slice(9,14);
-            e.target.value = value.slice(0,15);
         });
     }
 });

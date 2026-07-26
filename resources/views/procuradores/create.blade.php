@@ -10,6 +10,26 @@
 @section('title', 'Crear Procurador')
 
 @section('content')
+{{-- Toast de éxito --}}
+@if (session('success'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+        icon: 'success',
+        title: '¡Procurador guardado!',
+        text: '{{ session("success") }}',
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        timerProgressBar: true,
+        background: '#1E3A5F',
+        color: '#fff',
+        iconColor: '#FCD34D'
+    });
+});
+</script>
+@endif
 <form action="{{ route('procuradores.store') }}" method="POST">
     @csrf
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
@@ -59,7 +79,7 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de nacimiento</label>
-                <input type="text" name="procurador_fecha_nacimiento" id="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento') }}" required placeholder="DD/MM/AAAA" maxlength="10" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                <input type="date" name="procurador_fecha_nacimiento" id="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento') }}" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_fecha_nacimiento')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
@@ -133,23 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Formato Fecha: DD/MM/AAAA (auto-barras)
-    const fechaInput = document.getElementById('procurador_fecha_nacimiento');
-    if (fechaInput) {
-        fechaInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) value = value.slice(0,2) + '/' + value.slice(2);
-            if (value.length >= 5) value = value.slice(0,5) + '/' + value.slice(5,9);
-            e.target.value = value.slice(0,10);
-        });
-    }
-
-    // Formato Teléfono: +504 1234-5678
+    // Formato Teléfono: +504 XXXX-XXXX
     const telefonoInput = document.getElementById('procurador_telefono');
     if (telefonoInput) {
         telefonoInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            // Si no empieza con 504, agregarlo
             if (!value.startsWith('504')) {
                 value = '504' + value;
             }
