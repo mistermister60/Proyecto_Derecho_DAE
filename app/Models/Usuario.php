@@ -96,4 +96,13 @@ class Usuario extends Model implements AuthenticatableContract, AuthorizableCont
     {
         return $this->hasMany(Seguimiento::class, 'usuario_id');
     }
+
+    /**
+     * Marca la sesión como confirmada para acciones sensibles.
+     * Establece el timestamp 'auth.password_confirmed_at' en la sesión.
+     */
+    public function confirmPassword(): void
+    {
+        session(['auth.password_confirmed_at' => time()]);
+    }
 }

@@ -29,7 +29,7 @@ class ProfileController extends Controller
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            // En nuestro sistema custom no usamos email_verified_at, pero podríamos agregar
         }
 
         $request->user()->save();
@@ -38,7 +38,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Delete the user's account (soft delete - marcar inactivo).
      */
     public function destroy(Request $request): RedirectResponse
     {

@@ -27,6 +27,7 @@ use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\ResetPasswordController;
@@ -95,6 +96,25 @@ Route::get('/restablecer-contrasena/{token}', [ResetPasswordController::class, '
 Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update');
 // =============================================================
 
+// === CONFIRMACIÓN DE CONTRASEÑA (Para acciones sensibles) ===
+Route::middleware('auth')->group(function () {
+    Route::get('/confirmar-contrasena', function () {
+        return view('auth.confirm-password');
+    })->name('password.confirm');
+
+    Route::post('/confirmar-contrasena', function (\Illuminate\Http\Request $request) {
+        $request->validate(['password' => 'required']);
+        
+        if (!\Illuminate\Support\Facades\Hash::check($request->password, $request->user()->contrasena)) {
+            return back()->withErrors(['password' => 'La contraseña no coincide.']);
+        }
+        
+        $request->user()->confirmPassword();
+        return redirect()->intended(route('dashboard'))->with('success', 'Contraseña confirmada.');
+    })->name('password.confirm.store');
+});
+// =============================================================
+
 // === NUEVAS RUTAS DE DOBLE FACTOR (2FA) ===
 Route::get('/verify-two-factor', function () {
     return view('auth.two-factor');
@@ -103,12 +123,30 @@ Route::get('/verify-two-factor', function () {
 Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
 // ==========================================
 
-// === RUTAS DE CAMBIO DE CONTRASEÑA OBLIGATORIO (Primer inicio) ===
-Route::middleware('auth')->group(function () {
-    Route::get('/cambiar-contrasena', [PasswordChangeController::class, 'showChangeForm'])->name('password.change');
-    Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.change.update');
+// === RUTAS DE PERFIL DE USUARIO ===
+Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Cambio de contraseña desde perfil
+    Route::put('/profile/password', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()->symbols()],
+        ]);
+        
+        if (!\Illuminate\Support\Facades\Hash::check($request->current_password, $request->user()->contrasena)) {
+            return back()->withErrors(['current_password' => 'La contraseña actual no coincide.']);
+        }
+        
+        $request->user()->contrasena = \Illuminate\Support\Facades\Hash::make($request->password);
+        $request->user()->save();
+        
+        return back()->with('status', 'password-updated');
+    })->name('profile.password.update');
 });
-// ================================================================
+// =====================================
 
 // Rutas protegidas (requieren autenticación, 2FA verificado y contraseña cambiada)
 Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {

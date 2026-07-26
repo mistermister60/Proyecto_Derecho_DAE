@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => CheckRole::class,
             'otp' => \App\Http\Middleware\EnsureTwoFactorVerified::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
+            'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
