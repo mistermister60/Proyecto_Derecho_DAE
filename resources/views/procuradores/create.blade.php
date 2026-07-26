@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
-<form action="{{ route('procuradores.store') }}" method="POST">
+<form action="{{ route('procuradores.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo Procurador</h1>
@@ -78,36 +78,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-            <div class="sm:col-span-2 flex justify-center">
-                <div style="width: 50%;">
-                    <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Género</label>
-                    <select name="procurador_genero" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
-                        <option value="">Seleccionar...</option>
-                        <option value="Masculino" {{ old('procurador_genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                        <option value="Femenino" {{ old('procurador_genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                    </select>
-                    @error('procurador_genero')
-                    <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+            <div>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Género</label>
+                <select name="procurador_genero" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                    <option value="">Seleccionar...</option>
+                    <option value="Masculino" {{ old('procurador_genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                    <option value="Femenino" {{ old('procurador_genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                </select>
+                @error('procurador_genero')
+                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+                @enderror
             </div>
-            <div class="sm:col-span-2 flex items-center justify-center">
-                <div style="width: 50%;">
-                    <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Foto de perfil</label>
-                    <div class="relative">
-                        <div id="foto-preview" class="w-full aspect-square rounded-lg border-2 border-dashed #1E3A5F flex items-center justify-center bg-gray-50" style="background: #F9FAFB; color: #6B7280;">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v16.5m9-9h16.5m-16.5-9h16.5m0 9v9M3.75 21h16.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 6.75v12.75A2.25 2.25 0 003.75 21z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 15a3 3 0 00-2.83-2.993 2.5 2.5 0 00-2.83 0A3 3 0 003 21h18a3 3 0 00-2.83-5.993 2.5 2.5 0 00-2.83 0A3 3 0 003 21h18z" />
-                            </svg>
-                            <input type="file" name="procurador_foto" id="procurador_foto" accept="image/jpeg,image/png,image/jpg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="max-width: 100%;">
-                        </div>
+            <div>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Foto de perfil</label>
+                <div class="relative">
+                    <div id="foto-preview" class="w-full aspect-square rounded-lg border-2 border-dashed #1E3A5F flex items-center justify-center bg-gray-50" style="background: #F9FAFB; color: #6B7280;">
+                        <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v16.5m9-9h16.5m-16.5-9h16.5m0 9v9M3.75 21h16.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 6.75v12.75A2.25 2.25 0 003.75 21z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 15a3 3 0 00-2.83-2.993 2.5 2.5 0 00-2.83 0A3 3 0 003 21h18a3 3 0 00-2.83-5.993 2.5 2.5 0 00-2.83 0A3 3 0 003 21h18z" />
+                        </svg>
+                        <input type="file" name="procurador_foto" id="procurador_foto" accept="image/jpeg,image/png,image/jpg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="max-width: 100%;">
                     </div>
-                    @error('procurador_foto')
-                    <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-                    @enderror
                 </div>
+                @error('procurador_foto')
+                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+                @enderror
             </div>
         </div>
     </div>
