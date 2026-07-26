@@ -46,18 +46,19 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    {{-- Sección 1: Datos Personales e Identificación --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 2px solid #1E3A5F;">
-        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Datos personales</h3>
+        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Datos Personales e Identificación</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Nombres (dos nombres)</label>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Nombres</label>
                 <input type="text" name="procurador_nombre" value="{{ old('procurador_nombre') }}" required placeholder="Juan Carlos" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_nombre')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Apellidos (dos apellidos)</label>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Apellidos</label>
                 <input type="text" name="procurador_apellido" value="{{ old('procurador_apellido') }}" required placeholder="Pérez Gómez" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_apellido')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
@@ -88,6 +89,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
+        </div>
+    </div>
+
+    {{-- Sección 2: Información de Contacto --}}
+    <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 2px solid #1E3A5F;">
+        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información de Contacto</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Correo electrónico</label>
                 <input type="email" name="procurador_email" id="procurador_email" value="{{ old('procurador_email') }}" required placeholder="123456789@usap.edu" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
@@ -102,18 +110,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-            <div class="sm:col-span-2">
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Dirección</label>
-                <textarea name="procurador_direccion" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">{{ old('procurador_direccion') }}</textarea>
-                @error('procurador_direccion')
-                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+        </div>
+        <div class="mt-4">
+            <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Dirección</label>
+            <textarea name="procurador_direccion" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">{{ old('procurador_direccion') }}</textarea>
+            @error('procurador_direccion')
+            <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+            @enderror
         </div>
     </div>
 
+    {{-- Sección 3: Información Profesional --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 2px solid #1E3A5F;">
-        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información profesional</h3>
+        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información Profesional</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Carnet profesional</label>
