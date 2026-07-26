@@ -13,6 +13,9 @@
 <div x-data="{ 
     search: '', 
     statusFilter: 'activo',
+    searching: false,
+    searchResults: [],
+    showDropdown: false,
     shouldShow(nombre, apellido, dni, telefono, estado) {
         let term = this.search.trim().toLowerCase();
         if (term !== '') {
@@ -22,6 +25,31 @@
                    (telefono && telefono.toLowerCase().includes(term));
         }
         return estado === this.statusFilter;
+    },
+    async searchAPI(query) {
+        if (query.length < 2) {
+            this.searchResults = [];
+            this.showDropdown = false;
+            return;
+        }
+        this.searching = true;
+        try {
+            const response = await fetch(`/clientes/buscar?q=${encodeURIComponent(query)}&limit=10`);
+            const data = await response.json();
+            this.searchResults = data;
+            this.showDropdown = data.length > 0;
+        } catch (e) {
+            this.searchResults = [];
+            this.showDropdown = false;
+        } finally {
+            this.searching = false;
+        }
+    },
+    selectResult(result) {
+        this.search = result.nombre_completo;
+        this.searchResults = [];
+        this.showDropdown = false;
+        window.location.href = result.url;
     }
 }">
     {{-- Header --}}
@@ -35,17 +63,52 @@
 
     {{-- Buscador y Filtros --}}
     <div class="flex flex-col sm:flex-row gap-3 mb-5">
-        <div class="relative flex-1">
+        <div class="relative flex-1" x-data="{ open: false }">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="absolute" style="top: 50%; left: 12px; transform: translateY(-50%);" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" x-model="search" placeholder="Buscar clientes por nombre, DNI o teléfono..." class="w-full rounded-lg pl-9 pr-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
+            <input type="text" 
+                   x-model="search" 
+                   @input="searchAPI(search)"
+                   @focus="showDropdown = search.length >= 2"
+                   @blur="setTimeout(() => showDropdown = false, 200)"
+                   placeholder="Buscar clientes por nombre, DNI o teléfono..." 
+                   class="w-full rounded-lg pl-9 pr-3 py-2 text-sm outline-none" 
+                   style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;"
+                   autocomplete="off">
+            
+            {{-- Dropdown resultados búsqueda --}}
+            <div x-show="showDropdown && searchResults.length > 0" 
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="opacity-0 transform -translate-y-1"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-1"
+                 class="absolute z-50 w-full mt-1 rounded-lg shadow-lg border" style="background: white; border-color: #E5E7EB; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                <div class="max-h-60 overflow-y-auto">
+                    <template x-for="result in searchResults" :key="result.id">
+                        <a href="#" 
+                           @click.prevent="selectResult(result)"
+                           class="block px-4 py-2 hover:bg-gray-50 border-b last:border-0 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900" x-text="result.nombre_completo"></p>
+                                    <p class="text-xs text-gray-500" x-text="result.dni"></p>
+                                </div>
+                                <span class="text-xs text-gray-400" x-text="result.telefono"></span>
+                            </div>
+                        </a>
+                    </template>
+                </div>
+            </div>
         </div>
+
         <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg self-start sm:self-auto" style="background: #F3F4F6; border: 1px solid #E5E7EB;">
             <button type="button" @click="statusFilter = 'activo'" class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all outline-none"
-                :style="statusFilter === 'activo' ? 'background: #FFFFFF; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;' : 'color: #4B5563; border: 1px solid transparent;'">
+                :style="statusFilter === 'activo' ? 'background: #FFFFFF; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;' : 'color: #4B5563; border: 1px solid transparent;';">
                 Activos
             </button>
             <button type="button" @click="statusFilter = 'inactivo'" class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all outline-none"
-                :style="statusFilter === 'inactivo' ? 'background: #FFFFFF; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;' : 'color: #4B5563; border: 1px solid transparent;'">
+                :style="statusFilter === 'inactivo' ? 'background: #FFFFFF; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;' : 'color: #4B5563; border: 1px solid transparent;';">
                 Inactivos
             </button>
         </div>

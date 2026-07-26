@@ -36,7 +36,7 @@ class ClienteNombresHijosTest extends TestCase
             'rol_id' => $rol->rol_id,
             'procurador_id' => null,
             'usuario_nombre' => 'Director',
-            'email' => 'director@test.hn',
+            'email' => 'director@usap.edu',
             'contrasena' => Hash::make('Segura8!'),
             'usuario_estado' => 'activo',
             'debe_cambiar_contrasena' => false,
@@ -102,7 +102,7 @@ class ClienteNombresHijosTest extends TestCase
                 'cliente_telefono' => '9999-1111',
                 'cliente_direccion' => 'San Pedro Sula',
                 'cliente_numero_hijos' => 2,
-                'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez', // Campo auditado
+                'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
             ])
             ->assertRedirect(route('clientes.show', $cliente->cliente_dni));
 

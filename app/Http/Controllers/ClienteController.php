@@ -26,12 +26,13 @@ class ClienteController extends Controller
      * Incluye contador de casos asociados. Busca por DNI, teléfono, nombre
      * o apellido. Ordena por apellido y nombre.
      *
-     * @param  Request  $request  Contiene el parámetro opcional 'search'
+     * @param  Request  $request  Contiene el parámetro opcional 'search' y 'estado'
      * @return View Vista index con clientes paginados
      */
     public function index(Request $request)
     {
         $search = trim($request->query('search', ''));
+        $estado = $request->query('estado', '');
 
         $clientes = Cliente::withCount('casos')
             ->when($search, function ($query, $search) {
@@ -42,11 +43,54 @@ class ClienteController extends Controller
                         ->orWhere('cliente_apellido', 'like', "%{$search}%");
                 });
             })
+            ->when($estado, function ($query, $estado) {
+                $query->where('cliente_estado', $estado);
+            })
             ->orderBy('cliente_apellido')
             ->orderBy('cliente_nombre')
             ->paginate(20);
 
         return view('clientes.index', compact('clientes'));
+    }
+
+    /**
+     * Busca clientes para autocomplete/typeahead (API).
+     *
+     * @param  Request  $request  Parámetros 'q' (query) y opcional 'limit'
+     * @return \Illuminate\Http\JsonResponse JSON con clientes que coinciden
+     */
+    public function search(Request $request)
+    {
+        $query = trim($request->query('q', ''));
+        $limit = min((int) $request->query('limit', 10), 50);
+
+        if ($query === '') {
+            return response()->json([]);
+        }
+
+        $clientes = Cliente::where(function ($queryBuilder) use ($query) {
+                $queryBuilder->where('cliente_dni', 'like', "%{$query}%")
+                    ->orWhere('cliente_telefono', 'like', "%{$query}%")
+                    ->orWhere('cliente_nombre', 'like', "%{$query}%")
+                    ->orWhere('cliente_apellido', 'like', "%{$query}%");
+            })
+            ->where('cliente_estado', 'activo')
+            ->orderBy('cliente_apellido')
+            ->orderBy('cliente_nombre')
+            ->limit($limit)
+            ->get(['cliente_dni', 'cliente_nombre', 'cliente_apellido', 'cliente_telefono', 'cliente_estado'])
+            ->map(function ($cliente) {
+                return [
+                    'id' => $cliente->cliente_dni,
+                    'nombre_completo' => $cliente->nombre_completo,
+                    'dni' => $cliente->cliente_dni,
+                    'telefono' => $cliente->cliente_telefono,
+                    'estado' => $cliente->cliente_estado,
+                    'url' => route('clientes.show', $cliente->cliente_dni),
+                ];
+            });
+
+        return response()->json($clientes);
     }
 
     /**

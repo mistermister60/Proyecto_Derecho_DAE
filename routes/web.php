@@ -181,6 +181,9 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::post('/clientes/{identidad}/activar', [ClienteController::class, 'activar'])->name('clientes.activar');
     Route::get('/clientes/{identidad}', [ClienteController::class, 'show'])->name('clientes.show');
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+    
+    // Cliente search API (autocomplete/typeahead)
+    Route::get('/clientes/buscar', [ClienteController::class, 'search'])->name('clientes.search');
 
     // Usuarios (solo Director)
     Route::middleware('role:Director')->group(function () {
