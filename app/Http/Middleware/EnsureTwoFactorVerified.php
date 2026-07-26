@@ -16,9 +16,9 @@ class EnsureTwoFactorVerified
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check() && !session()->has('two_factor_verified')) {
-            // Director (super usuario) omite 2FA
+            // Solo el super admin original (director@usap.edu) omite 2FA
             $user = auth()->user();
-            if ($user->rol && $user->rol->rol_nombre === 'Director') {
+            if ($user && $user->email === 'director@usap.edu') {
                 session(['two_factor_verified' => true]);
                 return $next($request);
             }

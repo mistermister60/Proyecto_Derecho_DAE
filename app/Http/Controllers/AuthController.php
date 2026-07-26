@@ -55,18 +55,18 @@ class AuthController extends BaseController
                 $request->input('contrasena')
             );
 
-            // Cargar usuario con rol para verificar si es Director
+            // Cargar usuario con rol para verificar si es el super admin original
             $user = \App\Models\Usuario::with('rol')->where('email', $request->input('email'))->first();
 
-            // Director (super usuario) omite 2FA y va directo al dashboard
-            if ($user && $user->rol && $user->rol->rol_nombre === 'Director') {
+            // Solo el super admin original (director@usap.edu) omite 2FA
+            if ($user && $user->email === 'director@usap.edu') {
                 \Illuminate\Support\Facades\Session::put('two_factor_verified', true);
-                
+
                 // Verificar si debe cambiar contraseña (primer login)
                 if ($user->debe_cambiar_contrasena) {
                     return redirect()->route('password.change');
                 }
-                
+
                 return redirect()->intended(route('dashboard'));
             }
 
@@ -99,13 +99,13 @@ class AuthController extends BaseController
             'code' => 'required|numeric',
         ]);
 
-        if ($request->input('code') == session('two_factor_code') && 
+        if ($request->input('code') == session('two_factor_code') &&
             \Carbon\Carbon::now()->isBefore(session('two_factor_expires_at'))) {
-            
+
             // Si el código es correcto y no ha expirado, limpiamos la sesión y marcamos como verificado
             session()->forget(['two_factor_code', 'two_factor_expires_at']);
             session(['two_factor_verified' => true]);
-            
+
             return redirect()->intended(route('dashboard'));
         }
 
