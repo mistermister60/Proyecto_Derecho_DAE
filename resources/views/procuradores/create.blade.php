@@ -26,51 +26,50 @@
         </div>
     </div>
 
-    <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
+    <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 2px solid #1E3A5F;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Datos personales</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Nombres (dos nombres)</label>
-                <input type="text" name="procurador_nombre" value="{{ old('procurador_nombre') }}" required placeholder="Ej: Juan Carlos" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_nombre') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <input type="text" name="procurador_nombre" value="{{ old('procurador_nombre') }}" required placeholder="Juan Carlos" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_nombre')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Apellidos (dos apellidos)</label>
-                <input type="text" name="procurador_apellido" value="{{ old('procurador_apellido') }}" required placeholder="Ej: Pérez López" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_apellido') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <input type="text" name="procurador_apellido" value="{{ old('procurador_apellido') }}" required placeholder="Pérez Gómez" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_apellido')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">DNI</label>
-                <input type="text" name="procurador_dni" value="{{ old('procurador_dni') }}" required placeholder="Ej: 0801-1990-01234" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_dni') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <input type="text" name="procurador_dni" id="procurador_dni" value="{{ old('procurador_dni') }}" required placeholder="0801-1990-00123" maxlength="15" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_dni')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Carnet profesional</label>
-                <input type="text" name="procurador_carnet" value="{{ old('procurador_carnet') }}" placeholder="Ej: CAR-00123" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_carnet') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <input type="text" name="procurador_carnet" value="{{ old('procurador_carnet') }}" placeholder="CAR-00123" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_carnet')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de nacimiento (DD/MM/YYYY)</label>
-                <input type="text" name="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento') }}" required placeholder="Ej: 15/03/1990" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_fecha_nacimiento') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;" maxlength="10" id="fecha_nacimiento">
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Fecha de nacimiento</label>
+                <input type="text" name="procurador_fecha_nacimiento" id="procurador_fecha_nacimiento" value="{{ old('procurador_fecha_nacimiento') }}" required placeholder="DD/MM/AAAA" maxlength="10" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_fecha_nacimiento')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Género</label>
-                <select name="procurador_genero" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_genero') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <select name="procurador_genero" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar...</option>
                     <option value="Masculino" {{ old('procurador_genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
                     <option value="Femenino" {{ old('procurador_genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                    <option value="Otro" {{ old('procurador_genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
                 </select>
                 @error('procurador_genero')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
@@ -78,33 +77,64 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Correo electrónico</label>
-                <input type="email" name="procurador_email" value="{{ old('procurador_email') }}" required placeholder="123456789@usap.edu" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_email') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <input type="email" name="procurador_email" id="procurador_email" value="{{ old('procurador_email') }}" required placeholder="123456789@usap.edu" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_email')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Teléfono / Celular</label>
-                <input type="text" name="procurador_telefono" value="{{ old('procurador_telefono') }}" required placeholder="+504 1234-5678" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_telefono') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;" maxlength="15" id="telefono">
+                <input type="text" name="procurador_telefono" id="procurador_telefono" value="{{ old('procurador_telefono') }}" required placeholder="+504 1234-5678" maxlength="16" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
                 @error('procurador_telefono')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-            <div class="md:col-span-2">
+            <div class="sm:col-span-2">
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Dirección</label>
-                <input type="text" name="procurador_direccion" value="{{ old('procurador_direccion') }}" placeholder="Ej: Av. Principal 123" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_direccion') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <textarea name="procurador_direccion" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">{{ old('procurador_direccion') }}</textarea>
                 @error('procurador_direccion')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
         </div>
     </div>
+
+    <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 2px solid #1E3A5F;">
+        <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Información profesional</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Carnet profesional</label>
+                <input type="text" name="procurador_carnet" value="{{ old('procurador_carnet') }}" placeholder="CAR-00123" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                @error('procurador_carnet')
+                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Estado</label>
+                <select name="procurador_estado" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                    <option value="activo" selected>Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+            </div>
+        </div>
+    </div>
 </form>
 
 <script>
-// Formato automático fecha DD/MM/YYYY
 document.addEventListener('DOMContentLoaded', function() {
-    const fechaInput = document.getElementById('fecha_nacimiento');
+    // Formato DNI: 0801-1990-00123 (auto-guiones)
+    const dniInput = document.getElementById('procurador_dni');
+    if (dniInput) {
+        dniInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 4) value = value.slice(0,4) + '-' + value.slice(4);
+            if (value.length >= 9) value = value.slice(0,9) + '-' + value.slice(9,14);
+            e.target.value = value.slice(0,15);
+        });
+    }
+
+    // Formato Fecha: DD/MM/AAAA (auto-barras)
+    const fechaInput = document.getElementById('procurador_fecha_nacimiento');
     if (fechaInput) {
         fechaInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -114,8 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Formato automático teléfono +504 XXXX-XXXX
-    const telefonoInput = document.getElementById('telefono');
+    // Formato Teléfono: +504 1234-5678
+    const telefonoInput = document.getElementById('procurador_telefono');
     if (telefonoInput) {
         telefonoInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
