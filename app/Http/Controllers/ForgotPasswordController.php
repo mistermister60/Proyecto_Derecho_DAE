@@ -34,7 +34,7 @@ class ForgotPasswordController extends BaseController
     public function sendResetLinkEmail(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => 'required|email|exists:usuarios,email',
+            'email' => 'required|email|exists:usuarios,email|ends_with:@usap.edu',
         ]);
 
         $usuario = Usuario::where('email', $request->email)->first();

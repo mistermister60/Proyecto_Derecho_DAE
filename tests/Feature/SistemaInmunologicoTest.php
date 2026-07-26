@@ -131,7 +131,7 @@ class SistemaInmunologicoTest extends TestCase
         $rol = Rol::create(['rol_nombre' => 'Director', 'rol_descripcion' => 'Dir', 'rol_estado' => 'activo']);
         $director = Usuario::create([
             'rol_id' => $rol->rol_id, 'procurador_id' => null,
-            'usuario_nombre' => 'Dir', 'email' => 'dir@test.hn',
+            'usuario_nombre' => 'Dir', 'email' => 'dir@usap.edu',
             'contrasena' => Hash::make('Segura1!'), 'usuario_estado' => 'activo',
         ]);
 
@@ -139,7 +139,7 @@ class SistemaInmunologicoTest extends TestCase
             ->post(route('usuarios.store'), [
                 'rol_id' => $rol->rol_id,
                 'usuario_nombre' => 'Nuevo',
-                'email' => 'nuevo@test.hn',
+                'email' => 'nuevo@usap.edu',     // @usap.edu para validación de email
                 'contrasena' => 'Segura8chars',     // cumple: 8+, mayúscula, número
                 'contrasena_confirmation' => 'Segura8chars',
             ])

@@ -35,7 +35,7 @@ class ResetPasswordController extends BaseController
     {
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email|exists:usuarios,email',
+            'email' => 'required|email|exists:usuarios,email|ends_with:@usap.edu',
             'password' => [
                 'required',
                 'confirmed',

@@ -31,7 +31,7 @@ class UpdateUsuariosRequest extends FormRequest
     {
         return [
             'usuario_nombre' => 'sometimes|string|max:60',
-            'email' => 'sometimes|email|max:50|unique:usuarios,email,'.$this->route('id').',usuario_id',
+            'email' => 'sometimes|email|max:50|unique:usuarios,email,'.$this->route('id').',usuario_id|ends_with:@usap.edu',
             'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()],
             'rol_id' => 'sometimes|exists:roles,rol_id',
             'procurador_id' => 'nullable|exists:procuradores,procurador_id',
