@@ -103,17 +103,17 @@
         <div class="rounded-xl p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Actividad reciente</h3>
             @if ($usuario->procurador && $usuario->procurador->casos->count() > 0)
-                @foreach ($usuario->procurador->casos->take(5) as $caso)
-                <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}" class="flex items-center gap-3 p-3 rounded-lg mb-2 transition-colors" style="border: 1px solid #E5E7EB;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
-                    <div>
-                        <p class="text-sm font-medium" style="color: #2563EB;">{{ $caso->caso_numero_expediente }}</p>
-                        <p class="text-xs" style="color: #6B7280;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</p>
-                    </div>
-                    <div class="ml-auto">
-                        <x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" />
-                    </div>
-                </a>
-                @endforeach
+                            @foreach ($usuario->procurador->casos->take(5) as $caso)
+                            <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}" class="flex items-center gap-3 p-3 rounded-lg mb-2 transition-colors" style="border: 1px solid #E5E7EB;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                                <div>
+                                    <p class="text-sm font-medium" style="color: #2563EB;">{{ $caso->caso_numero_expediente }}</p>
+                                    <p class="text-xs" style="color: #6B7280;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <x-estado-badge :estado="{{ $caso->estado?->estado_nombre ?? '—' }}" />
+                                </div>
+                            </a>
+                            @endforeach
             @else
                 <div class="py-8 text-center">
                     <p class="text-sm" style="color: #9CA3AF;">Sin actividad registrada</p>

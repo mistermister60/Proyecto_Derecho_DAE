@@ -106,7 +106,7 @@ class UsuariosController extends Controller
      */
     public function show(string $id)
     {
-        $usuario = Usuario::with(['rol', 'procurador'])
+        $usuario = Usuario::with(['rol', 'procurador.casos.estado'])
             ->where('usuario_id', $id)
             ->firstOrFail();
 
