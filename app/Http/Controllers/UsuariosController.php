@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUsuariosRequest;
 use App\Http\Requests\UpdateUsuariosRequest;
+use App\Mail\BienvenidaProcuradorMail;
 use App\Models\Procurador;
 use App\Models\Rol;
 use App\Models\Usuario;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -71,28 +73,49 @@ class UsuariosController extends Controller
     }
 
     /**
-     * Registra un nuevo usuario en el sistema.
-     *
-     * Valida los datos incluyendo la regla Password (mínimo 8 caracteres,
-     * mayúsculas, minúsculas y números). Encripta la contraseña con Hash::make()
-     * y asigna estado 'activo' por defecto.
-     *
-     * @param  Request  $request  Datos del usuario con confirmación de contraseña
-     * @return RedirectResponse Redirección al índice con mensaje
-     */
-    public function store(StoreUsuariosRequest $request)
-    {
-        $validated = $request->validated();
+         * Registra un nuevo usuario en el sistema.
+         *
+         * Valida los datos incluyendo la regla Password (mínimo 8 caracteres,
+         * mayúsculas, minúsculas y números). Encripta la contraseña con Hash::make()
+         * y asigna estado 'activo' por defecto.
+         *
+         * Si el rol es Procurador: genera contraseña temporal, envía email de bienvenida
+         * con credenciales y fuerza cambio de contraseña en primer login.
+         *
+         * @param  StoreUsuariosRequest  $request  Datos del usuario con confirmación de contraseña
+         * @return RedirectResponse Redirección al índice con mensaje
+         */
+        public function store(StoreUsuariosRequest $request): RedirectResponse
+        {
+            $validated = $request->validated();
+        
+            // Obtener nombre del rol
+            $rol = Rol::findOrFail($validated['rol_id']);
+        
+            // Generar contraseña temporal segura
+            $tempPassword = 'P@ss' . Str::random(8) . rand(100, 999);
+        
+            $validated['usuario_estado'] = 'activo';
+            $validated['contrasena'] = Hash::make($tempPassword);
+            $validated['debe_cambiar_contrasena'] = true; // Siempre forzar cambio en primer login
 
-        $validated['usuario_estado'] = 'activo';
-        $validated['contrasena'] = Hash::make($validated['contrasena']); // 🔐 Encriptada
-        $validated['debe_cambiar_contrasena'] = ($validated['rol_id'] ?? 1) !== 1; // Forzar cambio solo si NO es Director
+            $usuario = Usuario::create($validated);
 
-        Usuario::create($validated);
+            // Si es Procurador, enviar email de bienvenida con credenciales
+            if ($rol->rol_nombre === 'Procurador' && $usuario->procurador) {
+                $loginUrl = url('/login');
+            
+                Mail::to($usuario->email)->send(new BienvenidaProcuradorMail(
+                    $usuario->usuario_nombre,
+                    $usuario->email,
+                    $tempPassword,
+                    $loginUrl
+                ));
+            }
 
-        return redirect()->route('usuarios.index')
-            ->with('success', 'Usuario registrado exitosamente.');
-    }
+            return redirect()->route('usuarios.index')
+                ->with('success', 'Usuario registrado exitosamente.' . ($rol->rol_nombre === 'Procurador' ? ' Se enviaron las credenciales por correo.' : ''));
+        }
 
     /**
      * Muestra los detalles de un usuario con sus relaciones.

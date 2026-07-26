@@ -32,7 +32,7 @@ class StoreUsuariosRequest extends FormRequest
         return [
             'usuario_nombre' => 'required|string|max:60',
             'email' => 'required|email|max:50|unique:usuarios,email|ends_with:@usap.edu',
-            'contrasena' => ['required', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()],
+            'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()],
             'rol_id' => 'required|exists:roles,rol_id',
             'procurador_id' => 'nullable|exists:procuradores,procurador_id',
         ];
