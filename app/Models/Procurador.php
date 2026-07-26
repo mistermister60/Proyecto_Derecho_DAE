@@ -56,6 +56,7 @@ class Procurador extends Model
         'procurador_telefono',
         'procurador_direccion',
         'procurador_estado',
+        'procurador_foto',
     ];
 
     protected function casts(): array

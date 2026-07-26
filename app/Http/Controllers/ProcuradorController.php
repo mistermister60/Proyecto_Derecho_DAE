@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 /**
@@ -83,6 +84,12 @@ class ProcuradorController extends Controller
 
         $validated['procurador_estado'] = 'activo';
 
+        // Manejar foto si se subió
+        if ($request->hasFile('procurador_foto')) {
+            $path = $request->file('procurador_foto')->store('procuradores/fotos', 'public');
+            $validated['procurador_foto'] = $path;
+        }
+
         DB::transaction(function () use ($validated) {
             $procurador = Procurador::create($validated);
             Usuario::create([
@@ -151,6 +158,15 @@ class ProcuradorController extends Controller
         $procurador = Procurador::where('procurador_dni', $identidad)->firstOrFail();
 
         $validated = $request->validated();
+
+        // Manejar foto si se subió una nueva
+        if ($request->hasFile('procurador_foto')) {
+            // Eliminar foto anterior si existe
+            if ($procurador->procurador_foto && Storage::disk('public')->exists($procurador->procurador_foto)) {
+                Storage::disk('public')->delete($procurador->procurador_foto);
+            }
+            $validated['procurador_foto'] = $request->file('procurador_foto')->store('procuradores', 'public');
+        }
 
         $procurador->update($validated);
 
