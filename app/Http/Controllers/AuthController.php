@@ -84,7 +84,7 @@ class AuthController extends BaseController
             Mail::to($request->input('email'))->send(new CodigoVerificacionMail($codigo2FA));
 
             // 4. Redirigimos al usuario a la vista para escribir el código
-            return redirect()->route('auth.two-factor');
+            return redirect()->route('auth.two-factor')->with('success', 'Código de verificación enviado a tu correo institucional.');
 
         } catch (AuthenticationException $e) {
             return back()->withErrors([

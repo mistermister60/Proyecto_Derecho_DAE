@@ -151,6 +151,10 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 // Rutas protegidas (requieren autenticación, 2FA verificado y contraseña cambiada)
 Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 
+    // Cambio obligatorio de contraseña (el middleware password.changed permite estas rutas)
+    Route::get('/cambiar-contrasena', [PasswordChangeController::class, 'showChangeForm'])->name('password.change');
+    Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.change.update');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
