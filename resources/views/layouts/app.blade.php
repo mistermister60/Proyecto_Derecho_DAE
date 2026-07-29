@@ -291,6 +291,28 @@
 
         {{-- Contenido dinámico --}}
         <main class="flex-1 overflow-auto p-4 md:p-6" style="view-transition-name: main-content;">
+
+            {{-- Flash messages: banner visible siempre (funciona sin JS) --}}
+            @if (session('success'))
+                <div class="mb-4 p-4 rounded-lg text-sm font-medium flex items-center gap-2"
+                     style="background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-4 p-4 rounded-lg text-sm font-medium flex items-center gap-2"
+                     style="background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @yield('content')
         </main>
 
@@ -419,7 +441,7 @@
                 const isWarning = icon === 'warning';
 
                 if (window.Swal) {
-                    Swal.fire({
+                    window.Swal.fire({
                         title: title,
                         text: text,
                         icon: icon,

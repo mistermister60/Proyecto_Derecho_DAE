@@ -110,7 +110,7 @@
                                     <p class="text-xs" style="color: #6B7280;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</p>
                                 </div>
                                 <div class="ml-auto">
-                                    <x-estado-badge :estado="{{ $caso->estado?->estado_nombre ?? '—' }}" />
+                                    <x-estado-badge estado="{{ $caso->estado?->estado_nombre ?? '—' }}" />
                                 </div>
                             </a>
                             @endforeach
