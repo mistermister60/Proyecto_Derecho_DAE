@@ -36,10 +36,10 @@ class UpdateProcuradorRequest extends FormRequest
             'procurador_dni' => 'required|string|max:20|unique:procuradores,procurador_dni,'.$identidad.',procurador_dni',
             'procurador_telefono' => 'required|string|max:15',
             'procurador_direccion' => 'required|string|max:350',
-            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email,'.$identidad.',procurador_email',
+            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email,'.$identidad.',procurador_dni',
             'procurador_fecha_nacimiento' => 'required|date',
             'procurador_genero' => 'required|string|in:Masculino,Femenino',
-            'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet,'.$identidad.',procurador_carnet',
+            'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet,'.$identidad.',procurador_dni',
             'procurador_estado' => 'required|string|in:activo,inactivo',
             'procurador_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
