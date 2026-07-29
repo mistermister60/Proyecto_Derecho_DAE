@@ -170,7 +170,7 @@ class ProcuradorController extends Controller
 
         $procurador->update($validated);
 
-        return redirect()->route('procuradores.show', $identidad)
+        return redirect()->route('procuradores.show', $procurador->fresh()->procurador_dni)
             ->with('success', 'Procurador actualizado exitosamente.');
     }
 
