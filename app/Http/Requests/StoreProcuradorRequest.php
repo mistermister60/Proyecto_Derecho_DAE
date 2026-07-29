@@ -40,6 +40,7 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet',
             'procurador_estado' => 'required|string|in:activo,inactivo',
             'procurador_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'procurador_fecha_ingreso' => ['required', 'date'],
         ];
     }
 
@@ -77,6 +78,8 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_foto.image' => 'El archivo debe ser una imagen.',
             'procurador_foto.mimes' => 'La foto debe estar en formato JPEG o PNG.',
             'procurador_foto.max' => 'La foto no puede superar los 2 MB.',
+            'procurador_fecha_ingreso.required' => 'La fecha de inicio de práctica es obligatoria.',
+'procurador_fecha_ingreso.date' => 'La fecha de inicio de práctica debe ser una fecha válida.',
         ];
     }
 }

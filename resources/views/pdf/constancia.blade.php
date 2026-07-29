@@ -186,11 +186,15 @@ DE PRÁCTICA
 </td>
 
 <td align="center">
-____________________
+    {{ $procurador->procurador_fecha_ingreso
+        ? $procurador->procurador_fecha_ingreso->format('d/m/Y')
+        : '____________________' }}
 </td>
 
 <td align="center">
-____________________
+    {{ $procurador->procurador_fecha_ingreso
+        ? $procurador->procurador_fecha_ingreso->copy()->addYear()->format('d/m/Y')
+        : '____________________' }}
 </td>
 
 </tr>

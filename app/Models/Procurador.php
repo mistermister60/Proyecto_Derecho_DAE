@@ -57,12 +57,14 @@ class Procurador extends Model
         'procurador_direccion',
         'procurador_estado',
         'procurador_foto',
+        'procurador_fecha_ingreso',
     ];
 
     protected function casts(): array
     {
         return [
             'procurador_fecha_nacimiento' => 'date',
+            'procurador_fecha_ingreso' => 'date',
         ];
     }
 

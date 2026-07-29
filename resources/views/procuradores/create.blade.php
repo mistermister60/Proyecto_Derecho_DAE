@@ -154,6 +154,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     <option value="inactivo">Inactivo</option>
                 </select>
             </div>
+            <div>
+    <label for="procurador_fecha_ingreso"
+           class="block text-sm font-medium text-gray-700">
+        Fecha de inicio de práctica
+    </label>
+
+    <input
+        type="date"
+        name="procurador_fecha_ingreso"
+        id="procurador_fecha_ingreso"
+        value="{{ old('procurador_fecha_ingreso') }}"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+    >
+
+    @error('procurador_fecha_ingreso')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
         </div>
     </div>
 </form>

@@ -93,6 +93,22 @@
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Teléfono</dt><dd class="text-sm font-medium text-right" style="color: #111827;">{{ $procurador->procurador_telefono ?? '—' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Dirección</dt><dd class="text-sm font-medium text-right" style="color: #111827; max-width: 200px;">{{ $procurador->procurador_direccion ?? '—' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Estado</dt><dd class="text-sm font-medium text-right"><x-estado-badge :estado="$procurador->procurador_estado === 'activo' ? 'Activo' : 'Inactivo'" /></dd></div>
+                <div class="flex justify-between gap-4">
+    <span class="text-gray-500">Fecha de inicio de práctica</span>
+    <span class="font-medium text-gray-900">
+        {{ $procurador->procurador_fecha_ingreso
+            ? $procurador->procurador_fecha_ingreso->format('d/m/Y')
+            : 'No registrada' }}
+    </span>
+</div>
+<div class="flex justify-between gap-4">
+    <span class="text-gray-500">Fecha de egreso de práctica</span>
+    <span class="font-medium text-gray-900">
+        {{ $procurador->procurador_fecha_ingreso
+            ? $procurador->procurador_fecha_ingreso->copy()->addYear()->format('d/m/Y')
+            : 'No disponible' }}
+    </span>
+</div>
             </dl>
         </div>
 
