@@ -70,7 +70,7 @@ class ProfileTest extends TestCase
                 'email' => 'nuevo@example.com',
             ])
             ->assertRedirect('/profile')
-            ->assertSessionHas('status', 'profile-updated');
+            ->assertSessionHas('success', 'Perfil actualizado exitosamente.');
 
         $user->refresh();
         $this->assertSame('Nuevo Nombre', $user->usuario_nombre);
@@ -97,7 +97,7 @@ class ProfileTest extends TestCase
                 'email' => 'test@example.com', // Mismo email
             ])
             ->assertRedirect('/profile')
-            ->assertSessionHas('status', 'profile-updated');
+            ->assertSessionHas('success', 'Perfil actualizado exitosamente.');
 
         $user->refresh();
         $this->assertSame('Otro Nombre', $user->usuario_nombre);

@@ -13,7 +13,7 @@
     </div>
 
     {{-- Status messages --}}
-    @if (session('status'))
+    @if (session('success'))
         <div style="background: #D1FAE5; border: 1px solid #10B981; color: #065F46; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
             {{ session('status') }}
         </div>
@@ -63,7 +63,7 @@
                         <button type="submit" style="background: #1E3A8A; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
                             Guardar Cambios
                         </button>
-                        @if (session('status') === 'profile-updated')
+                        @if (session('success') === 'Perfil actualizado exitosamente.')
                             <div style="display: flex; align-items: center; padding: 8px 16px; background: #D1FAE5; color: #065F46; border-radius: 8px; font-size: 14px;">
                                 Perfil actualizado
                             </div>

@@ -25,9 +25,17 @@
 
     <title>@yield('title', 'Consultorio Jurídico - USAP') | Consultorio Jurídico</title>
 
-    @fonts
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @PwaHead
+    <!-- PWA Head -->
+    <meta name="theme-color" content="#1E3A5F">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Consultorio Jurídico USAP">
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body x-data="{ sidebarOpen: false, openNotif: false, openUser: false }">
 
@@ -338,7 +346,7 @@
         }
 
         // Start View Transition
-        document.startViewTransition(async () => {
+        const transition = document.startViewTransition(async () => {
             // Add loading class for visual feedback
             document.documentElement.classList.add('view-transition-active');
             
@@ -349,6 +357,9 @@
                 // The transition will complete after navigation
                 // This cleanup runs on the new page load
             }
+        });
+        transition.catch(() => {
+            window.location.href = link.href;
         });
     });
 
@@ -361,33 +372,39 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Alertas de sesión (Success/Error)
+        // Remove view-transition-active class after page load
+        document.documentElement.classList.remove('view-transition-active');
+        // Make page visible FIRST (removes opacity:0 from CSS) — antes de Swal
+        document.documentElement.classList.add('view-transition-ready');
+
+        // Alertas de sesión (Success/Error) — la página ya es visible
         @if (session('success'))
             if (window.Swal) {
-                Swal.fire({
+                window.Swal.fire({
                     title: '¡Éxito!',
-                    text: "{{ session('success') }}",
+                    text: @json(session('success')),
                     icon: 'success',
                     confirmButtonColor: '#2563EB'
                 });
+            } else {
+                console.warn('SweetAlert2 no disponible. Flash:', @json(session('success')));
+                alert(@json(session('success')));
             }
         @endif
 
         @if (session('error'))
             if (window.Swal) {
-                Swal.fire({
+                window.Swal.fire({
                     title: 'Error',
-                    text: "{{ session('error') }}",
+                    text: @json(session('error')),
                     icon: 'error',
                     confirmButtonColor: '#DC2626'
                 });
+            } else {
+                console.warn('SweetAlert2 no disponible. Flash:', @json(session('error')));
+                alert(@json(session('error')));
             }
         @endif
-
-        // Remove view-transition-active class after page load
-        document.documentElement.classList.remove('view-transition-active');
-        // Make page visible (removes opacity:0 from CSS)
-        document.documentElement.classList.add('view-transition-ready');
 
         // Escuchador global de confirmaciones SweetAlert2
         document.addEventListener('submit', function (e) {
