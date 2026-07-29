@@ -126,13 +126,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-        </div>
-        <div class="mt-4">
-            <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Dirección</label>
-            <textarea name="procurador_direccion" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">{{ old('procurador_direccion') }}</textarea>
-            @error('procurador_direccion')
-            <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-            @enderror
+            <div class="sm:col-span-2">
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Dirección</label>
+                <textarea name="procurador_direccion" rows="2" class="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">{{ old('procurador_direccion') }}</textarea>
+                @error('procurador_direccion')
+                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
     </div>
 
