@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Carbon;
 
 /**
  * Form request para almacenar un nuevo procurador.
@@ -23,19 +22,6 @@ class StoreProcuradorRequest extends FormRequest
     }
 
     /**
-     * Preparar los datos para la validación.
-     * Convierte YYYY-MM-DD (de type="date") a DD/MM/YYYY para validación.
-     */
-    protected function prepareForValidation(): void
-    {
-        if ($this->procurador_fecha_nacimiento) {
-            $this->merge([
-                'procurador_fecha_nacimiento' => Carbon::parse($this->procurador_fecha_nacimiento)->format('d/m/Y'),
-            ]);
-        }
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, string>
@@ -48,10 +34,11 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_dni' => 'required|string|max:20|unique:procuradores,procurador_dni',
             'procurador_telefono' => 'required|string|max:15',
             'procurador_direccion' => 'required|string|max:350',
-            'procurador_correo' => 'required|email|max:50|unique:procuradores,procurador_correo',
-            'procurador_profesion' => 'required|string|max:50',
-            'procurador_colegiacion' => 'required|string|max:50|unique:procuradores,procurador_colegiacion',
-            'procurador_fecha_nacimiento' => 'required|date_format:d/m/Y',
+            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email',
+            'procurador_fecha_nacimiento' => 'required|date',
+            'procurador_genero' => 'required|string|in:Masculino,Femenino',
+            'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet',
+            'procurador_estado' => 'required|string|in:activo,inactivo',
             'procurador_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }

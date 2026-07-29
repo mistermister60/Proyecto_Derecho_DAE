@@ -96,7 +96,7 @@ class ProcuradorController extends Controller
                 'rol_id' => Rol::where('rol_nombre', 'Procurador')->value('rol_id'),
                 'procurador_id' => $procurador->procurador_id,
                 'usuario_nombre' => $validated['procurador_nombre'].' '.$validated['procurador_apellido'],
-                'email' => $validated['procurador_correo'],
+                'email' => $validated['procurador_email'],
                 'contrasena' => Hash::make($validated['procurador_nombre'] . substr($validated['procurador_dni'], -4)),
                 'usuario_estado' => 'activo',
             ]);
