@@ -39,4 +39,28 @@ class UpdateDemandadoRequest extends FormRequest
             'demandado_telefono_trabajo' => 'nullable|string|max:29',
         ];
     }
+
+    /**
+     * Get the custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'demandado_nombre.required' => 'El nombre del demandado es obligatorio.',
+            'demandado_nombre.max' => 'El nombre no puede tener más de :max caracteres.',
+            'demandado_apellido.required' => 'El apellido del demandado es obligatorio.',
+            'demandado_apellido.max' => 'El apellido no puede tener más de :max caracteres.',
+            'demandado_dni.required' => 'El número de DNI del demandado es obligatorio.',
+            'demandado_dni.max' => 'El DNI no puede tener más de :max caracteres.',
+            'demandado_dni.unique' => 'Este número de DNI ya está registrado en el sistema.',
+            'demandado_telefono.max' => 'El teléfono no puede tener más de :max caracteres.',
+            'demandado_direccion.required' => 'La dirección del demandado es obligatoria.',
+            'demandado_profesion.max' => 'La profesión no puede tener más de :max caracteres.',
+            'demandado_lugar_trabajo.max' => 'El lugar de trabajo no puede tener más de :max caracteres.',
+            'demandado_direccion_trabajo.max' => 'La dirección de trabajo no puede tener más de :max caracteres.',
+            'demandado_telefono_trabajo.max' => 'El teléfono del trabajo no puede tener más de :max caracteres.',
+        ];
+    }
 }

@@ -74,6 +74,35 @@ class UpdateCasoRequest extends FormRequest
     }
 
     /**
+     * Get the custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'estado_id.required' => 'Debe seleccionar un estado del caso.',
+            'estado_id.exists' => 'El estado del caso seleccionado no existe.',
+            'caso_parte_representada.required' => 'La parte representada es obligatoria.',
+            'caso_parte_representada.max' => 'La parte representada no puede tener más de :max caracteres.',
+            'caso_juzgado.max' => 'El nombre del juzgado no puede tener más de :max caracteres.',
+            'caso_relacion_hechos.required' => 'La relación de hechos es obligatoria.',
+            // Director-only
+            'cliente_id.required' => 'Debe seleccionar un cliente.',
+            'cliente_id.exists' => 'El cliente seleccionado no existe.',
+            'tipo_tramite_id.required' => 'Debe seleccionar un tipo de trámite.',
+            'tipo_tramite_id.exists' => 'El tipo de trámite seleccionado no existe.',
+            'procurador_id.required' => 'Debe seleccionar un procurador.',
+            'procurador_id.exists' => 'El procurador seleccionado no existe.',
+            'demandado_id.exists' => 'El demandado seleccionado no existe.',
+            'caso_fecha_interpuesta.date' => 'La fecha interpuesta no tiene un formato válido.',
+            'caso_admisible.boolean' => 'El valor de admisible debe ser verdadero o falso.',
+            'caso_estado.required' => 'El estado del caso es obligatorio.',
+            'caso_estado.in' => 'El estado del caso seleccionado no es válido.',
+        ];
+    }
+
+    /**
      * Determine if the authenticated user has the Director role.
      */
     public function esDirector(): bool

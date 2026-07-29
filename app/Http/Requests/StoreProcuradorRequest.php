@@ -42,4 +42,41 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
+
+    /**
+     * Get the custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'procurador_nombre.required' => 'El nombre del procurador es obligatorio.',
+            'procurador_nombre.max' => 'El nombre no puede tener más de :max caracteres.',
+            'procurador_apellido.required' => 'El apellido del procurador es obligatorio.',
+            'procurador_apellido.max' => 'El apellido no puede tener más de :max caracteres.',
+            'procurador_dni.required' => 'El número de DNI es obligatorio.',
+            'procurador_dni.max' => 'El DNI no puede tener más de :max caracteres.',
+            'procurador_dni.unique' => 'Este número de DNI ya está registrado en el sistema.',
+            'procurador_telefono.required' => 'El teléfono o celular es obligatorio.',
+            'procurador_telefono.max' => 'El teléfono no puede tener más de :max caracteres.',
+            'procurador_direccion.required' => 'La dirección es obligatoria.',
+            'procurador_direccion.max' => 'La dirección no puede tener más de :max caracteres.',
+            'procurador_email.required' => 'El correo electrónico es obligatorio.',
+            'procurador_email.email' => 'Debe ingresar un correo electrónico válido.',
+            'procurador_email.max' => 'El correo electrónico no puede tener más de :max caracteres.',
+            'procurador_email.unique' => 'Este correo electrónico ya está registrado en el sistema.',
+            'procurador_fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+            'procurador_fecha_nacimiento.date' => 'Debe ingresar una fecha de nacimiento válida.',
+            'procurador_genero.required' => 'Debe seleccionar un género.',
+            'procurador_genero.in' => 'El género seleccionado no es válido. Seleccione Masculino o Femenino.',
+            'procurador_carnet.max' => 'El carnet profesional no puede tener más de :max caracteres.',
+            'procurador_carnet.unique' => 'Este número de carnet profesional ya está registrado.',
+            'procurador_estado.required' => 'Debe seleccionar un estado.',
+            'procurador_estado.in' => 'El estado seleccionado no es válido.',
+            'procurador_foto.image' => 'El archivo debe ser una imagen.',
+            'procurador_foto.mimes' => 'La foto debe estar en formato JPEG o PNG.',
+            'procurador_foto.max' => 'La foto no puede superar los 2 MB.',
+        ];
+    }
 }

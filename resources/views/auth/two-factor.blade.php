@@ -6,11 +6,22 @@
         <h2 style="color: #1e3a8a; margin-bottom: 10px;">Verificación de Seguridad</h2>
         <p style="color: #6b7280; font-size: 14px; margin-bottom: 25px;">Hemos enviado un código de acceso a tu correo institucional de la USAP.</p>
 
+        @if ($errors->any())
+        <div style="margin-bottom: 20px; padding: 12px; border-radius: 8px; background: #FEE2E2; border: 1px solid #FECACA;">
+            @foreach ($errors->all() as $error)
+            <p style="color: #DC2626; font-size: 14px; margin: 0;">{{ $error }}</p>
+            @endforeach
+        </div>
+        @endif
+
         <form action="{{ route('auth.two-factor.verify') }}" method="POST">
             @csrf
             <div style="margin-bottom: 20px;">
                 <input type="text" name="code" placeholder="000000" maxlength="6" required 
                        style="width: 100%; padding: 15px; font-size: 24px; text-align: center; letter-spacing: 5px; border: 2px solid #e5e7eb; border-radius: 8px; font-weight: bold; box-sizing: border-box;">
+                @error('code')
+                <p style="color: #DC2626; font-size: 12px; margin-top: 5px; text-align: left;">{{ $message }}</p>
+                @enderror
             </div>
 
             <button type="submit" style="width: 100%; background: #1e3a8a; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">

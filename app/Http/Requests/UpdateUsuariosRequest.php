@@ -37,4 +37,26 @@ class UpdateUsuariosRequest extends FormRequest
             'procurador_id' => 'nullable|exists:procuradores,procurador_id',
         ];
     }
+
+    /**
+     * Get the custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'usuario_nombre.max' => 'El nombre no puede tener más de :max caracteres.',
+            'email.email' => 'El formato del correo electrónico no es válido.',
+            'email.max' => 'El correo electrónico no puede tener más de :max caracteres.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'email.ends_with' => 'El correo debe terminar en @usap.edu.',
+            'contrasena.max' => 'La contraseña no puede tener más de :max caracteres.',
+            'contrasena.min' => 'La contraseña debe tener al menos :min caracteres.',
+            'contrasena.mixed' => 'La contraseña debe contener mayúsculas y minúsculas.',
+            'contrasena.numbers' => 'La contraseña debe contener al menos un número.',
+            'rol_id.exists' => 'El rol seleccionado no existe.',
+            'procurador_id.exists' => 'El procurador seleccionado no existe.',
+        ];
+    }
 }
