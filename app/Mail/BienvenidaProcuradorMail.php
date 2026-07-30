@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -13,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
  * Se envía cuando un Director crea un usuario con rol Procurador.
  * Incluye credenciales temporales y URL de login.
  */
-class BienvenidaProcuradorMail extends Mailable implements ShouldQueue
+class BienvenidaProcuradorMail extends Mailable
 {
     use Queueable, SerializesModels;
 
