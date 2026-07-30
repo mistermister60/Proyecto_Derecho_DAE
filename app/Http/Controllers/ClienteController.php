@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolEnum;
 use App\Http\Requests\StoreClienteRequest;
 use App\Http\Requests\UpdateClienteRequest;
 use App\Models\Cliente;
@@ -34,7 +35,12 @@ class ClienteController extends Controller
         $search = trim($request->query('search', ''));
         $estado = $request->query('estado', '');
 
-        $clientes = Cliente::withCount('casos')
+        $clientes = Cliente::withCount(['casos' => function ($q) {
+            // Si es procurador, solo cuenta los casos que le pertenecen
+            if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
+                $q->where('procurador_id', auth()->user()->procurador_id);
+            }
+        }])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('cliente_dni', 'like', "%{$search}%")
@@ -45,6 +51,12 @@ class ClienteController extends Controller
             })
             ->when($estado, function ($query, $estado) {
                 $query->where('cliente_estado', $estado);
+            })
+            // Si es procurador, solo ve clientes que tengan casos asignados a él
+            ->when(RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR), function ($query) {
+                $query->whereHas('casos', function ($q) {
+                    $q->where('procurador_id', auth()->user()->procurador_id);
+                });
             })
             ->orderBy('cliente_apellido')
             ->orderBy('cliente_nombre')
@@ -156,6 +168,17 @@ class ClienteController extends Controller
         $cliente = Cliente::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador'])
             ->where('cliente_dni', $identidad)
             ->firstOrFail();
+
+        // Si es procurador, verificar que este cliente tenga al menos un caso asignado a él
+        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
+            $tieneCaso = $cliente->casos()
+                ->where('procurador_id', auth()->user()->procurador_id)
+                ->exists();
+
+            if (!$tieneCaso) {
+                abort(403, 'No tienes permiso para ver este cliente.');
+            }
+        }
 
         return view('clientes.show', compact('cliente'));
     }

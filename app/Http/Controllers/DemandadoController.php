@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolEnum;
 use App\Http\Requests\StoreDemandadoRequest;
 use App\Http\Requests\UpdateDemandadoRequest;
 use App\Models\Demandado;
@@ -33,13 +34,24 @@ class DemandadoController extends Controller
     {
         $search = trim($request->query('search', ''));
 
-        $demandados = Demandado::withCount('casos')
+        $demandados = Demandado::withCount(['casos' => function ($q) {
+            // Si es procurador, solo cuenta los casos que le pertenecen
+            if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
+                $q->where('procurador_id', auth()->user()->procurador_id);
+            }
+        }])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('demandado_dni', 'like', "%{$search}%")
                         ->orWhere('demandado_telefono', 'like', "%{$search}%")
                         ->orWhere('demandado_nombre', 'like', "%{$search}%")
                         ->orWhere('demandado_apellido', 'like', "%{$search}%");
+                });
+            })
+            // Si es procurador, solo ve demandados que tengan casos asignados a él
+            ->when(RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR), function ($query) {
+                $query->whereHas('casos', function ($q) {
+                    $q->where('procurador_id', auth()->user()->procurador_id);
                 });
             })
             ->orderBy('demandado_apellido')
@@ -94,6 +106,17 @@ class DemandadoController extends Controller
         $demandado = Demandado::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador'])
             ->where('demandado_dni', $identidad)
             ->firstOrFail();
+
+        // Si es procurador, verificar que este demandado tenga al menos un caso asignado a él
+        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
+            $tieneCaso = $demandado->casos()
+                ->where('procurador_id', auth()->user()->procurador_id)
+                ->exists();
+
+            if (!$tieneCaso) {
+                abort(403, 'No tienes permiso para ver este demandado.');
+            }
+        }
 
         return view('demandados.show', compact('demandado'));
     }

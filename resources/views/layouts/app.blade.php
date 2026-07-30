@@ -92,20 +92,22 @@
                 $rolUsuario = $user ? strtolower($user->rol?->rol_nombre ?? '') : '';
                 $esDirector = $user ? \App\Enums\RolEnum::equals($user->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR) : false;
 
-                // 1. Iniciamos con los elementos base que ve el procurador (y todos)
+                // 1. Dashboard y Casos los ve todo el mundo
                 $navItems = [
                     ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard'],
                     ['route' => 'casos.index', 'label' => 'Casos', 'icon' => 'casos'],
                 ];
 
-                // 2. Si NO es procurador, inyectamos los catálogos administrativos
-                if ($rolUsuario !== 'procurador') {
-                    $navItems[] = ['route' => 'clientes.index', 'label' => 'Clientes', 'icon' => 'clientes'];
-                    $navItems[] = ['route' => 'demandados.index', 'label' => 'Demandados', 'icon' => 'demandados'];
+                // 2. Clientes y Demandados los ven TODOS (Procurador ve solo los suyos vía controller)
+                $navItems[] = ['route' => 'clientes.index', 'label' => 'Clientes', 'icon' => 'clientes'];
+                $navItems[] = ['route' => 'demandados.index', 'label' => 'Demandados', 'icon' => 'demandados'];
+
+                // 3. Procuradores solo lo ve el Director
+                if ($esDirector) {
                     $navItems[] = ['route' => 'procuradores.index', 'label' => 'Procuradores', 'icon' => 'procuradores'];
                 }
 
-                // 3. Audiencias lo ven todos (el procurador solo verá las suyas desde el controlador)
+                // 4. Audiencias lo ven todos (el procurador solo verá las suyas desde el controlador)
                 $navItems[] = ['route' => 'agenda.index', 'label' => 'Audiencias', 'icon' => 'agenda'];
             @endphp
 
