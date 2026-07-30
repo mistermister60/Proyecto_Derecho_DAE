@@ -86,8 +86,11 @@
 <nav class="flex-1 px-3 py-4 space-y-1">
             @php
                 $current = request()->route()->getName() ?? 'dashboard';
-                $rolUsuario = strtolower(Auth::user()->rol?->rol_nombre ?? ''); // Usado en $navItems abajo
-                $esDirector = \App\Enums\RolEnum::equals(Auth::user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR);
+                
+                // Verificar si hay usuario autenticado
+                $user = Auth::user();
+                $rolUsuario = $user ? strtolower($user->rol?->rol_nombre ?? '') : '';
+                $esDirector = $user ? \App\Enums\RolEnum::equals($user->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR) : false;
 
                 // 1. Iniciamos con los elementos base que ve el procurador (y todos)
                 $navItems = [
