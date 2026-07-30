@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -70,7 +71,7 @@ class ResetPasswordController extends BaseController
         }
 
         // Verificar expiración (60 minutos)
-        if ($resetRecord->created_at->diffInMinutes(now()) > 60) {
+        if (Carbon::parse($resetRecord->created_at)->diffInMinutes(now()) > 60) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
             throw ValidationException::withMessages([
                 'token' => ['El token de restablecimiento ha expirado. Solicita uno nuevo.'],
