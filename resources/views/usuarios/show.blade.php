@@ -46,7 +46,7 @@
                             </form>
                
                             {{-- Botón: Resetear contraseña (Admin) --}}
-                            <form action="{{ route('usuarios.resetPassword', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Restablecer contraseña?" data-text="Se generará una contraseña temporal. El usuario deberá cambiarla en su primer ingreso. Se conservan todos sus datos." data-icon="question" data-confirm-text="Sí, restablecer" style="display:inline;">
+                            <form action="{{ route('usuarios.reset-password', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Restablecer contraseña?" data-text="Se generará una contraseña temporal. El usuario deberá cambiarla en su primer ingreso. Se conservan todos sus datos." data-icon="question" data-confirm-text="Sí, restablecer" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px]"
                                         style="background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;"
