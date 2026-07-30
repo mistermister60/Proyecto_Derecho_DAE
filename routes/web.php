@@ -31,6 +31,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
 
@@ -243,6 +244,11 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     // Entrevistas (dentro del expediente)
     Route::post('/casos/{expediente}/entrevistas', [EntrevistaController::class, 'store'])->name('entrevistas.store');
     Route::delete('/casos/{expediente}/entrevistas/{entrevista_id}', [EntrevistaController::class, 'destroy'])->name('entrevistas.destroy');
+
+    // ============================================
+    // BÚSQUEDA GLOBAL (typeahead)
+    // ============================================
+    Route::get('/api/search', SearchController::class)->name('api.search');
 
     // ============================================
     // PWA - Notificaciones Push

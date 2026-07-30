@@ -11,6 +11,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Prevenir flash de contenido en dark mode — se ejecuta antes del render --}}
+    <script>if(localStorage.getItem('darkMode')==='true'){document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=theme-color]');if(m)m.content='#0f172a'}</script>
 
     {{-- Íconos de la aplicación (balanza de la justicia) — PWA y favicon --}}
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
@@ -55,7 +57,7 @@
                   max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:w-60
                   md:relative md:translate-x-0"
            :class="sidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'"
-           style="width: 240px; background: #1E3A5F; border-right: 1px solid rgba(255,255,255,0.08); view-transition-name: sidebar;">
+           style="width: 240px; background: var(--color-sidebar-bg); border-right: 1px solid rgba(255,255,255,0.08); view-transition-name: sidebar;">
 
         {{-- Logo: Balanza de la justicia --}}
         <div class="flex items-center gap-3 px-5 py-5" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -118,9 +120,9 @@
                 <a href="{{ route($item['route']) }}"
                    @click="sidebarOpen = false"
                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-base transition-all duration-150"
-                   style="{{ $isActive ? 'background: rgba(201,169,97,0.2); color: #FFFFFF;' : 'color: rgba(255,255,255,0.65);' }}"
-                   onmouseover="this.style.background='{{ $isActive ? 'rgba(201,169,97,0.2)' : 'rgba(201,169,97,0.08)' }}'; this.style.color='#FFFFFF';"
-                   onmouseout="this.style.background='{{ $isActive ? 'rgba(201,169,97,0.2)' : 'transparent' }}'; this.style.color='{{ $isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)' }}';">
+                   style="{{ $isActive ? 'background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);' : 'color: var(--color-sidebar-text);' }}"
+                   onmouseover="this.style.background='{{ $isActive ? 'var(--color-sidebar-active-bg)' : 'var(--color-sidebar-hover-bg)' }}'; this.style.color='#FFFFFF';"
+                   onmouseout="this.style.background='{{ $isActive ? 'var(--color-sidebar-active-bg)' : 'transparent' }}'; this.style.color='{{ $isActive ? 'var(--color-sidebar-active-text)' : 'var(--color-sidebar-text)' }}';">
                     @if ($item['icon'] === 'dashboard')
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -178,7 +180,7 @@
     <div class="flex flex-col flex-1 h-full">
 
         {{-- Topbar --}}
-        <header class="relative z-50 flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3"    style="background: #F8FAFC; border-bottom: 1px solid #E5E7EB; view-transition-name: header;">
+        <header class="relative z-50 flex items-center justify-between shrink-0 px-4 py-3 md:px-6 md:py-3"    style="background: var(--color-topbar-bg); border-bottom: 1px solid var(--color-topbar-border); view-transition-name: header;">
             <div class="flex items-center gap-3">
                 {{-- Hamburger (mobile only) --}}
                 <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 rounded-lg transition-colors" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';" aria-label="Abrir menú">
@@ -186,34 +188,122 @@
                         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
                     </svg>
                 </button>
-                <h1 class="text-base md:text-lg font-semibold" style="color: #111827;">@yield('title', 'Dashboard')</h1>
+                <h1 class="text-base md:text-lg font-semibold" style="color: var(--color-topbar-title);">@yield('title', 'Dashboard')</h1>
             </div>
 
             <div class="flex items-center gap-2 md:gap-4">
-                {{-- Buscador (hidden on mobile) --}}
-                <div class="relative hidden sm:block" x-data="{ search: '' }">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                {{-- BUSCADOR GLOBAL REAL (typeahead) — hidden on mobile --}}
+                <div class="relative hidden sm:block" x-data="globalSearch()"
+                     @click.away="open = false"
+                     @keydown.escape="open = false; selectedIndex = -1">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
-                    <input type="text" x-model="search" placeholder="Buscar..."
-                           class="pl-9 pr-3 py-1.5 rounded-lg text-sm outline-none transition-all duration-150"
-                           style="background: #F7F8FA; border: 1px solid #E5E7EB; color: #111827; width: 220px;"
+                    <input type="text" x-model="query"
+                           @keydown.down.prevent="selectedIndex = Math.min(selectedIndex + 1, results.length - 1); open = true"
+                           @keydown.up.prevent="selectedIndex = Math.max(selectedIndex - 1, 0)"
+                           @keydown.enter.prevent="selectResult(selectedIndex)"
+                           @focus="open = results.length > 0"
+                           placeholder="Buscar expediente, cliente..."
+                           class="pl-9 pr-8 py-1.5 rounded-lg text-sm outline-none transition-all duration-150"
+                           style="background: var(--color-input-bg); border: 1px solid var(--color-input-border); color: var(--color-input-text); width: 220px;"
                            onfocus="this.style.borderColor='#2563EB'; this.style.width='260px';"
-                           onblur="this.style.borderColor='#E5E7EB'; this.style.width='220px';">
+                           onblur="this.style.borderColor='var(--color-input-border)'; this.style.width='220px';">
+
+                    {{-- Loading spinner --}}
+                    <div x-show="loading" x-cloak class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <svg class="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round">
+                            <circle cx="12" cy="12" r="10" stroke-dasharray="31.4 31.4" stroke-dashoffset="10"/>
+                        </svg>
+                    </div>
+
+                    {{-- Dropdown de resultados --}}
+                    <div x-show="open && results.length > 0" x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="fixed sm:absolute top-14 sm:top-10 right-4 sm:right-0 w-[calc(100vw-2rem)] sm:w-96 rounded-xl shadow-lg border z-50 overflow-hidden max-h-[70vh] overflow-y-auto"
+                         style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
+                        <template x-for="(item, idx) in results" :key="idx">
+                            <a :href="item.url"
+                               @click="open = false"
+                               :class="idx === selectedIndex ? 'bg-[var(--color-search-result-bg)]' : ''"
+                               class="flex items-center gap-3 px-4 py-3 transition-colors duration-100 no-underline"
+                               style="border-bottom: 1px solid var(--color-dropdown-divider); color: var(--color-dropdown-text);"
+                               onmouseover="this.style.background='var(--color-dropdown-hover)'"
+                               onmouseout="this.style.background='transparent'">
+                                <div class="flex items-center justify-center rounded-lg shrink-0"
+                                     style="width: 36px; height: 36px; background: #EFF6FF;">
+                                    <template x-if="item.type === 'Caso'">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                    </template>
+                                    <template x-if="item.type === 'Cliente' || item.type === 'Demandado'">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                    </template>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium truncate" x-text="item.label" style="color: var(--color-dropdown-text);"></p>
+                                    <p class="text-xs truncate" x-text="item.sub" style="color: var(--color-dropdown-text-sec);"></p>
+                                </div>
+                                <span class="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+                                      :style="item.type === 'Caso' ? 'background:#EFF6FF;color:#2563EB' : 'background:#F0FDF4;color:#166534'"
+                                      x-text="item.type"></span>
+                            </a>
+                        </template>
+                    </div>
+
+                    {{-- Sin resultados --}}
+                    <div x-show="open && query.length >= 2 && results.length === 0 && !loading" x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         class="fixed sm:absolute top-14 sm:top-10 right-4 sm:right-0 w-[calc(100vw-2rem)] sm:w-96 rounded-xl shadow-lg border z-50 p-6 text-center"
+                         style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
+                        <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <p class="text-sm" style="color: var(--color-dropdown-text-sec);">Sin resultados para <strong x-text="query"></strong></p>
+                        <p class="text-xs mt-1" style="color: var(--color-search-section);">Probá con otro término</p>
+                    </div>
                 </div>
 
+                {{-- Dark mode toggle — CSS-based icon swap (sin dependencia de reactividad Alpine) --}}
+                <button onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', document.documentElement.classList.contains('dark')); var m = document.querySelector('meta[name=theme-color]'); if(m){m.content=document.documentElement.classList.contains('dark')?'#0f172a':'#1E3A5F'}"
+                        class="p-2 rounded-lg transition-colors duration-150 hidden sm:block dark-mode-btn"
+                        style="color: var(--color-topbar-icon);"
+                        aria-label="Cambiar modo claro/oscuro">
+                    {{-- Luna (modo claro) --}}
+                    <svg class="dark-mode-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    {{-- Sol (modo oscuro) --}}
+                    <svg class="dark-mode-icon-sun hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+
                 {{-- Dropdowns compartidos (mismo scope Alpine) --}}
-                                 <div class="contents" 
-                                      @keydown.escape.window="openNotif = false; openUser = false">
+                <div class="contents"
+                     @keydown.escape.window="openNotif = false; openUser = false">
 
                     {{-- Notificaciones --}}
                     <div class="relative">
-                            <button @click="openNotif = !openNotif; openUser = false" class="relative p-2 rounded-lg transition-colors duration-150" style="color: #6B7280;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
+                            <button @click="openNotif = !openNotif; openUser = false" class="relative p-2 rounded-lg transition-colors duration-150"
+                                    style="color: var(--color-topbar-icon);"
+                                    onmouseover="this.style.background='var(--color-topbar-icon-hover-bg)'"
+                                    onmouseout="this.style.background='transparent';">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                                 </svg>
                                 @if(isset($notificacionesPendientes) && $notificacionesPendientes > 0)
-                                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: #EF4444;"></span>
+                                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background: var(--color-notif-badge);"></span>
                                 @endif
                             </button>
 
@@ -225,21 +315,21 @@
                              x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                              @click.outside="openNotif = false"
                              class="absolute top-12 right-0 w-80 rounded-xl shadow-lg border py-1 z-50"
-                             style="background: #FFFFFF; border-color: #E5E7EB;">
-                            <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E5E7EB;">
-                                <p class="text-sm font-semibold" style="color: #111827;">Notificaciones</p>
+                             style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
+                            <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid var(--color-dropdown-divider);">
+                                <p class="text-sm font-semibold" style="color: var(--color-dropdown-text);">Notificaciones</p>
                                 <span class="text-xs px-2 py-0.5 rounded-full" style="background: #EFF6FF; color: #2563EB;">
                                     {{ $notificacionesPendientes ?? 0 }} nueva(s)
                                 </span>
                             </div>
                             <div class="max-h-72 overflow-y-auto">
                                 @forelse($notificaciones ?? [] as $notif)
-                                    <div class="px-4 py-3 flex gap-3 items-start transition-colors duration-100" style="border-bottom: 1px solid #F3F4F6;"
-                                         onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
+                                    <div class="px-4 py-3 flex gap-3 items-start transition-colors duration-100" style="border-bottom: 1px solid var(--color-dropdown-divider);"
+                                         onmouseover="this.style.background='var(--color-dropdown-hover)'" onmouseout="this.style.background='transparent';">
                                         <div class="flex items-center justify-center rounded-full shrink-0 mt-0.5" style="width: 8px; height: 8px; background: #2563EB;"></div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-sm" style="color: #374151;">{{ $notif['mensaje'] }}</p>
-                                            <p class="text-xs mt-1" style="color: #9CA3AF;">{{ $notif['fecha'] }}</p>
+                                            <p class="text-sm" style="color: var(--color-dropdown-text);">{{ $notif['mensaje'] }}</p>
+                                            <p class="text-xs mt-1" style="color: var(--color-dropdown-text-sec);">{{ $notif['fecha'] }}</p>
                                         </div>
                                     </div>
                                 @empty
@@ -247,8 +337,8 @@
                                         <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                                         </svg>
-                                        <p class="text-sm" style="color: #9CA3AF;">No hay notificaciones</p>
-                                        <p class="text-xs mt-1" style="color: #D1D5DB;">Aparecerán aquí las actualizaciones de tus casos</p>
+                                        <p class="text-sm" style="color: var(--color-dropdown-text-sec);">No hay notificaciones</p>
+                                        <p class="text-xs mt-1" style="color: var(--color-search-section);">Aparecerán aquí las actualizaciones de tus casos</p>
                                     </div>
                                 @endforelse
                             </div>
@@ -258,14 +348,17 @@
 {{-- Usuario --}}
                     @auth
                     <div class="relative">
-                            <button @click="openUser = !openUser; openNotif = false" class="flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors duration-150" style="background: transparent; border: none;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
-                                 <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
+                            <button @click="openUser = !openUser; openNotif = false" class="flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors duration-150"
+                                    style="background: transparent; border: none;"
+                                    onmouseover="this.style.background='var(--color-topbar-icon-hover-bg)'"
+                                    onmouseout="this.style.background='transparent';">
+                                 <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: var(--color-sidebar-bg); color: white; font-size: 12px; font-weight: 600;">
                                       {{ strtoupper(substr(explode(' ', auth()->user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', auth()->user()->usuario_nombre)[1] ?? '', 0, 1)) }}
                                   </div>
-                                  <div class="text-sm hidden md:block" style="color: #111827;">
+                                  <div class="text-sm hidden md:block" style="color: var(--color-topbar-title);">
                                       <span class="font-medium">{{ auth()->user()->usuario_nombre }}</span>
                                   </div>
-                                  <svg :class="openUser ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
+                                  <svg :class="openUser ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-topbar-icon);">
                                       <polyline points="6 9 12 15 18 9"/>
                                   </svg>
                               </button>
@@ -278,10 +371,10 @@
                               x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                               @click.outside="openUser = false"
                               class="absolute top-12 right-0 w-48 rounded-lg shadow-lg border py-1 z-50"
-                              style="background: #FFFFFF; border-color: #E5E7EB;">
-                             <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
-                                 <p class="text-xs" style="color: #9CA3AF;">{{ auth()->user()->email }}</p>
-                                 <p class="text-xs font-medium mt-0.5" style="color: #6B7280;">{{ auth()->user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
+                              style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
+                             <div class="px-4 py-2" style="border-bottom: 1px solid var(--color-dropdown-divider);">
+                                 <p class="text-xs" style="color: var(--color-dropdown-text-sec);">{{ auth()->user()->email }}</p>
+                                 <p class="text-xs font-medium mt-0.5" style="color: var(--color-dropdown-text-sec);">{{ auth()->user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
                              </div>
                              <form method="POST" action="{{ route('logout') }}">
                                  @csrf
@@ -302,7 +395,7 @@
             {{-- Flash messages: banner visible siempre (funciona sin JS) --}}
             @if (session('success'))
                 <div class="mb-4 p-4 rounded-lg text-sm font-medium flex items-center gap-2"
-                     style="background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534;">
+                     style="background: var(--color-flash-success-bg); border: 1px solid var(--color-flash-success-border); color: var(--color-flash-success-text);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
                     </svg>
@@ -312,7 +405,7 @@
 
             @if (session('error'))
                 <div class="mb-4 p-4 rounded-lg text-sm font-medium flex items-center gap-2"
-                     style="background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B;">
+                     style="background: var(--color-flash-error-bg); border: 1px solid var(--color-flash-error-border); color: var(--color-flash-error-text);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
                     </svg>

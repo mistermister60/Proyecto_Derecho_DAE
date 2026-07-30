@@ -194,4 +194,50 @@ navigator.serviceWorker.addEventListener('message', async (event) => {
     }
 });
 
+// ============================================
+// BÚSQUEDA GLOBAL — Componente Alpine (typeahead)
+// ============================================
+Alpine.data('globalSearch', () => ({
+    query: '',
+    results: [],
+    open: false,
+    loading: false,
+    selectedIndex: -1,
+    _debounceTimer: null,
+
+    init() {
+        this.$watch('query', () => {
+            if (this._debounceTimer) clearTimeout(this._debounceTimer);
+            if (this.query.length < 2) {
+                this.results = [];
+                this.open = false;
+                return;
+            }
+            this._debounceTimer = setTimeout(() => this.fetchResults(), 300);
+        });
+    },
+
+    async fetchResults() {
+        this.loading = true;
+        this.selectedIndex = -1;
+        try {
+            const response = await fetch(`/api/search?q=${encodeURIComponent(this.query)}`);
+            const data = await response.json();
+            this.results = data.results ?? [];
+            this.open = this.results.length > 0;
+        } catch (e) {
+            this.results = [];
+            this.open = false;
+        } finally {
+            this.loading = false;
+        }
+    },
+
+    selectResult(idx) {
+        if (idx >= 0 && idx < this.results.length) {
+            window.location.href = this.results[idx].url;
+        }
+    },
+}));
+
 Alpine.start();

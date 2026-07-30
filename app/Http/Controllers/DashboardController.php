@@ -8,6 +8,7 @@ use App\Models\Caso;
 use App\Models\EstadoCaso;
 use App\Models\Procurador;
 use App\Models\TipoTramite;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 
 /**
@@ -42,7 +43,7 @@ class DashboardController extends Controller
     /**
      * Aplicar filtro de procurador a una consulta de Casos.
      */
-    private function casosFiltered(): Caso
+    private function casosFiltered(): Builder
     {
         $procuradorId = $this->getProcuradorFilter();
         return Caso::when($procuradorId, fn ($q) => $q->where('procurador_id', $procuradorId));
@@ -51,7 +52,7 @@ class DashboardController extends Controller
     /**
      * Aplicar filtro de procurador a una consulta de Audiencias.
      */
-    private function audienciasFiltered(): Audiencia
+    private function audienciasFiltered(): Builder
     {
         $procuradorId = $this->getProcuradorFilter();
         return Audiencia::when($procuradorId, fn ($q) => $q->whereHas('caso', fn ($cq) => $cq->where('procurador_id', $procuradorId)));

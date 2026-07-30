@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -48,9 +50,100 @@
     --color-estado-atrasado: #DC2626;
 }
 
+/* ============================================
+   DARK MODE — Variables de tema
+   ============================================ */
+:root {
+    --color-topbar-bg: #F8FAFC;
+    --color-topbar-border: #E5E7EB;
+    --color-topbar-title: #111827;
+    --color-topbar-icon: #6B7280;
+    --color-topbar-icon-hover-bg: #F3F4F6;
+    --color-input-bg: #F7F8FA;
+    --color-input-border: #E5E7EB;
+    --color-input-text: #111827;
+    --color-input-placeholder: #9CA3AF;
+    --color-dropdown-bg: #FFFFFF;
+    --color-dropdown-border: #E5E7EB;
+    --color-dropdown-text: #111827;
+    --color-dropdown-text-sec: #6B7280;
+    --color-dropdown-hover: #F9FAFB;
+    --color-dropdown-divider: #E5E7EB;
+    --color-main-bg: #F7F8FA;
+    --color-main-text: #111827;
+    --color-card-bg: #FFFFFF;
+    --color-card-border: #E5E7EB;
+    --color-sidebar-bg: #1E3A5F;
+    --color-sidebar-text: rgba(255,255,255,0.65);
+    --color-sidebar-active-bg: rgba(201,169,97,0.2);
+    --color-sidebar-active-text: #FFFFFF;
+    --color-sidebar-hover-bg: rgba(201,169,97,0.08);
+    --color-notif-badge: #EF4444;
+    --color-flash-success-bg: #F0FDF4;
+    --color-flash-success-border: #BBF7D0;
+    --color-flash-success-text: #166534;
+    --color-flash-error-bg: #FEF2F2;
+    --color-flash-error-border: #FECACA;
+    --color-flash-error-text: #991B1B;
+    --color-search-highlight: #2563EB;
+    --color-search-result-bg: #F9FAFB;
+    --color-search-result-border: #E5E7EB;
+    --color-search-section: #6B7280;
+}
+
+.dark {
+    --color-topbar-bg: #1e293b;
+    --color-topbar-border: #334155;
+    --color-topbar-title: #f1f5f9;
+    --color-topbar-icon: #94a3b8;
+    --color-topbar-icon-hover-bg: #334155;
+    --color-input-bg: #1e293b;
+    --color-input-border: #334155;
+    --color-input-text: #f1f5f9;
+    --color-input-placeholder: #64748b;
+    --color-dropdown-bg: #1e293b;
+    --color-dropdown-border: #334155;
+    --color-dropdown-text: #f1f5f9;
+    --color-dropdown-text-sec: #94a3b8;
+    --color-dropdown-hover: #334155;
+    --color-dropdown-divider: #334155;
+    --color-main-bg: #0f172a;
+    --color-main-text: #f1f5f9;
+    --color-card-bg: #1e293b;
+    --color-card-border: #334155;
+    --color-sidebar-bg: #0a0f1e;
+    --color-sidebar-text: rgba(255,255,255,0.5);
+    --color-sidebar-active-bg: rgba(201,169,97,0.15);
+    --color-sidebar-active-text: #FFFFFF;
+    --color-sidebar-hover-bg: rgba(201,169,97,0.06);
+    --color-notif-badge: #EF4444;
+    --color-flash-success-bg: #052e16;
+    --color-flash-success-border: #166534;
+    --color-flash-success-text: #bbf7d0;
+    --color-flash-error-bg: #450a0a;
+    --color-flash-error-border: #991B1B;
+    --color-flash-error-text: #fecaca;
+    --color-search-highlight: #3b82f6;
+    --color-search-result-bg: #334155;
+    --color-search-result-border: #475569;
+    --color-search-section: #94a3b8;
+}
+
+/* ============================================
+   DARK MODE TOGGLE — Iconos luna/sol
+   ============================================ */
+.dark .dark-mode-icon-moon { display: none; }
+.dark .dark-mode-icon-sun { display: block; }
+:not(.dark) .dark-mode-icon-sun { display: none; }
+:not(.dark) .dark-mode-icon-moon { display: block; }
+
+.dark-mode-btn:hover {
+    background: var(--color-topbar-icon-hover-bg);
+}
+
 body {
-    background-color: var(--color-fondo);
-    color: var(--color-texto);
+    background-color: var(--color-main-bg);
+    color: var(--color-main-text);
     font-family: var(--font-sans);
 }
 
@@ -191,3 +284,17 @@ html.view-transitions-enabled.view-transition-ready {
 .avatar { view-transition-name: avatar; }
 .badge { view-transition-name: badge; }
 .form-input { view-transition-name: form-input; }
+
+/* ============================================
+   DARK MODE — Scrollbar y elementos base
+   ============================================ */
+.dark ::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
