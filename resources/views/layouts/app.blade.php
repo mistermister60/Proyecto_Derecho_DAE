@@ -193,7 +193,7 @@
 
             <div class="flex items-center gap-2 md:gap-4">
                 {{-- BUSCADOR GLOBAL REAL (typeahead) — hidden on mobile --}}
-                <div class="relative hidden sm:block flex-1 max-w-[500px]" x-data="globalSearch()"
+                <div class="relative hidden sm:block" x-data="globalSearch()"
                      @click.away="open = false"
                      @keydown.escape="open = false; selectedIndex = -1">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -205,10 +205,10 @@
                            @keydown.enter.prevent="selectResult(selectedIndex)"
                            @focus="open = results.length > 0"
                            placeholder="Buscar expediente, cliente..."
-                           class="pl-9 pr-8 py-1.5 rounded-lg text-sm outline-none transition-all duration-150 w-full"
-                           style="background: var(--color-input-bg); border: 1px solid var(--color-input-border); color: var(--color-input-text);"
-                           onfocus="this.style.borderColor='#2563EB';"
-                           onblur="this.style.borderColor='var(--color-input-border)';">
+                           class="pl-9 pr-8 py-1.5 rounded-lg text-sm outline-none transition-all duration-150"
+                                                       style="background: var(--color-input-bg); border: 1px solid var(--color-input-border); color: var(--color-input-text); width: min(50vw, 500px);"
+                           onfocus="this.style.borderColor='#2563EB'; this.style.width='min(55vw, 600px)';"
+                           onblur="this.style.borderColor='var(--color-input-border)'; this.style.width='min(50vw, 500px)';">
 
                     {{-- Loading spinner --}}
                     <div x-show="loading" x-cloak class="absolute right-2 top-1/2 -translate-y-1/2">
@@ -225,7 +225,7 @@
                          x-transition:leave="transition ease-in duration-100"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="fixed sm:absolute top-14 sm:top-10 right-4 sm:right-0 w-[calc(100vw-2rem)] sm:left-0 sm:w-full rounded-xl shadow-lg border z-50 overflow-hidden max-h-[70vh] overflow-y-auto"
+                         class="fixed sm:absolute top-14 sm:top-10 right-4 sm:right-0 w-[calc(100vw-2rem)] sm:w-96 rounded-xl shadow-lg border z-50 overflow-hidden max-h-[70vh] overflow-y-auto"
                          style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
                         <template x-for="(item, idx) in results" :key="idx">
                             <a :href="item.url"
@@ -264,7 +264,7 @@
                          x-transition:enter="transition ease-out duration-150"
                          x-transition:enter-start="opacity-0 scale-95"
                          x-transition:enter-end="opacity-100 scale-100"
-                         class="fixed sm:absolute top-14 sm:top-10 right-4 sm:right-0 w-[calc(100vw-2rem)] sm:left-0 sm:w-full rounded-xl shadow-lg border z-50 p-6 text-center"
+                         class="fixed sm:absolute top-14 sm:top-10 right-4 sm:right-0 w-[calc(100vw-2rem)] sm:w-96 rounded-xl shadow-lg border z-50 p-6 text-center"
                          style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
                         <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
