@@ -114,4 +114,20 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Define el email del super admin que omite 2FA y otras restricciones.
+    | Centralizado para cumplir DRY y OCP.
+    |
+    */
+    'super_admin_email' => env('SUPER_ADMIN_EMAIL', 'director@usap.edu'),
+
+    /**
+     * Tiempo de expiración del token de restablecimiento en minutos.
+     */
+    'reset_token_expiry' => 60,
+
 ];

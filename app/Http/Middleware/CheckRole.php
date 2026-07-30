@@ -18,7 +18,11 @@ class CheckRole
         }
 
         foreach ($roles as $role) {
-            if (RolEnum::equals($user->rol->rol_nombre, RolEnum::from(strtolower($role)))) {
+            $roleEnum = RolEnum::tryFrom(strtolower($role));
+            if (!$roleEnum) {
+                abort(403, 'Rol inválido.');
+            }
+            if (RolEnum::equals($user->rol->rol_nombre, $roleEnum)) {
                 return $next($request);
             }
         }

@@ -21,6 +21,31 @@ Hay skills especializados en `.agents/skills/` — léelos antes de trabajar en 
 - `.agents/skills/laravel-best-practices/SKILL.md` — patrones Laravel, Eloquent, N+1, caché
 - `.agents/skills/tailwindcss-development/SKILL.md` — Tailwind v4, responsive, dark mode
 
+## Principios de diseño
+
+Este proyecto sigue principios SOLID y prácticas de código limpio:
+
+| Principio | Aplicación |
+|-----------|------------|
+| **SRP** — Single Responsibility | Cada clase tiene una única responsabilidad. Los controladores delegan en servicios. |
+| **OCP** — Open/Closed | Las extensiones se hacen creando nuevas clases, no modificando las existentes. |
+| **LSP** — Liskov Substitution | Las subclases son sustituibles por sus padres sin romper el sistema. |
+| **ISP** — Interface Segregation | Interfaces pequeñas y específicas (Form Requests, Services). |
+| **DIP** — Dependency Inversion | Dependemos de abstracciones (interfaces/services), no de implementaciones concretas. |
+| **DRY** — Don't Repeat Yourself | El usuario autenticado se obtiene vía `auth()->user()`, no consultando de nuevo. |
+| **KISS** — Keep It Simple | `Auth::id()` basta; no `Auth::user()->id ?? Auth::id()`. |
+| **YAGNI** — You Ain't Gonna Need It | No agregues código "por si acaso". Solo lo que se necesita ahora. |
+
+## Fixes de seguridad aplicados
+
+- **OTP por email**: Autenticación de dos factores mediante código de 6 dígitos enviado al correo institucional, con expiración de 15 minutos.
+- **Rate limiting**: Protección contra fuerza bruta en login (5 intentos → bloqueo 5 min).
+- **Sanctum tokens**: Tokens de acceso efímeros (1 hora) con hash SHA-256.
+- **CSP**: Content Security Policy global vía `SecurityHeadersMiddleware`.
+- **Cuentas inactivas**: Denegación de acceso si `usuario_estado !== 'activo'`.
+- **Excepción genérica en login**: No se revela si el email o la contraseña son incorrectos.
+- **Exclusión de `.env` del repositorio**: `APP_KEY` y credenciales nunca se commitean.
+
 ## Comandos esenciales
 
 ```bash
@@ -39,8 +64,18 @@ php artisan make:model --help
 php artisan make:test --phpunit NombreTest
 
 # Frontend
-npm run build    # build producción (Vite manifest)
-npm run dev      # dev server
+npm run build       # build producción (Vite manifest)
+npm run dev         # dev server
+npm run lint        # lint CSS/JS (si configurado)
+npm audit           # auditoría de seguridad de dependencias
+
+# Git / Seguridad
+git secret scan     # escanea commits en busca de secretos (gitleaks)
+git rm --cached     # remueve archivo del tracking sin borrarlo del disco
+
+# Debug
+php artisan tinker              # REPL interactivo
+php artisan optimize:clear      # limpia cachés (config, route, view, events)
 ```
 
 ## Convenciones de código

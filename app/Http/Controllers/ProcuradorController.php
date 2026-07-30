@@ -94,7 +94,7 @@ class ProcuradorController extends Controller
 
         // Generar contraseña temporal ANTES de la transacción para poder enviarla por email
         // Formato: Procurador.{dni}!
-        $tempPassword = 'Procurador.' . $validated['procurador_dni'] . '!';
+        $tempPassword = 'Procurador.' . \Illuminate\Support\Str::random(12) . '!';
 
         DB::transaction(function () use ($validated, $tempPassword) {
             $procurador = Procurador::create($validated);

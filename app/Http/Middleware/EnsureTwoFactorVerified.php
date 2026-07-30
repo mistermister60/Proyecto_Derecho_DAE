@@ -18,7 +18,7 @@ class EnsureTwoFactorVerified
         if (auth()->check() && !session()->has('two_factor_verified')) {
             // Solo el super admin original (director@usap.edu) omite 2FA
             $user = auth()->user();
-            if ($user && $user->email === 'director@usap.edu') {
+            if ($user && $user->email === config('auth.super_admin_email')) {
                 session(['two_factor_verified' => true]);
                 return $next($request);
             }

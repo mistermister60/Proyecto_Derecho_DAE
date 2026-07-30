@@ -50,17 +50,16 @@ class AuthController extends BaseController
     public function login(LoginCredentialsRequest $request): RedirectResponse
     {
         try {
-            $authResponse = $this->authService->attemptLogin(
+            $this->authService->attemptLogin(
                 $request->input('email'),
                 $request->input('contrasena')
             );
 
-            // Cargar usuario con rol para verificar si es el super admin original
-            $user = \App\Models\Usuario::with('rol')->where('email', $request->input('email'))->first();
+            $user = auth()->user();
 
-            // Solo el super admin original (director@usap.edu) omite 2FA
-            if ($user && $user->email === 'director@usap.edu') {
-                \Illuminate\Support\Facades\Session::put('two_factor_verified', true);
+            // Solo el super admin original omite 2FA (configurado en config/auth.php)
+            if ($user && $user->email === config('auth.super_admin_email')) {
+                Session::put('two_factor_verified', true);
 
                 // Verificar si debe cambiar contraseña (primer login)
                 if ($user->debe_cambiar_contrasena) {
@@ -71,7 +70,7 @@ class AuthController extends BaseController
             }
 
             // 1. Generamos un código aleatorio de 6 dígitos
-            $codigo2FA = rand(100000, 999999);
+            $codigo2FA = random_int(100000, 999999);
 
             // 2. Guardamos los datos temporalmente en la sesión para validarlos después
             session([

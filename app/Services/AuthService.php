@@ -249,12 +249,12 @@ class AuthService
     private function recordFailedLoginAttempt(string $email, string $ip): void
     {
         $key = $this->getRateLimitKey($email);
-        $attempts = Cache::get($key, 0) + 1;
-        Cache::put($key, $attempts, self::RATE_LIMIT_EXPIRY);
+        Cache::increment($key, 1);
+        Cache::put($key, Cache::get($key), self::RATE_LIMIT_EXPIRY);
 
         $keyWithIp = $this->getRateLimitKey($email, $ip);
-        $attemptsWithIp = Cache::get($keyWithIp, 0) + 1;
-        Cache::put($keyWithIp, $attemptsWithIp, self::RATE_LIMIT_EXPIRY);
+        Cache::increment($keyWithIp, 1);
+        Cache::put($keyWithIp, Cache::get($keyWithIp), self::RATE_LIMIT_EXPIRY);
     }
 
     /**

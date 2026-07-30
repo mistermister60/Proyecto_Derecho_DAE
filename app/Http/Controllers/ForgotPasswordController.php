@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -41,6 +42,16 @@ class ForgotPasswordController extends BaseController
             'email.exists' => 'No existe ninguna cuenta registrada con este correo.',
             'email.ends_with' => 'El correo debe ser institucional (@usap.edu).',
         ]);
+
+        // Rate limiting por IP para evitar abuso del formulario de recuperación
+        $key = 'forgot-password:' . $request->ip();
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            $seconds = RateLimiter::availableIn($key);
+            throw ValidationException::withMessages([
+                'email' => "Demasiados intentos. Intente nuevamente en {$seconds} segundos.",
+            ]);
+        }
+        RateLimiter::hit($key, 60);
 
         $usuario = Usuario::where('email', $request->email)->first();
 

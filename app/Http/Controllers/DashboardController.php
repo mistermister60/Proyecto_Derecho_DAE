@@ -43,7 +43,7 @@ class DashboardController extends Controller
             now()->startOfWeek(), now()->endOfWeek(),
         ])->count();
 
-        $estadoAtrasado = EstadoCaso::where('estado_nombre', 'Atrasado')->value('estado_id');
+        $estadoAtrasado = EstadoCaso::where('estado_nombre', config('app.estados_caso.atrasado'))->value('estado_id');
         $atrasados = Caso::where('estado_id', $estadoAtrasado)->where('caso_estado', 'activo')->count();
 
         // Audiencias próximas (hoy + 7 días)
@@ -60,9 +60,14 @@ class DashboardController extends Controller
                 $q->where('caso_estado', 'activo');
             },
         ])->get();
-        $procuradores->loadCount(['casos as activos' => function ($q) {
+        $estadosExcluidos = EstadoCaso::whereIn('estado_nombre', [
+            config('app.estados_caso.cerrado'),
+            config('app.estados_caso.inadmisible'),
+        ])->pluck('estado_id');
+
+        $procuradores->loadCount(['casos as activos' => function ($q) use ($estadosExcluidos) {
             $q->where('caso_estado', 'activo')
-                ->whereNotIn('estado_id', EstadoCaso::whereIn('estado_nombre', ['Cerrado', 'Inadmisible'])->pluck('estado_id'));
+                ->whereNotIn('estado_id', $estadosExcluidos);
         }]);
 
         // Datos para gráfica de pipeline

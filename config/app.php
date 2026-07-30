@@ -123,4 +123,21 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Constantes del Sistema Legal DAE
+    |--------------------------------------------------------------------------
+    | Centralizadas para cumplir OCP — configuración, no modificación.
+    |
+    */
+
+    'oficina_receptora' => env('OFICINA_RECEPTORA', '0501'),
+
+    'estados_caso' => [
+        'entrevista' => 'Entrevista',
+        'atrasado' => 'Atrasado',
+        'cerrado' => 'Cerrado',
+        'inadmisible' => 'Inadmisible',
+    ],
+
 ];

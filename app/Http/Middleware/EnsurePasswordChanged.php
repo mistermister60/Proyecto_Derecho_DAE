@@ -27,7 +27,7 @@ class EnsurePasswordChanged
                 'auth.two-factor.verify', // validar 2FA
             ];
 
-            if (!in_array($request->route()->getName(), $rutasPermitidas)) {
+            if (!in_array($request->route()->getName(), $rutasPermitidas, true)) {
                 return redirect()->route('password.change')
                     ->with('warning', 'Por seguridad, debes cambiar tu contraseña antes de continuar.');
             }

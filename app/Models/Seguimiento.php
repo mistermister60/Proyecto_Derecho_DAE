@@ -44,6 +44,13 @@ class Seguimiento extends Model
         'seguimiento_estado',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'seguimiento_fecha' => 'date',
+        ];
+    }
+
     /**
      * Relación con el caso al que pertenece el seguimiento.
      */

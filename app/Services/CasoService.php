@@ -103,10 +103,12 @@ class CasoService
             ->orderBy('estado_orden')
             ->get();
 
+        $casosByEstado = $casosKanban->groupBy('estado_id');
+
         $columnas = [];
         foreach ($estados as $estado) {
             $tarjetas = [];
-            foreach ($casosKanban->where('estado_id', $estado->estado_id) as $caso) {
+            foreach ($casosByEstado[$estado->estado_id] ?? [] as $caso) {
                 $tarjetas[$caso->caso_numero_expediente] = [
                     $caso->cliente?->nombre_completo ?? 'Sin cliente',
                     $caso->tipoTramite?->tramite_nombre ?? 'Sin trámite',
@@ -153,10 +155,17 @@ class CasoService
                 ->lockForUpdate()
                 ->first();
 
-            $correlativo = $ultimo ? intval(substr($ultimo->caso_numero_expediente, -5)) + 1 : 1;
+            $correlativo = 1;
+            if ($ultimo && preg_match('/-(\d+)$/', $ultimo->caso_numero_expediente, $matches)) {
+                $correlativo = intval($matches[1]) + 1;
+            }
 
-            $data['caso_numero_expediente'] = '0501-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
-            $data['estado_id'] = EstadoCaso::where('estado_nombre', 'Entrevista')->value('estado_id');
+            $data['caso_numero_expediente'] = config('app.oficina_receptora').'-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
+            $estadoId = EstadoCaso::where('estado_nombre', config('app.estados_caso.entrevista'))->value('estado_id');
+            if (!$estadoId) {
+                throw new \RuntimeException('El estado "Entrevista" no existe en la base de datos. Ejecuta los seeders.');
+            }
+            $data['estado_id'] = $estadoId;
             $data['caso_fecha_interpuesta'] = now()->toDateString();
             $data['caso_fecha_asignacion'] = now()->toDateString();
             $data['caso_estado'] = 'activo';

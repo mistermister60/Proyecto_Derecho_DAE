@@ -46,7 +46,7 @@ class SeguimientoController extends Controller
 
         Seguimiento::create([
             'caso_id' => $caso_id,
-            'usuario_id' => Auth::user()->usuario_id ?? Auth::id(),
+            'usuario_id' => Auth::id(),
             'seguimiento_fecha' => now()->toDateString(),
             'seguimiento_tipo' => $request->input('seguimiento_tipo'),
             'seguimiento_descripcion' => $request->input('seguimiento_descripcion'),

@@ -7,8 +7,8 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * Form request para almacenar una suscripción de notificación push.
  *
- * Valida que el payload de suscripción sea un string válido y que
- * el usuario asociado exista en la tabla `usuarios`.
+ * Valida que el payload de suscripción sea un string válido.
+ * El usuario se obtiene de auth()->id() en el controlador.
  */
 class StorePushNotificationRequest extends FormRequest
 {
@@ -31,7 +31,6 @@ class StorePushNotificationRequest extends FormRequest
     {
         return [
             'subscription' => ['required', 'string'],
-            'user_id' => ['required', 'integer', 'exists:usuarios,usuario_id'],
         ];
     }
 
@@ -45,9 +44,6 @@ class StorePushNotificationRequest extends FormRequest
         return [
             'subscription.required' => 'La suscripción push es requerida',
             'subscription.string' => 'La suscripción push debe ser un string',
-            'user_id.required' => 'El ID de usuario es requerido',
-            'user_id.integer' => 'El ID de usuario debe ser un entero',
-            'user_id.exists' => 'El usuario especificado no existe',
         ];
     }
 }

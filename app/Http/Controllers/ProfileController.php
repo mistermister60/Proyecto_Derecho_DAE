@@ -28,10 +28,6 @@ class ProfileController extends Controller
     {
         $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            // En nuestro sistema custom no usamos email_verified_at, pero podríamos agregar
-        }
-
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('success', 'Perfil actualizado exitosamente.');

@@ -45,6 +45,13 @@ class Documento extends Model
         'documento_estado',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'documento_tamano' => 'integer',
+        ];
+    }
+
     /**
      * Relación con el caso al que pertenece el documento.
      */
