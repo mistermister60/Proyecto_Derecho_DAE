@@ -229,7 +229,8 @@
                          style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
                         <template x-for="(item, idx) in results" :key="idx">
                             <a :href="item.url"
-                               @click="open = false"
+                               @click.prevent="selectResult(idx)"
+                               @mouseenter="selectedIndex = idx"
                                :class="idx === selectedIndex ? 'bg-[var(--color-search-result-bg)]' : ''"
                                class="flex items-center gap-3 px-4 py-3 transition-colors duration-100 no-underline"
                                style="border-bottom: 1px solid var(--color-dropdown-divider); color: var(--color-dropdown-text);"

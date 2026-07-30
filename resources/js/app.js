@@ -235,7 +235,11 @@ Alpine.data('globalSearch', () => ({
 
     selectResult(idx) {
         if (idx >= 0 && idx < this.results.length) {
-            window.location.href = this.results[idx].url;
+            this.open = false;
+            // Pequeño delay para que Alpine cierre el dropdown antes de navegar
+            setTimeout(() => {
+                window.location.href = this.results[idx].url;
+            }, 50);
         }
     },
 }));
