@@ -237,15 +237,42 @@
                                onmouseover="this.style.background='var(--color-dropdown-hover)'"
                                onmouseout="this.style.background='transparent'">
                                 <div class="flex items-center justify-center rounded-lg shrink-0"
-                                     style="width: 36px; height: 36px; background: #EFF6FF;">
+                                     :style="iconBg(item.type)"
+                                     style="width: 36px; height: 36px;">
+                                    {{-- Caso — carpeta --}}
                                     <template x-if="item.type === 'Caso'">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                                         </svg>
                                     </template>
-                                    <template x-if="item.type === 'Cliente' || item.type === 'Demandado'">
+                                    {{-- Cliente / Demandado / Procurador — personas --}}
+                                    <template x-if="item.type === 'Cliente' || item.type === 'Demandado' || item.type === 'Procurador'">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                    </template>
+                                    {{-- Audiencia — calendario --}}
+                                    <template x-if="item.type === 'Audiencia'">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                    </template>
+                                    {{-- Documento — archivo --}}
+                                    <template x-if="item.type === 'Documento'">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                                        </svg>
+                                    </template>
+                                    {{-- Entrevista — conversación --}}
+                                    <template x-if="item.type === 'Entrevista'">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0891B2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                    </template>
+                                    {{-- Seguimiento — actividad/historial --}}
+                                    <template x-if="item.type === 'Seguimiento'">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                                         </svg>
                                     </template>
                                 </div>
@@ -254,7 +281,7 @@
                                     <p class="text-xs truncate" x-text="item.sub" style="color: var(--color-dropdown-text-sec);"></p>
                                 </div>
                                 <span class="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
-                                      :style="item.type === 'Caso' ? 'background:#EFF6FF;color:#2563EB' : 'background:#F0FDF4;color:#166534'"
+                                      :style="badgeStyle(item.type)"
                                       x-text="item.type"></span>
                             </a>
                         </template>

@@ -236,11 +236,38 @@ Alpine.data('globalSearch', () => ({
     selectResult(idx) {
         if (idx >= 0 && idx < this.results.length) {
             this.open = false;
-            // Pequeño delay para que Alpine cierre el dropdown antes de navegar
             setTimeout(() => {
                 window.location.href = this.results[idx].url;
             }, 50);
         }
+    },
+
+    iconBg(type) {
+        const colors = {
+            Caso: '#EFF6FF',
+            Cliente: '#EFF6FF',
+            Demandado: '#EFF6FF',
+            Procurador: '#FEF3C7',
+            Audiencia: '#F3E8FF',
+            Documento: '#FFFBEB',
+            Entrevista: '#E0F2FE',
+            Seguimiento: '#ECFDF5',
+        };
+        return `background:${colors[type] || '#EFF6FF'}`;
+    },
+
+    badgeStyle(type) {
+        const colors = {
+            Caso: 'background:#EFF6FF;color:#2563EB',
+            Cliente: 'background:#F0FDF4;color:#166534',
+            Demandado: 'background:#F0FDF4;color:#166534',
+            Procurador: 'background:#FEF3C7;color:#92400E',
+            Audiencia: 'background:#F3E8FF;color:#6B21A8',
+            Documento: 'background:#FFFBEB;color:#92400E',
+            Entrevista: 'background:#E0F2FE;color:#155E75',
+            Seguimiento: 'background:#ECFDF5;color:#065F46',
+        };
+        return colors[type] || 'background:#F3F4F6;color:#374151';
     },
 }));
 
