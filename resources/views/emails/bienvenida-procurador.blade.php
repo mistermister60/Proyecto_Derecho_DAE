@@ -1,6 +1,6 @@
-@component('mail::layout')
-{{-- Header con logo --}}
-@slot('header')
+@extends('emails.layout')
+
+@section('header')
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 40px 20px; text-align: center;">
     <tr>
         <td>
@@ -22,10 +22,9 @@
         </td>
     </tr>
 </table>
-@endslot
+@endsection
 
-{{-- Contenido principal --}}
-@slot('content')
+@section('content')
 <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1f2937; line-height: 1.6;">
 
     <p style="font-size: 16px; margin: 0 0 16px;">Hola <strong style="color: #1e3a8a;">{{ $nombre }}</strong>,</p>
@@ -96,10 +95,9 @@
         Guarda tu nueva contraseña en un lugar seguro (gestor de contraseñas recomendado).
     </p>
 </div>
-@endslot
+@endsection
 
-{{-- Footer --}}
-@slot('footer')
+@section('footer')
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f9fafb; border-top: 1px solid #e5e7eb;">
     <tr>
         <td style="padding: 24px 20px; text-align: center;">
@@ -111,5 +109,4 @@
         </td>
     </tr>
 </table>
-@endslot
-@endcomponent
+@endsection

@@ -1,6 +1,6 @@
-@component('mail::layout')
-{{-- Header --}}
-@slot('header')
+@extends('emails.layout')
+
+@section('header')
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 16px 16px 0 0; padding: 40px 30px; text-align: center;">
     <tr>
         <td style="text-align: center;">
@@ -9,10 +9,9 @@
         </td>
     </tr>
 </table>
-@endslot
+@endsection
 
-{{-- Content --}}
-@slot('content')
+@section('content')
 <div style="padding: 40px 30px;">
     <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hola <strong>{{ $nombre }}</strong>,</p>
     
@@ -62,10 +61,9 @@
         Si tienes problemas, contacta al <strong>Director del Consultorio Jurídico</strong>.
     </p>
 </div>
-@endslot
+@endsection
 
-{{-- Footer --}}
-@slot('footer')
+@section('footer')
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f9fafb; border-top: 1px solid #e5e7eb; border-radius: 0 0 16px 16px;">
     <tr>
         <td style="padding: 24px 20px; text-align: center;">
@@ -77,5 +75,4 @@
         </td>
     </tr>
 </table>
-@endslot
-@endcomponent
+@endsection

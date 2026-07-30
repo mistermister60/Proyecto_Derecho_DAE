@@ -19,11 +19,11 @@
         <tr>
             <td align="center" style="padding: 32px 16px;">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-                    @if (isset($header))
+                    @hasSection('header')
                         @yield('header')
                     @endif
                     @yield('content')
-                    @if (isset($footer))
+                    @hasSection('footer')
                         @yield('footer')
                     @endif
                 </table>
