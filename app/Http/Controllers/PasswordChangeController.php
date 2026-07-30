@@ -56,6 +56,10 @@ class PasswordChangeController extends BaseController
             'contrasena_actual.required' => 'Debes ingresar tu contraseña actual.',
             'nueva_contrasena.required' => 'Debes ingresar una nueva contraseña.',
             'nueva_contrasena.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'nueva_contrasena.min' => 'La contraseña debe tener al menos :min caracteres.',
+            'nueva_contrasena.mixed' => 'La contraseña debe contener mayúsculas y minúsculas.',
+            'nueva_contrasena.numbers' => 'La contraseña debe contener al menos un número.',
+            'nueva_contrasena.symbols' => 'La contraseña debe contener al menos un símbolo.',
         ]);
 
         $usuario = auth()->user();

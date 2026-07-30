@@ -45,7 +45,17 @@ class ResetPasswordController extends BaseController
                     ->symbols(),
             ],
         ], [
+            'token.required' => 'El token de restablecimiento es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico no es válido.',
+            'email.exists' => 'No existe ninguna cuenta registrada con este correo.',
+            'email.ends_with' => 'El correo debe ser institucional (@usap.edu).',
+            'password.required' => 'La nueva contraseña es obligatoria.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'password.min' => 'La contraseña debe tener al menos :min caracteres.',
+            'password.mixed' => 'La contraseña debe contener mayúsculas y minúsculas.',
+            'password.numbers' => 'La contraseña debe contener al menos un número.',
+            'password.symbols' => 'La contraseña debe contener al menos un símbolo.',
         ]);
 
         // Verificar token en BD
