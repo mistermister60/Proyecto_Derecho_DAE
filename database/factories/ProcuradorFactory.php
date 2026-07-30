@@ -15,15 +15,15 @@ class ProcuradorFactory extends Factory
     public function definition(): array
     {
         return [
-            'procurador_nombre' => fake()->firstName(),
-            'procurador_apellido' => fake()->lastName(),
-            'procurador_dni' => fake()->unique()->numerify('####-####-#####'),
-            'procurador_carnet' => fake()->optional()->unique()->bothify('CAR-#####'),
-            'procurador_fecha_nacimiento' => fake()->date('Y-m-d', '-30 years'),
-            'procurador_genero' => fake()->randomElement(['Masculino', 'Femenino']),
-            'procurador_email' => fake()->unique()->safeEmail(),
-            'procurador_telefono' => fake()->numerify('+504 ####-####'),
-            'procurador_direccion' => fake()->address(),
+            'procurador_nombre' => $this->faker->firstName(),
+            'procurador_apellido' => $this->faker->lastName(),
+            'procurador_dni' => $this->faker->unique()->numerify('####-####-#####'),
+            'procurador_carnet' => $this->faker->unique()->numerify('CAR-#####'),
+            'procurador_fecha_nacimiento' => $this->faker->date('Y-m-d', '-30 years'),
+            'procurador_genero' => $this->faker->randomElement(['Masculino', 'Femenino']),
+            'procurador_email' => $this->faker->unique()->safeEmail(),
+            'procurador_telefono' => $this->faker->numerify('+504 ####-####'),
+            'procurador_direccion' => $this->faker->address(),
             'procurador_estado' => 'activo',
         ];
     }

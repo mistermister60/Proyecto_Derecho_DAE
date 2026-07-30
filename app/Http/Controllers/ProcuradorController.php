@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProcuradorRequest;
 use App\Http\Requests\UpdateProcuradorRequest;
+use App\Mail\BienvenidaProcuradorMail;
 use App\Models\Procurador;
 use App\Models\Rol;
 use App\Models\Usuario;
@@ -12,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -90,20 +92,33 @@ class ProcuradorController extends Controller
             $validated['procurador_foto'] = $path;
         }
 
-        DB::transaction(function () use ($validated) {
+        // Generar contraseña temporal ANTES de la transacción para poder enviarla por email
+        // Formato: Procurador.{dni}!
+        $tempPassword = 'Procurador.' . $validated['procurador_dni'] . '!';
+
+        DB::transaction(function () use ($validated, $tempPassword) {
             $procurador = Procurador::create($validated);
-            Usuario::create([
+            $usuario = Usuario::create([
                 'rol_id' => Rol::where('rol_nombre', 'Procurador')->value('rol_id'),
                 'procurador_id' => $procurador->procurador_id,
                 'usuario_nombre' => $validated['procurador_nombre'].' '.$validated['procurador_apellido'],
                 'email' => $validated['procurador_email'],
-                'contrasena' => Hash::make($validated['procurador_nombre'] . substr($validated['procurador_dni'], -4)),
+                'contrasena' => Hash::make($tempPassword),
                 'usuario_estado' => 'activo',
+                'debe_cambiar_contrasena' => true, // Forzar cambio en primer login
             ]);
+
+            // Enviar email de bienvenida con credenciales (cola, se envía tras commit)
+            Mail::to($usuario->email)->send(new BienvenidaProcuradorMail(
+                $usuario->usuario_nombre,
+                $usuario->email,
+                $tempPassword,
+                route('login')
+            ));
         });
 
         return redirect()->route('procuradores.index')
-            ->with('success', 'Procurador y usuario registrados exitosamente.');
+            ->with('success', 'Procurador y usuario registrados exitosamente. Se han enviado las credenciales al correo institucional.');
     }
 
     /**
