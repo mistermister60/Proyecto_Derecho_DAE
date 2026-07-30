@@ -253,41 +253,43 @@
                         </div>
                     </div>
 
-                    {{-- Usuario --}}
+{{-- Usuario --}}
+                    @auth
                     <div class="relative">
                             <button @click="openUser = !openUser; openNotif = false" class="flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors duration-150" style="background: transparent; border: none;" onmouseover="this.style.background='#F3F4F6';" onmouseout="this.style.background='transparent';">
                                  <div class="flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background: #1E3A5F; color: white; font-size: 12px; font-weight: 600;">
-                                     {{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->usuario_nombre)[1] ?? '', 0, 1)) }}
-                                 </div>
-                                 <div class="text-sm hidden md:block" style="color: #111827;">
-                                     <span class="font-medium">{{ Auth::user()->usuario_nombre }}</span>
-                                 </div>
-                                 <svg :class="openUser ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
-                                     <polyline points="6 9 12 15 18 9"/>
-                                 </svg>
-                             </button>
+                                      {{ strtoupper(substr(explode(' ', auth()->user()->usuario_nombre)[0] ?? 'U', 0, 1)) }}{{ strtoupper(substr(explode(' ', auth()->user()->usuario_nombre)[1] ?? '', 0, 1)) }}
+                                  </div>
+                                  <div class="text-sm hidden md:block" style="color: #111827;">
+                                      <span class="font-medium">{{ auth()->user()->usuario_nombre }}</span>
+                                  </div>
+                                  <svg :class="openUser ? 'rotate-180' : ''" class="transition-transform duration-200 hidden md:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;">
+                                      <polyline points="6 9 12 15 18 9"/>
+                                  </svg>
+                              </button>
 
-                        {{-- Dropdown menú --}}
-                        <div x-show="openUser" x-cloak
-                             x-transition:enter="transition ease-out duration-150"
-                             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-100"
-                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                             @click.outside="openUser = false"
-                             class="absolute top-12 right-0 w-48 rounded-lg shadow-lg border py-1 z-50"
-                             style="background: #FFFFFF; border-color: #E5E7EB;">
-                            <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
-                                <p class="text-xs" style="color: #9CA3AF;">{{ Auth::user()->email }}</p>
-                                <p class="text-xs font-medium mt-0.5" style="color: #6B7280;">{{ Auth::user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
-                            </div>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
-                                    Cerrar sesión
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                         {{-- Dropdown menú --}}
+                         <div x-show="openUser" x-cloak
+                              x-transition:enter="transition ease-out duration-150"
+                              x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                              x-transition:leave="transition ease-in duration-100"
+                              x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                              @click.outside="openUser = false"
+                              class="absolute top-12 right-0 w-48 rounded-lg shadow-lg border py-1 z-50"
+                              style="background: #FFFFFF; border-color: #E5E7EB;">
+                             <div class="px-4 py-2" style="border-bottom: 1px solid #E5E7EB;">
+                                 <p class="text-xs" style="color: #9CA3AF;">{{ auth()->user()->email }}</p>
+                                 <p class="text-xs font-medium mt-0.5" style="color: #6B7280;">{{ auth()->user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
+                             </div>
+                             <form method="POST" action="{{ route('logout') }}">
+                                 @csrf
+                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
+                                     Cerrar sesión
+                                 </button>
+                             </form>
+                         </div>
+                     </div>
+                     @endauth
                 </div>
             </div>
         </header>
