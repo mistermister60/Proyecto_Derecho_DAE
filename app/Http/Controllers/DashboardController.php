@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolEnum;
 use App\Models\Audiencia;
 use App\Models\Caso;
 use App\Models\EstadoCaso;
@@ -16,6 +17,9 @@ use Illuminate\View\View;
  * gráficas de pipeline y tipo de trámite, audiencias próximas y carga de
  * trabajo por procurador.
  *
+ * Si el usuario autenticado es Procurador, TODAS las métricas se filtran
+ * automáticamente para reflejar solo sus casos, audiencias y datos.
+ *
  * Nota: NO usar Cache::remember con modelos/Collections aquí. Laravel 13
  * trae 'serializable_classes' => false por defecto (config/cache.php), lo que
  * degrada los objetos cacheados a __PHP_Incomplete_Class al leerlos y provoca
@@ -25,75 +29,130 @@ use Illuminate\View\View;
 class DashboardController extends Controller
 {
     /**
+     * Obtener el procurador_id si el usuario es Procurador, null si es Director.
+     */
+    private function getProcuradorFilter(): ?int
+    {
+        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
+            return auth()->user()->procurador_id;
+        }
+        return null;
+    }
+
+    /**
+     * Aplicar filtro de procurador a una consulta de Casos.
+     */
+    private function casosFiltered(): Caso
+    {
+        $procuradorId = $this->getProcuradorFilter();
+        return Caso::when($procuradorId, fn ($q) => $q->where('procurador_id', $procuradorId));
+    }
+
+    /**
+     * Aplicar filtro de procurador a una consulta de Audiencias.
+     */
+    private function audienciasFiltered(): Audiencia
+    {
+        $procuradorId = $this->getProcuradorFilter();
+        return Audiencia::when($procuradorId, fn ($q) => $q->whereHas('caso', fn ($cq) => $cq->where('procurador_id', $procuradorId)));
+    }
+
+    /**
      * Muestra el panel principal con métricas y gráficas del sistema.
      *
      * @return View
      */
     public function index()
     {
-        $casosActivos = Caso::where('caso_estado', 'activo')->count();
-        $cerrados = Caso::where('caso_estado', 'cerrado')->count();
-        $totalCasos = Caso::count();
+        $procuradorId = $this->getProcuradorFilter();
+        $esProcurador = $procuradorId !== null;
 
-        $nuevosEsteMes = Caso::whereMonth('created_at', now()->month)
+        // === KPIs ===
+        $casosActivos = $this->casosFiltered()->where('caso_estado', 'activo')->count();
+        $cerrados = $this->casosFiltered()->where('caso_estado', 'cerrado')->count();
+        $totalCasos = $this->casosFiltered()->count();
+
+        $nuevosEsteMes = $this->casosFiltered()
+            ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
 
-        $audienciasEstaSemana = Audiencia::whereBetween('audiencia_fecha', [
-            now()->startOfWeek(), now()->endOfWeek(),
-        ])->count();
+        $audienciasEstaSemana = $this->audienciasFiltered()
+            ->whereBetween('audiencia_fecha', [
+                now()->startOfWeek(), now()->endOfWeek(),
+            ])->count();
 
         $estadoAtrasado = EstadoCaso::where('estado_nombre', config('app.estados_caso.atrasado'))->value('estado_id');
-        $atrasados = Caso::where('estado_id', $estadoAtrasado)->where('caso_estado', 'activo')->count();
+        $atrasados = $this->casosFiltered()
+            ->where('estado_id', $estadoAtrasado)
+            ->where('caso_estado', 'activo')
+            ->count();
 
-        // Audiencias próximas (hoy + 7 días)
-        $proximasAudiencias = Audiencia::with(['caso', 'procurador'])
+        // === Audiencias próximas (hoy + 7 días) ===
+        $proximasAudiencias = $this->audienciasFiltered()
+            ->with(['caso', 'procurador'])
             ->whereBetween('audiencia_fecha', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->orderBy('audiencia_fecha')
             ->orderBy('audiencia_hora')
             ->take(5)
             ->get();
 
-        // Carga por procurador
-        $procuradores = Procurador::withCount([
-            'casos as total_casos' => function ($q) {
-                $q->where('caso_estado', 'activo');
-            },
-        ])->get();
+        // === Carga por procurador ===
+        if ($esProcurador) {
+            // Si es procurador, solo se ve a sí mismo
+            $procuradores = Procurador::where('procurador_id', $procuradorId)
+                ->withCount([
+                    'casos as total_casos' => fn ($q) => $q->where('caso_estado', 'activo'),
+                ])
+                ->get();
+        } else {
+            // Director ve todos los procuradores
+            $procuradores = Procurador::withCount([
+                'casos as total_casos' => fn ($q) => $q->where('caso_estado', 'activo'),
+            ])->get();
+        }
+
         $estadosExcluidos = EstadoCaso::whereIn('estado_nombre', [
             config('app.estados_caso.cerrado'),
             config('app.estados_caso.inadmisible'),
         ])->pluck('estado_id');
 
-        $procuradores->loadCount(['casos as activos' => function ($q) use ($estadosExcluidos) {
+        $procuradores->loadCount(['casos as activos' => function ($q) use ($estadosExcluidos, $procuradorId) {
             $q->where('caso_estado', 'activo')
                 ->whereNotIn('estado_id', $estadosExcluidos);
+            // Si es procurador filtrando su propia carga, solo cuenta sus casos (el where procurador_id ya está en la relación)
+            if ($procuradorId) {
+                $q->where('procurador_id', $procuradorId);
+            }
         }]);
 
-        // Datos para gráfica de pipeline
+        // === Datos para gráfica de pipeline ===
         $estados = EstadoCaso::where('estado_tipo', 'pipeline')
             ->orderBy('estado_orden')
             ->get();
         $pipelineLabels = $estados->pluck('estado_nombre');
-        $pipelineCounts = Caso::where('caso_estado', 'activo')
+        $pipelineCounts = $this->casosFiltered()
+            ->where('caso_estado', 'activo')
             ->selectRaw('estado_id, COUNT(*) as total')
             ->groupBy('estado_id')
             ->pluck('total', 'estado_id');
         $pipelineData = $estados->map(fn ($e) => $pipelineCounts[$e->estado_id] ?? 0);
         $pipelineColors = $estados->pluck('estado_color');
 
-        // Datos para gráfica de tipo de trámite
+        // === Datos para gráfica de tipo de trámite ===
         $tramites = TipoTramite::all();
         $tipoLabels = $tramites->pluck('tramite_nombre');
-        $tipoCounts = Caso::where('caso_estado', 'activo')
+        $tipoCounts = $this->casosFiltered()
+            ->where('caso_estado', 'activo')
             ->selectRaw('tipo_tramite_id, COUNT(*) as total')
             ->groupBy('tipo_tramite_id')
             ->pluck('total', 'tipo_tramite_id');
         $tipoData = $tramites->map(fn ($t) => $tipoCounts[$t->tipo_tramite_id] ?? 0);
 
-        // Datos para gráfica de resoluciones (casos cerrados)
+        // === Datos para gráfica de resoluciones (casos cerrados) ===
         $resolucionesLabels = ['Ganado', 'Perdido', 'Conciliado', 'Desistido', 'Desestimado'];
-        $resolucionesValues = Caso::where('caso_estado', 'cerrado')
+        $resolucionesValues = $this->casosFiltered()
+            ->where('caso_estado', 'cerrado')
             ->whereNotNull('resolucion_tipo')
             ->selectRaw('resolucion_tipo, COUNT(*) as total')
             ->groupBy('resolucion_tipo')
@@ -108,7 +167,8 @@ class DashboardController extends Controller
             'proximasAudiencias', 'procuradores',
             'pipelineLabels', 'pipelineData', 'pipelineColors',
             'tipoLabels', 'tipoData',
-            'resolucionesLabels', 'resolucionesData', 'resolucionesColors'
+            'resolucionesLabels', 'resolucionesData', 'resolucionesColors',
+            'esProcurador'
         ));
     }
 }

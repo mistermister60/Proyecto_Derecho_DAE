@@ -90,10 +90,10 @@
             </div>
         </div>
 
-        {{-- Carga por procurador --}}
+        {{-- Carga por procurador / Mi carga --}}
         <div class="rounded-xl" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <div class="px-4 py-3 md:px-5 md:py-4" style="border-bottom: 1px solid #E5E7EB;">
-                <h3 class="text-sm font-semibold" style="color: #111827;">Carga por procurador</h3>
+                <h3 class="text-sm font-semibold" style="color: #111827;">{{ $esProcurador ? 'Mi carga de trabajo' : 'Carga por procurador' }}</h3>
             </div>
             <div class="divide-y" style="border-color: #E5E7EB;">
                 @foreach ($procuradores as $proc)
