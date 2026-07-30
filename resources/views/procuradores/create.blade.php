@@ -32,6 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
 @endif
 <form action="{{ route('procuradores.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
+    {{-- Errores generales de validación --}}
+    @if ($errors->any())
+    <div class="rounded-lg p-3 mb-4" style="background: #FEE2E2; border: 1px solid #FECACA;">
+        <p class="text-sm font-medium" style="color: #991B1B;">Por favor corrige los siguientes errores:</p>
+        <ul class="mt-2 list-disc list-inside text-xs" style="color: #DC2626;">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo Procurador</h1>
         <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -89,22 +100,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-            <div>
-                            <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Foto de perfil</label>
-                            <div class="relative">
-                                <div id="foto-preview" class="w-full rounded-lg border-2 border-dashed #1E3A5F flex items-center justify-center bg-gray-50 p-2" style="background: #F9FAFB; color: #6B7280; min-height: 44px; max-height: 44px;">
-                                    <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v16.5m9-9h16.5m-16.5-9h16.5m0 9v9M3.75 21h16.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 6.75v12.75A2.25 2.25 0 003.75 21z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 15a3 3 0 00-2.83-2.993 2.5 2.5 0 00-2.83 0A3 3 0 003 21h18a3 3 0 00-2.83-5.993 2.5 2.5 0 00-2.83 0A3 3 0 003 21h18z" />
-                                    </svg>
-                                    <input type="file" name="procurador_foto" id="procurador_foto" accept="image/jpeg,image/png,image/jpg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="max-width: 100%;">
-                                </div>
-                            </div>
-                            @error('procurador_foto')
-                            <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+<div>
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Foto de perfil</label>
+                <input type="file" name="procurador_foto" id="procurador_foto" accept="image/jpeg,image/png,image/jpg" class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 2px solid #1E3A5F; color: #111827; background: #FFFFFF;">
+                @error('procurador_foto')
+                <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
     </div>
 
@@ -204,22 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 value = '+' + value;
             }
             e.target.value = value.slice(0,16);
-        });
-    }
-
-    // Preview de foto
-    const fotoInput = document.getElementById('procurador_foto');
-    const fotoPreview = document.getElementById('foto-preview');
-    if (fotoInput && fotoPreview) {
-        fotoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    fotoPreview.innerHTML = `<img src="${e.target.result}" alt="Vista previa" class="w-full h-full object-cover rounded-lg">`;
-                };
-                reader.readAsDataURL(file);
-            }
         });
     }
 });
