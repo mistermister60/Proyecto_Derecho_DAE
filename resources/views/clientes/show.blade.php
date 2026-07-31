@@ -22,6 +22,8 @@
                 <p class="text-sm" style="color: #6B7280;">{{ $cliente->cliente_dni }}</p>
             </div>
         </div>
+        {{-- Acciones de edición/desactivación: SOLO Director --}}
+        @if (auth()->user()?->rol?->rol_nombre === 'Director')
         <div class="flex items-center gap-2 flex-wrap">
             <a href="{{ route('clientes.edit', $cliente->cliente_dni) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
@@ -48,6 +50,7 @@
                 </form>
             @endif
         </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -73,10 +76,14 @@
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Lugar de trabajo</dt><dd class="text-sm font-medium text-right" style="color: #111827;">{{ $cliente->cliente_lugar_trabajo ?? 'No especificado' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Dirección trabajo</dt><dd class="text-sm font-medium text-right" style="color: #111827; max-width: 200px;">{{ $cliente->cliente_direccion_trabajo ?? 'No especificada' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Teléfono trabajo</dt><dd class="text-sm font-medium text-right" style="color: #111827;">{{ $cliente->cliente_telefono_trabajo ?? 'No especificado' }}</dd></div>
+                {{-- Salario mensual: dato sensible, SOLO visible para Director --}}
+                @if (auth()->user()?->rol?->rol_nombre === 'Director')
                 <div class="flex justify-between"><dt class="text-sm" style="color: #6B7280;">Salario mensual</dt><dd class="text-sm font-medium text-right" style="color: #111827;">{{ $cliente->cliente_salario_mensual > 0 ? 'L. ' . number_format($cliente->cliente_salario_mensual, 2) : 'No especificado' }}</dd></div>
+                @endif
             </dl>
 
-            @if ($cliente->cliente_nombres_hijos)
+            {{-- Datos de hijos: dato sensible, SOLO visible para Director --}}
+            @if (auth()->user()?->rol?->rol_nombre === 'Director' && $cliente->cliente_nombres_hijos)
             <div class="mt-4 pt-4" style="border-top: 1px solid #E5E7EB;">
                 <h4 class="text-xs font-semibold mb-2" style="color: #6B7280;">HIJOS</h4>
                 <p class="text-sm" style="color: #374151;">{{ $cliente->cliente_nombres_hijos }}</p>

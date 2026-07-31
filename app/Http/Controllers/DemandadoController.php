@@ -60,12 +60,6 @@ class DemandadoController extends Controller
                         ->orWhere('demandado_apellido', 'like', "%{$search}%");
                 });
             })
-            // ─── [Filtro por rol: Procurador ve solo sus demandados] ─
-            ->when(RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR), function ($query) {
-                $query->whereHas('casos', function ($q) {
-                    $q->where('procurador_id', auth()->user()->procurador_id);
-                });
-            })
             // ─── [Ordenamiento y paginación] ────────────────────
             ->orderBy('demandado_apellido')
             ->orderBy('demandado_nombre')
@@ -122,7 +116,7 @@ class DemandadoController extends Controller
      * ───────────────────────────────────────────────────────
      * Muestra los detalles de un demandado con sus casos asociados.
      * Realiza eager loading de casos con estado, tipo de trámite y procurador.
-     * Verifica permisos: Procurador solo ve demandados con casos suyos.
+     * Los demandados son compartidos: cualquier usuario autenticado puede verlos.
      * ═══════════════════════════════════════════════════════
      *
      * @param  string  $identidad  Número de DNI del demandado
@@ -136,19 +130,6 @@ class DemandadoController extends Controller
         $demandado = Demandado::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador'])
             ->where('demandado_dni', $identidad)
             ->firstOrFail();
-
-        // ─── [Verificación de permisos para Procurador] ────────
-        // Si es procurador, verificar que este demandado tenga al menos
-        // un caso asignado a él; si no, 403
-        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
-            $tieneCaso = $demandado->casos()
-                ->where('procurador_id', auth()->user()->procurador_id)
-                ->exists();
-
-            if (! $tieneCaso) {
-                abort(403, 'No tienes permiso para ver este demandado.');
-            }
-        }
 
         // ─── [Renderizado de vista] ────────────────────────────
         return view('demandados.show', compact('demandado'));

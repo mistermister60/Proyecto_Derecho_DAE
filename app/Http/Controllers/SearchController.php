@@ -71,8 +71,8 @@ class SearchController extends Controller
                     ->orWhere('caso_parte_representada', 'like', "%{$q}%");
             });
 
-        if ($esProcurador && $procuradorId) {
-            $casosQuery->where('procurador_id', $procuradorId);
+        if ($esProcurador) {
+            $casosQuery->where('procurador_id', $procuradorId ?? -1);
         }
 
         foreach ($casosQuery->limit($limit)->get() as $caso) {
@@ -96,8 +96,8 @@ class SearchController extends Controller
             })
             ->where('cliente_estado', 'activo');
 
-        if ($esProcurador && $procuradorId) {
-            $clientesQuery->whereHas('casos', fn ($qry) => $qry->where('procurador_id', $procuradorId));
+        if ($esProcurador) {
+            $clientesQuery->whereHas('casos', fn ($qry) => $qry->where('procurador_id', $procuradorId ?? -1));
         }
 
         foreach ($clientesQuery->limit($limit)->get() as $cliente) {
@@ -120,8 +120,8 @@ class SearchController extends Controller
             })
             ->where('demandado_estado', 'activo');
 
-        if ($esProcurador && $procuradorId) {
-            $demandadosQuery->whereHas('casos', fn ($qry) => $qry->where('procurador_id', $procuradorId));
+        if ($esProcurador) {
+            $demandadosQuery->whereHas('casos', fn ($qry) => $qry->where('procurador_id', $procuradorId ?? -1));
         }
 
         foreach ($demandadosQuery->limit($limit)->get() as $demandado) {
@@ -136,6 +136,8 @@ class SearchController extends Controller
         // ═══════════════════════════════════════════════════════
         // 4. PROCURADORES — por nombre, apellido, DNI, carnet o email
         // ═══════════════════════════════════════════════════════
+        // Solo el Director ve resultados de procuradores: para un
+        // Procurador representaría fuga de metadata de sus colegas.
         $procuradoresQuery = Procurador::select(
             'procuradores.procurador_id',
             'procuradores.procurador_nombre',
@@ -151,16 +153,18 @@ class SearchController extends Controller
         })
             ->where('procurador_estado', 'activo');
 
-        foreach ($procuradoresQuery->limit($limit)->get() as $procurador) {
-            $sub = $procurador->procurador_carnet
-                ? "Carnet: {$procurador->procurador_carnet}"
-                : "DNI: {$procurador->procurador_dni}";
-            $results[] = [
-                'type' => 'Procurador',
-                'label' => "{$procurador->procurador_nombre} {$procurador->procurador_apellido}",
-                'sub' => $sub,
-                'url' => route('procuradores.show', $procurador->procurador_dni),
-            ];
+        if (! $esProcurador) {
+            foreach ($procuradoresQuery->limit($limit)->get() as $procurador) {
+                $sub = $procurador->procurador_carnet
+                    ? "Carnet: {$procurador->procurador_carnet}"
+                    : "DNI: {$procurador->procurador_dni}";
+                $results[] = [
+                    'type' => 'Procurador',
+                    'label' => "{$procurador->procurador_nombre} {$procurador->procurador_apellido}",
+                    'sub' => $sub,
+                    'url' => route('procuradores.show', $procurador->procurador_dni),
+                ];
+            }
         }
 
         // ═══════════════════════════════════════════════════════
@@ -179,8 +183,8 @@ class SearchController extends Controller
                     ->orWhere('audiencia_fecha', 'like', "%{$q}%");
             });
 
-        if ($esProcurador && $procuradorId) {
-            $audienciasQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId));
+        if ($esProcurador) {
+            $audienciasQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId ?? -1));
         }
 
         foreach ($audienciasQuery->limit($limit)->get() as $audiencia) {
@@ -210,8 +214,8 @@ class SearchController extends Controller
             })
             ->where('documento_estado', 'activo');
 
-        if ($esProcurador && $procuradorId) {
-            $documentosQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId));
+        if ($esProcurador) {
+            $documentosQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId ?? -1));
         }
 
         foreach ($documentosQuery->limit($limit)->get() as $documento) {
@@ -239,8 +243,8 @@ class SearchController extends Controller
             })
             ->where('entrevista_estado', 'activo');
 
-        if ($esProcurador && $procuradorId) {
-            $entrevistasQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId));
+        if ($esProcurador) {
+            $entrevistasQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId ?? -1));
         }
 
         foreach ($entrevistasQuery->limit($limit)->get() as $entrevista) {
@@ -269,8 +273,8 @@ class SearchController extends Controller
             ->where('seguimiento_descripcion', 'like', "%{$q}%")
             ->where('seguimiento_estado', 'activo');
 
-        if ($esProcurador && $procuradorId) {
-            $seguimientosQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId));
+        if ($esProcurador) {
+            $seguimientosQuery->whereHas('caso', fn ($qry) => $qry->where('procurador_id', $procuradorId ?? -1));
         }
 
         foreach ($seguimientosQuery->limit($limit)->get() as $seguimiento) {

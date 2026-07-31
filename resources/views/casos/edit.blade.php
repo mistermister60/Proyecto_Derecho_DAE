@@ -19,14 +19,14 @@
 @section('title', 'Editar Caso — ' . $caso->caso_numero_expediente)
 
 @section('content')
-{{-- ─── [DETECCIÓN DE ROL DIRECTOR] ──────────────── ──}}
+{{-- ─── [DETECCIÓN DE ROL DIRECTOR] ──────────────── --}}
 {{-- Variable booleana que controla la edición de campos restringidos --}}
 @php($esDirector = \App\Enums\RolEnum::equals(auth()->user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
 <form action="{{ route('casos.update', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
     @method('PUT')
     
-    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── ──}}
+    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── --}}
     {{-- Muestra el número de expediente como identificador, botón Cancelar (vuelve a show) y Guardar cambios --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>

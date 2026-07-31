@@ -42,13 +42,15 @@ class DashboardController extends Controller
      * getProcuradorFilter
      * ───────────────────────────────────────────────────────
      * Obtener el procurador_id si el usuario es Procurador,
-     * null si es Director. Método privado auxiliar.
+     * null si es Director. Si el Procurador no tiene procurador
+     * vinculado, devuelve -1 (id inexistente) para que los filtros
+     * retornen 0 resultados y no haya fuga de datos ajenos.
      * ═══════════════════════════════════════════════════════
      */
     private function getProcuradorFilter(): ?int
     {
         if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
-            return auth()->user()->procurador_id;
+            return auth()->user()->procurador_id ?? -1;
         }
 
         return null;
@@ -98,7 +100,8 @@ class DashboardController extends Controller
     public function index()
     {
         $procuradorId = $this->getProcuradorFilter();
-        $esProcurador = $procuradorId !== null;
+        $esProcurador = RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR);
+        $sinProcuradorAsignado = $esProcurador && auth()->user()->procurador_id === null;
 
         // ═══════════════════════════════════════════════════════
         // === KPIs (Indicadores Clave) ===
@@ -222,7 +225,7 @@ class DashboardController extends Controller
             'pipelineLabels', 'pipelineData', 'pipelineColors',
             'tipoLabels', 'tipoData',
             'resolucionesLabels', 'resolucionesData', 'resolucionesColors',
-            'esProcurador'
+            'esProcurador', 'sinProcuradorAsignado'
         ));
     }
 }

@@ -37,7 +37,8 @@ class StoreUsuariosRequest extends FormRequest
      * - contrasena:     Opcional (a veces se genera automáticamente), string, máx. 50,
      *                   mínimo 8 caracteres, mayúsculas, minúsculas y números
      * - rol_id:         Obligatorio, debe existir en tabla roles
-     * - procurador_id:  Opcional, debe existir en tabla procuradores
+     * - procurador_id:  Opcional, debe existir en tabla procuradores.
+     *                   OBLIGATORIO cuando rol_id = 2 (Procurador)
      * ═══════════════════════════════════════════════
      *
      * @return array<string, mixed>
@@ -49,7 +50,7 @@ class StoreUsuariosRequest extends FormRequest
             'email' => 'required|email|max:50|unique:usuarios,email|ends_with:@usap.edu',             // ─── Obligatorio, email institucional único
             'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()], // ─── Opcional, contraseña segura (8+ chars, mayúsculas, minúsculas, números)
             'rol_id' => 'required|exists:roles,rol_id',                                               // ─── Obligatorio, rol existente
-            'procurador_id' => 'nullable|exists:procuradores,procurador_id',                          // ─── Opcional, procurador asociado existente
+            'procurador_id' => ['nullable', 'exists:procuradores,procurador_id', 'required_if:rol_id,2'], // ─── Opcional salvo rol Procurador
         ];
     }
 
@@ -77,6 +78,7 @@ class StoreUsuariosRequest extends FormRequest
             'rol_id.required' => 'Debe seleccionar un rol.',
             'rol_id.exists' => 'El rol seleccionado no existe.',
             'procurador_id.exists' => 'El procurador seleccionado no existe.',
+            'procurador_id.required_if' => 'Debe seleccionar un procurador cuando el rol es Procurador.',
         ];
     }
 }

@@ -19,7 +19,7 @@
 @section('content')
 <form action="{{ route('casos.store') }}" method="POST">
     @csrf
-    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── ──}}
+    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── --}}
     {{-- Título del formulario, botón Cancelar (vuelve al listado) y botón Guardar caso --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo caso</h1>
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    {{-- ─── [SECCIÓN: SELECCIÓN DE CLIENTE] ──────── ──}}
+    {{-- ─── [SECCIÓN: SELECCIÓN DE CLIENTE] ──────── --}}
     {{-- Desplegable con clientes activos. Muestra nombre completo y DNI. --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Cliente</h3>
@@ -52,7 +52,7 @@
         @enderror
     </div>
 
-    {{-- ─── [SECCIÓN: TIPO DE TRÁMITE Y PARTE] ───── ──}}
+    {{-- ─── [SECCIÓN: TIPO DE TRÁMITE Y PARTE] ───── --}}
     {{-- Selección del tipo de trámite (ej: divorcio, pensión) y la parte representada (Demandante/Demandado/Ambas) --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Tipo de trámite</h3>
@@ -86,21 +86,29 @@
         </div>
     </div>
 
-    {{-- ─── [SECCIÓN: ASIGNACIÓN Y JUZGADO] ───────── ──}}
+    {{-- ─── [SECCIÓN: ASIGNACIÓN Y JUZGADO] ───────── --}}
     {{-- Asignación del procurador responsable y juzgado donde se tramitará el caso (opcional) --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Asignación</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Procurador asignado</label>
+                @if ($esProcurador)
+                {{-- ─── [Bloque] Procurador fijo (solo lectura) ─── --}}
+                {{-- El Procurador no puede cambiar la asignación: el backend fuerza su propio registro --}}
+                <div class="w-full rounded-lg px-3 py-2 text-sm" style="border: 1px solid #E5E7EB; color: #111827; background: #F3F4F6;">{{ $procuradorNombre }}</div>
+                <input type="hidden" name="procurador_id" value="{{ $procuradorSeleccionado }}">
+                @else
+                {{-- ─── [Bloque] Select de procurador (Director) ─── --}}
                 <select name="procurador_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar procurador...</option>
                     @foreach ($procuradores as $procurador)
-                    <option value="{{ $procurador->procurador_id }}" {{ old('procurador_id') == $procurador->procurador_id ? 'selected' : '' }}>
+                    <option value="{{ $procurador->procurador_id }}" {{ old('procurador_id', $procuradorSeleccionado) == $procurador->procurador_id ? 'selected' : '' }}>
                         {{ $procurador->nombre_completo }} — Carnet {{ $procurador->procurador_carnet }}
                     </option>
                     @endforeach
                 </select>
+                @endif
                 @error('procurador_id')
                 <p class="text-xs mt-1" style="color: #DC2626;">{{ $message }}</p>
                 @enderror
@@ -112,7 +120,7 @@
         </div>
     </div>
 
-    {{-- ─── [SECCIÓN: RELACIÓN DE HECHOS] ─────────── ──}}
+    {{-- ─── [SECCIÓN: RELACIÓN DE HECHOS] ─────────── --}}
     {{-- Narración detallada de los hechos del caso y observaciones internas del Director (opcional) --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Relación de hechos</h3>

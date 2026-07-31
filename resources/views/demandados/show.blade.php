@@ -22,6 +22,8 @@
                 <p class="text-sm" style="color: #6B7280;">{{ $demandado->demandado_dni }}</p>
             </div>
         </div>
+        {{-- Acciones de edición/desactivación: SOLO Director --}}
+        @if (auth()->user()?->rol?->rol_nombre === 'Director')
         <div class="flex items-center gap-2 flex-wrap">
             <a href="{{ route('demandados.edit', $demandado->demandado_dni) }}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all min-h-[44px] flex items-center"
                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
@@ -48,6 +50,7 @@
                 </form>
             @endif
         </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

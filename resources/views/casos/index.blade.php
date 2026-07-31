@@ -18,10 +18,10 @@
 @section('title', 'Casos')
 
 @section('content')
-{{-- ─── [CONTENEDOR PRINCIPAL CON ALPINE.JS] ─────── ──}}
-{{-- Controla el toggle entre vista 'tabla' y 'kanban', y los filtros de búsqueda --}}
-<div x-data="{ vista: 'tabla', search: '', filtroEstado: '', filtroTramite: '' }">
-    {{-- ─── [ENCABEZADO Y BARRA DE ACCIONES] ───────── ──}}
+{{-- ─── [CONTENEDOR PRINCIPAL CON ALPINE.JS] ─────── --}}
+{{-- Controla el toggle entre vista 'tabla' y 'kanban'. Los filtros son un form GET que recarga la página --}}
+<div x-data="{ vista: 'tabla' }">
+    {{-- ─── [ENCABEZADO Y BARRA DE ACCIONES] ───────── --}}
     {{-- Título de la página, botones de cambio de vista (Tabla/Kanban), filtros desplegables y botón "Nuevo caso" --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
         <div class="flex items-center gap-3">
@@ -42,20 +42,40 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-            <select x-model="filtroEstado" class="text-sm rounded-lg px-3 py-1.5 outline-none w-full sm:w-auto" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
-                <option value="">Todos los estados</option>
-                @foreach ($estados as $estado)
-                <option value="{{ $estado->estado_nombre }}">{{ $estado->estado_nombre }}</option>
-                @endforeach
-            </select>
+            {{-- ─── [FILTROS: FORM GET] ───────────────── --}}
+            {{-- Al enviar recarga la página con ?estado=X&tramite=Y; el backend filtra ambas vistas y los filtros se preservan al paginar --}}
+            <form method="GET" action="{{ route('casos.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                <select name="estado" class="text-sm rounded-lg px-3 py-1.5 outline-none w-full sm:w-auto" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
+                    <option value="">Todos los estados</option>
+                    @foreach ($estados as $estado)
+                    <option value="{{ $estado->estado_nombre }}" @selected(request('estado') === $estado->estado_nombre)>{{ $estado->estado_nombre }}</option>
+                    @endforeach
+                </select>
 
-            <select x-model="filtroTramite" class="text-sm rounded-lg px-3 py-1.5 outline-none w-full sm:w-auto" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
-                <option value="">Todos los trámites</option>
-                @foreach ($tramites as $tramite)
-                <option value="{{ $tramite->tramite_nombre }}">{{ $tramite->tramite_nombre }}</option>
-                @endforeach
-            </select>
+                <select name="tramite" class="text-sm rounded-lg px-3 py-1.5 outline-none w-full sm:w-auto" style="border: 1px solid #E5E7EB; color: #6B7280; background: #FFFFFF;">
+                    <option value="">Todos los trámites</option>
+                    @foreach ($tramites as $tramite)
+                    <option value="{{ $tramite->tramite_nombre }}" @selected(request('tramite') === $tramite->tramite_nombre)>{{ $tramite->tramite_nombre }}</option>
+                    @endforeach
+                </select>
 
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] w-full sm:w-auto"
+                        style="background: #2563EB; color: white;"
+                        onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
+                    Filtrar
+                </button>
+
+                {{-- ─── [ENLACE LIMPIAR FILTROS] ────────── --}}
+                {{-- Solo aparece si hay algún filtro activo en la URL --}}
+                @if (request()->has('estado') || request()->has('tramite'))
+                <a href="{{ route('casos.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] inline-flex items-center justify-center w-full sm:w-auto"
+                   style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;">
+                    Limpiar
+                </a>
+                @endif
+            </form>
+
+            {{-- ─── [BOTÓN NUEVO CASO] ────────────────── --}}
             <a href="{{ route('casos.create') }}" class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all min-h-[44px] w-full sm:w-auto"
                style="background: #2563EB; color: white;"
                onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563EB';">
@@ -65,7 +85,7 @@
         </div>
     </div>
 
-    {{-- ─── [VISTA TABLA] ─────────────────────────── ──}}
+    {{-- ─── [VISTA TABLA] ─────────────────────────── --}}
     {{-- Tabla responsiva con columnas: Expediente, Cliente, Trámite, Parte, Procurador, Juzgado, Estado, Fecha --}}
     {{-- Cada fila es clickeable y redirige al detalle del caso --}}
     <div x-show="vista === 'tabla'">
@@ -88,16 +108,16 @@
             </tr>
             @endforelse
         </x-tabla>
-        {{-- ─── [PAGINACIÓN] ───────────────────────── ──}}
+        {{-- ─── [PAGINACIÓN] ───────────────────────── --}}
         {{-- Solo se muestra si hay más de una página de resultados --}}
         @if ($casos->hasPages())
         <div class="px-4 py-3 border-t" style="border-color: #E5E7EB;">
-            {{ $casos->links() }}
+            {{ $casos->appends(request()->query())->links() }}
         </div>
         @endif
     </div>
 
-    {{-- ─── [VISTA KANBAN] ───────────────────────── ──}}
+    {{-- ─── [VISTA KANBAN] ───────────────────────── --}}
     {{-- Columnas agrupadas por estado del pipeline, cada columna contiene tarjetas de caso --}}
     {{-- Las tarjetas muestran: cliente, tipo de trámite, y fecha (si existe) --}}
     <div x-show="vista === 'kanban'" class="flex gap-3 md:gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
@@ -109,7 +129,7 @@
                 <span class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-full" style="background: #E5E7EB; color: #6B7280;">{{ count($tarjetas) }}</span>
             </div>
             <div class="flex-1 px-3 pb-3 space-y-2">
-                {{-- ─── [TARJETA DE CASO EN KANBAN] ─────── ──}}
+                {{-- ─── [TARJETA DE CASO EN KANBAN] ─────── --}}
                 @forelse ($tarjetas as $exp => [$cliente, $tipo, $fecha])
                 <div class="rounded-lg p-3 cursor-pointer transition-shadow" style="background: #FFFFFF; border: 1px solid #E5E7EB; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onclick="window.location='{{ route('casos.show', $exp) }}'" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';" onmouseout="this.style.boxShadow='0 1px 2px rgba(0,0,0,0.04)';">
                     <p class="text-sm font-medium" style="color: #111827;">{{ $cliente }}</p>

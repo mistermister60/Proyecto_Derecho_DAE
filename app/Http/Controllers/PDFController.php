@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Caso;
 use App\Models\Procurador;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
@@ -50,6 +51,12 @@ class PDFController extends Controller
                 },
             ])
             ->firstOrFail();
+
+        // ─── [Autorización: permiso 'view'] ─────────────────
+        // Solo el Director o el procurador asignado al caso
+        // pueden descargar el PDF de seguimiento (mismo criterio
+        // que CasoController::show).
+        Gate::authorize('view', $caso);
 
         // ─── [Generación del PDF] ───────────────────────────────
         $pdf = Pdf::loadView('pdf.seguimiento', compact('caso'));

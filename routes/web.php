@@ -232,23 +232,25 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 
     Route::get('/casos', [CasoController::class, 'index'])->name('casos.index');
 
-    // ═══════════════════════════════════════════════════════
+    // ───────────────────────────────────────────────────────
     // CLIENTES — CRUD completo
-    // ═══════════════════════════════════════════════════════
-    // Personas representadas por el consultorio.
-    // La clave primaria es 'identidad' (DNI/número de identidad).
-    // Se pueden activar/desactivar (borrado lógico).
+    // ───────────────────────────────────────────────────────
+    // Personas representadas por el consultorio (catálogo compartido:
+    // Director y Procurador consultan y crean). La clave primaria es
+    // 'identidad' (DNI). Modificar/desactivar registros: solo Director.
+    // La API /clientes/buscar DEBE ir antes de /clientes/{identidad}
+    // para no ser capturada como show.
     Route::get('/clientes/crear', [ClienteController::class, 'create'])->name('clientes.create');
+    Route::get('/clientes/buscar', [ClienteController::class, 'search'])->name('clientes.search');
     Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
-    Route::get('/clientes/{identidad}/editar', [ClienteController::class, 'edit'])->name('clientes.edit');
-    Route::put('/clientes/{identidad}', [ClienteController::class, 'update'])->name('clientes.update');
-    Route::delete('/clientes/{identidad}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
-    Route::post('/clientes/{identidad}/activar', [ClienteController::class, 'activar'])->name('clientes.activar');
     Route::get('/clientes/{identidad}', [ClienteController::class, 'show'])->name('clientes.show');
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-
-    // API de búsqueda de clientes para autocomplete (typeahead en formularios)
-    Route::get('/clientes/buscar', [ClienteController::class, 'search'])->name('clientes.search');
+    Route::middleware('role:Director')->group(function () {
+        Route::get('/clientes/{identidad}/editar', [ClienteController::class, 'edit'])->name('clientes.edit');
+        Route::put('/clientes/{identidad}', [ClienteController::class, 'update'])->name('clientes.update');
+        Route::delete('/clientes/{identidad}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+        Route::post('/clientes/{identidad}/activar', [ClienteController::class, 'activar'])->name('clientes.activar');
+    });
 
     // ═══════════════════════════════════════════════════════
     // USUARIOS DEL SISTEMA — Solo Director
@@ -267,19 +269,21 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
         Route::get('/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
     });
 
-    // ═══════════════════════════════════════════════════════
+    // ───────────────────────────────────────────────────────
     // DEMANDADOS — CRUD completo
-    // ═══════════════════════════════════════════════════════
-    // Contraparte del caso. Clave primaria: 'identidad'.
-    // Soporta borrado lógico (activar/desactivar).
+    // ───────────────────────────────────────────────────────
+    // Contraparte del caso. Catálogo compartido: consulta y creación
+    // para todos; modificar/desactivar registros: solo Director.
     Route::get('/demandados', [DemandadoController::class, 'index'])->name('demandados.index');
     Route::get('/demandados/crear', [DemandadoController::class, 'create'])->name('demandados.create');
     Route::post('/demandados', [DemandadoController::class, 'store'])->name('demandados.store');
-    Route::get('/demandados/{identidad}/editar', [DemandadoController::class, 'edit'])->name('demandados.edit');
-    Route::put('/demandados/{identidad}', [DemandadoController::class, 'update'])->name('demandados.update');
-    Route::delete('/demandados/{identidad}', [DemandadoController::class, 'destroy'])->name('demandados.destroy');
-    Route::post('/demandados/{identidad}/activar', [DemandadoController::class, 'activar'])->name('demandados.activar');
     Route::get('/demandados/{identidad}', [DemandadoController::class, 'show'])->name('demandados.show');
+    Route::middleware('role:Director')->group(function () {
+        Route::get('/demandados/{identidad}/editar', [DemandadoController::class, 'edit'])->name('demandados.edit');
+        Route::put('/demandados/{identidad}', [DemandadoController::class, 'update'])->name('demandados.update');
+        Route::delete('/demandados/{identidad}', [DemandadoController::class, 'destroy'])->name('demandados.destroy');
+        Route::post('/demandados/{identidad}/activar', [DemandadoController::class, 'activar'])->name('demandados.activar');
+    });
 
     // ═══════════════════════════════════════════════════════
     // PROCURADORES — Solo Director

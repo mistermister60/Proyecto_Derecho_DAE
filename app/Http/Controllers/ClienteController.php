@@ -69,12 +69,6 @@ class ClienteController extends Controller
             ->when($estado, function ($query, $estado) {
                 $query->where('cliente_estado', $estado);
             })
-            // ─── [Filtro por rol: Procurador ve solo sus clientes] ─
-            ->when(RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR), function ($query) {
-                $query->whereHas('casos', function ($q) {
-                    $q->where('procurador_id', auth()->user()->procurador_id);
-                });
-            })
             // ─── [Ordenamiento y paginación] ────────────────────
             ->orderBy('cliente_apellido')
             ->orderBy('cliente_nombre')
@@ -197,7 +191,7 @@ class ClienteController extends Controller
      * ───────────────────────────────────────────────────────
      * Muestra los detalles de un cliente con sus casos asociados.
      * Realiza eager loading de casos con estado, tipo de trámite y procurador.
-     * Verifica permisos: Procurador solo ve clientes con casos suyos.
+     * Los clientes son compartidos: cualquier usuario autenticado puede verlos.
      * ═══════════════════════════════════════════════════════
      *
      * @param  string  $identidad  Número de DNI del cliente
@@ -211,19 +205,6 @@ class ClienteController extends Controller
         $cliente = Cliente::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador'])
             ->where('cliente_dni', $identidad)
             ->firstOrFail();
-
-        // ─── [Verificación de permisos para Procurador] ────────
-        // Si es procurador, verificar que este cliente tenga al menos
-        // un caso asignado a él; si no, 403
-        if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
-            $tieneCaso = $cliente->casos()
-                ->where('procurador_id', auth()->user()->procurador_id)
-                ->exists();
-
-            if (! $tieneCaso) {
-                abort(403, 'No tienes permiso para ver este cliente.');
-            }
-        }
 
         // ─── [Renderizado de vista] ────────────────────────────
         return view('clientes.show', compact('cliente'));

@@ -33,7 +33,8 @@ class StoreCasoRequest extends FormRequest
      * ───────────────────────────────────────────────
      * - cliente_id:           Obligatorio, debe existir en clientes
      * - tipo_tramite_id:      Obligatorio, debe existir en tipos_trámite
-     * - procurador_id:        Obligatorio, debe existir en procuradores
+     * - procurador_id:        Opcional (si es Procurador el service lo fuerza
+     *                         desde su cuenta vinculada; el Director lo envía)
      * - caso_parte_representada: Obligatorio, texto, máx. 50 caracteres
      * - caso_juzgado:         Opcional, texto, máx. 50 caracteres
      * - caso_relacion_hechos: Obligatorio, texto largo
@@ -47,7 +48,7 @@ class StoreCasoRequest extends FormRequest
         return [
             'cliente_id' => 'required|exists:clientes,cliente_id',                                          // ─── Obligatorio, debe ser un cliente existente
             'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',                             // ─── Obligatorio, debe ser un tipo de trámite existente
-            'procurador_id' => 'required|exists:procuradores,procurador_id',                                 // ─── Obligatorio, debe ser un procurador existente
+            'procurador_id' => 'sometimes|nullable|exists:procuradores,procurador_id',                 // ─── Opcional: Procurador lo fuerza el service; Director lo envía
             'caso_parte_representada' => 'required|string|max:50',                                           // ─── Obligatorio, texto hasta 50 caracteres
             'caso_juzgado' => 'nullable|string|max:50',                                                      // ─── Opcional, texto hasta 50 caracteres
             'caso_relacion_hechos' => 'required|string',                                                     // ─── Obligatorio, texto libre (relato de los hechos)

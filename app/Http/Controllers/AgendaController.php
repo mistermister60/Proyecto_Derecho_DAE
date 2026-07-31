@@ -46,7 +46,8 @@ class AgendaController extends Controller
         // ─── [2. Filtro por rol: Procurador ve solo sus audiencias] ───
         if (RolEnum::equals(auth()->user()->rol?->rol_nombre, RolEnum::PROCURADOR)) {
             $query->whereHas('caso', function ($q) {
-                $q->where('procurador_id', auth()->user()->procurador_id);
+                // ─── [Blindaje: si el procurador no tiene vínculo, -1 → 0 resultados] ───
+                $q->where('procurador_id', auth()->user()->procurador_id ?? -1);
             });
         }
 

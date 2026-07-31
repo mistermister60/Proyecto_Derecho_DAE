@@ -38,7 +38,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- ─── Meta etiquetas PWA ─────────────────────────── ──}}
+    {{-- ─── Meta etiquetas PWA ─────────────────────────── --}}
     {{-- Configuración de Progressive Web App: manifest, theme color, íconos --}}
     <!-- PWA Head -->
     <meta name="theme-color" content="#1E3A5F">
@@ -413,6 +413,16 @@
                                  <p class="text-xs" style="color: var(--color-dropdown-text-sec);">{{ auth()->user()->email }}</p>
                                  <p class="text-xs font-medium mt-0.5" style="color: var(--color-dropdown-text-sec);">{{ auth()->user()->rol?->rol_nombre ?? 'Sin rol' }}</p>
                              </div>
+                             {{-- ─── [BLOQUE: PERFIL Y CAMBIO DE CONTRASEÑA] ─── --}}
+                             {{-- Enlaces a la página de perfil (formulario de contraseña con contraseña actual incluido) --}}
+                             <div style="border-bottom: 1px solid var(--color-dropdown-divider); padding: 4px 0;">
+                                 <a href="{{ route('profile.edit') }}" class="block w-full text-left px-4 py-2 text-sm" style="color: var(--color-dropdown-text); text-decoration: none;" onmouseover="this.style.background='var(--color-dropdown-hover)'" onmouseout="this.style.background='transparent';">
+                                     Mi perfil
+                                 </a>
+                                 <a href="{{ route('profile.edit') }}" class="block w-full text-left px-4 py-2 text-sm" style="color: var(--color-dropdown-text); text-decoration: none;" onmouseover="this.style.background='var(--color-dropdown-hover)'" onmouseout="this.style.background='transparent';">
+                                     Cambiar contraseña
+                                 </a>
+                             </div>
                              <form method="POST" action="{{ route('logout') }}">
                                  @csrf
                                  <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #EF4444; background: none; border: none; cursor: pointer;" onmouseover="this.style.background='#FEF2F2';" onmouseout="this.style.background='transparent';">
@@ -465,7 +475,7 @@
 
 {{-- ─── Scripts de terceros (inyectados por vistas hijas) ── --}}
 @stack('scripts')
-{{-- ─── JavaScript global del layout ─────────────────── ──}}
+{{-- ─── JavaScript global del layout ─────────────────── --}}
 {{-- View Transitions API para navegación MPA fluida, SweetAlert2 para
      confirmaciones, dark mode toggle y alertas flash. --}}
 <script>
@@ -606,7 +616,7 @@
         });
     });
 </script>
-{{-- ─── Navegación inferior móvil ─────────────────────── ──}}
+{{-- ─── Navegación inferior móvil ─────────────────────── --}}
 {{-- Barra de navegación fija en la parte inferior para móviles --}}
 <x:mobile-navigation />
 </body>

@@ -38,9 +38,9 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    {{-- ─── Cuerpo de la página ─────────────────────────── ──}}
+    {{-- ─── Cuerpo de la página ─────────────────────────── --}}
     <body class="font-sans text-gray-900 antialiased">
-        {{-- ─── Contenedor principal centrado ─────────────── ──}}
+        {{-- ─── Contenedor principal centrado ─────────────── --}}
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
@@ -49,7 +49,7 @@
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{-- ─── Contenido dinámico (slot) ─────────────── ──}}
+                {{-- ─── Contenido dinámico (slot) ─────────────── --}}
                 {{ $slot }}
             </div>
         </div>

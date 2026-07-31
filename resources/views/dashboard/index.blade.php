@@ -22,7 +22,7 @@
 
 @section('title', 'Dashboard')
 
-{{-- Contenido principal del Dashboard —}}
+{{-- Contenido principal del Dashboard --}}
 @section('content')
 <div x-data="dashboardData()" x-init="initCharts()">
     {{-- KPIs: Tarjetas de resumen (casos activos, nuevos, audiencias, cerrados, atrasados) --}}
@@ -129,7 +129,7 @@
     </div>
 </div>
 
-{{-- Script de inicialización de gráficas Chart.js (pipeline, tipo de trámite, resoluciones) —}}
+{{-- Script de inicialización de gráficas Chart.js (pipeline, tipo de trámite, resoluciones) --}}
 @push('scripts')
 <script>
 function dashboardData() {

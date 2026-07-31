@@ -29,7 +29,7 @@
 </div>
 @endif
 
-<form action="{{ route('usuarios.store') }}" method="POST">
+<form action="{{ route('usuarios.store') }}" method="POST" x-data="{ rol_id: '{{ old('rol_id') }}' }">
     @csrf
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo Usuario</h1>
@@ -77,7 +77,7 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Rol</label>
-                <select name="rol_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('rol_id') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                <select name="rol_id" x-model="rol_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('rol_id') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
                     <option value="">Seleccionar rol...</option>
                     @foreach ($roles as $rol)
                         <option value="{{ $rol->rol_id }}" {{ old('rol_id') == $rol->rol_id ? 'selected' : '' }}>{{ $rol->rol_nombre }}</option>
@@ -88,8 +88,9 @@
                 @enderror
             </div>
             <div>
-                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Procurador asociado (opcional)</label>
-                <select name="procurador_id" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_id') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
+                {{-- ─── [Bloque] Procurador: obligatorio solo si el rol es Procurador (rol_id=2) ─── --}}
+                <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Procurador asociado (obligatorio para Procurador)</label>
+                <select name="procurador_id" x-bind:required="rol_id == 2" class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('procurador_id') border-red-500 @else border-gray-300 @enderror" style="color: #111827; background: #FFFFFF;">
                     <option value="">Sin procurador...</option>
                     @foreach ($procuradores as $procurador)
                         <option value="{{ $procurador->procurador_id }}" {{ old('procurador_id') == $procurador->procurador_id ? 'selected' : '' }}>{{ $procurador->nombre_completo }}</option>

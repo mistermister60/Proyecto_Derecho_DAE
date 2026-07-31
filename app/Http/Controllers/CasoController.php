@@ -14,6 +14,7 @@ namespace App\Http\Controllers;
  * expediente (string). Delega lógica de negocio en CasoService.
  */
 
+use App\Enums\RolEnum;
 use App\Http\Requests\StoreCasoRequest;
 use App\Http\Requests\UpdateCasoRequest;
 use App\Models\Caso;
@@ -51,14 +52,18 @@ class CasoController extends Controller
      * CasoService::getIndexData(), que retorna un array con la colección
      * de casos, filtros activos, etc.
      *
+     * @param  Request  $request  Contiene los parámetros opcionales 'estado' y 'tramite'.
      * @return View Vista index con datos de casos
      */
-    public function index()
+    public function index(Request $request)
     {
         // ─── [Obtener datos filtrados y paginados] ──────────
         // Delega en CasoService que aplica filtros por rol,
         // búsqueda, estado y ordenamiento
-        $data = $this->casoService->getIndexData();
+        $data = $this->casoService->getIndexData([
+            'estado' => $request->query('estado', ''),
+            'tramite' => $request->query('tramite', ''),
+        ]);
 
         // ─── [Renderizado de vista] ─────────────────────────
         // Retorna la vista con los datos de casos y filtros
@@ -71,6 +76,9 @@ class CasoController extends Controller
      * Precarga los catálogos de clientes activos, procuradores activos
      * y tipos de trámite para los campos select del formulario.
      *
+     * Si el usuario es Procurador, se pasa su procurador vinculado para
+     * preseleccionarlo y ocultar el selector (el service lo fuerza igualmente).
+     *
      * @return View Vista create con catálogos precargados
      */
     public function create()
@@ -82,8 +90,16 @@ class CasoController extends Controller
         $procuradores = Procurador::where('procurador_estado', 'activo')->get();
         $tramites = TipoTramite::all();
 
+        // ─── [Variables para el formulario de Procurador] ──
+        // Si el usuario es Procurador, su procurador vinculado se
+        // preselecciona (y el service lo fuerza al crear el caso)
+        $user = auth()->user();
+        $esProcurador = RolEnum::equals($user->rol?->rol_nombre, RolEnum::PROCURADOR);
+        $procuradorSeleccionado = $esProcurador ? $user->procurador_id : null;
+        $procuradorNombre = $procuradorSeleccionado ? optional(Procurador::find($procuradorSeleccionado))->nombre_completo : null;
+
         // ─── [Renderizado de vista] ─────────────────────────
-        return view('casos.create', compact('clientes', 'procuradores', 'tramites'));
+        return view('casos.create', compact('clientes', 'procuradores', 'tramites', 'esProcurador', 'procuradorSeleccionado', 'procuradorNombre'));
     }
 
     /**
@@ -106,7 +122,17 @@ class CasoController extends Controller
 
         // ─── [Delegar creación al servicio] ─────────────────
         // CasoService se encarga de la lógica de persistencia
-        $this->casoService->createCaso($validated);
+        // (incluye la autoasignación del procurador para rol Procurador)
+        try {
+            $this->casoService->createCaso($validated);
+        } catch (\RuntimeException $e) {
+            // ─── [Error amigable: cuenta sin procurador vinculado] ──
+            // En lugar de un error 500, se devuelve al formulario con
+            // el mensaje claro y los datos ya ingresados preservados.
+            return back()
+                ->withInput()
+                ->withErrors(['procurador_id' => $e->getMessage()]);
+        }
 
         // ─── [Redirección con mensaje de éxito] ─────────────
         return redirect()->route('casos.index')

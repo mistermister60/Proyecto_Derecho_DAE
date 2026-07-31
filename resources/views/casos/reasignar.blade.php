@@ -16,10 +16,10 @@
 @section('title', 'Reasignar caso')
 
 @section('content')
-{{-- ─── [FORMULARIO DE REASIGNACIÓN] ─────────────── ──}}
+{{-- ─── [FORMULARIO DE REASIGNACIÓN] ─────────────── --}}
 <form action="{{ route('casos.storeReasignacion', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
-    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── ──}}
+    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── --}}
     {{-- Título, número de expediente, botón Cancelar y Confirmar reasignación --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>

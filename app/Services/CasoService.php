@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\RolEnum;
 use App\Models\Caso;
 use App\Models\EstadoCaso;
 use App\Models\Reasignacion;
@@ -42,16 +43,24 @@ class CasoService
      *    es una columna con su color y las tarjetas son los casos asociados.
      *
      * Si el usuario autenticado es "Procurador", filtra automáticamente
-     * los casos asignados a su procurador_id.
+     * los casos asignados a su procurador_id. Si el procurador no tiene
+     * procurador vinculado, se usa -1 (id inexistente) para evitar fugas.
      *
-     * @return array<string, mixed> Array con casos, estados, tramites y columnas.
+     * Los filtros de estado y trámite se aplican server-side sobre el query
+     * base ANTES de delegar a getTableData y getKanbanColumns.
+     *
+     * @param  array<string, string>  $filters  Filtros activos (estado, tramite).
+     * @return array<string, mixed> Array con casos, estados, tramites, columnas y filtros.
      */
-    public function getIndexData(): array
+    public function getIndexData(array $filters = []): array
     {
         $user = Auth::user();
-        $esProcurador = ($user?->rol?->rol_nombre === 'Procurador');
+        $esProcurador = RolEnum::equals($user?->rol?->rol_nombre, RolEnum::PROCURADOR);
 
-        $base = Caso::when($esProcurador, fn ($q) => $q->where('procurador_id', $user?->procurador_id));
+        $base = Caso::query()
+            ->when($esProcurador, fn ($q) => $q->where('procurador_id', $user?->procurador_id ?? -1))
+            ->when($filters['estado'] ?? null, fn ($q, $estado) => $q->whereHas('estado', fn ($e) => $e->where('estado_nombre', $estado)))
+            ->when($filters['tramite'] ?? null, fn ($q, $tramite) => $q->whereHas('tipoTramite', fn ($t) => $t->where('tramite_nombre', $tramite)));
 
         $casos = $this->getTableData(clone $base, $esProcurador);
         $estados = EstadoCaso::where('estado_tipo', 'pipeline')
@@ -59,8 +68,9 @@ class CasoService
             ->get();
         $tramites = TipoTramite::all();
         $columnas = $this->getKanbanColumns(clone $base);
+        $filtros = $filters;
 
-        return compact('casos', 'estados', 'tramites', 'columnas');
+        return compact('casos', 'estados', 'tramites', 'columnas', 'filtros');
     }
 
     /**
@@ -145,13 +155,40 @@ class CasoService
      * - Fecha de interposición y asignación como la fecha actual.
      * - Estado del caso como "activo".
      *
+     * Si el usuario autenticado es Procurador, el procurador_id del caso se
+     * SOBRESCRIBE con el procurador vinculado a su cuenta (nunca el del form).
+     * Si el procurador no tiene procurador vinculado, se lanza una excepción.
+     *
      * @param  array<string, mixed>  $data  Datos del caso enviados desde el formulario.
      * @return Caso Modelo del caso recién creado.
      *
+     * @throws \RuntimeException Si el procurador autenticado no tiene procurador vinculado.
      * @throws \Throwable Si ocurre un error durante la transacción.
      */
     public function createCaso(array $data): Caso
     {
+        $user = Auth::user();
+
+        // ─── [Autoasignación forzada para Procurador] ──────
+        // El procurador nunca elige a quién se asigna el caso: se usa
+        // el procurador vinculado a su cuenta de usuario. Esto evita
+        // que un caso quede huérfano (procurador_id del form) o que
+        // se asigne a un procurador ajeno.
+        if (RolEnum::equals($user?->rol?->rol_nombre, RolEnum::PROCURADOR)) {
+            if ($user->procurador_id === null) {
+                throw new \RuntimeException('Tu cuenta de usuario no tiene un procurador vinculado. Contacta al director para configurarlo.');
+            }
+            $data['procurador_id'] = $user->procurador_id;
+        }
+
+        // ─── [Guard: el caso SIEMPRE requiere un procurador] ──
+        // Incluso el Director debe asignar un procurador; sin esto un
+        // POST manipulado podría crear un caso huérfano (procurador_id NULL)
+        // que nadie podría ver ni gestionar.
+        if (empty($data['procurador_id'])) {
+            throw new \RuntimeException('Debe seleccionar un procurador asignado para el caso.');
+        }
+
         return DB::transaction(function () use ($data) {
             // Bloquear la fila para evitar lecturas concurrentes
             $ultimo = Caso::orderBy('caso_id', 'desc')

@@ -18,10 +18,10 @@
 @section('title', "Caso {$caso->caso_numero_expediente}")
 
 @section('content')
-{{-- ─── [CONTENEDOR PRINCIPAL CON PESTAÑAS] ─────── ──}}
+{{-- ─── [CONTENEDOR PRINCIPAL CON PESTAÑAS] ─────── --}}
 {{-- Alpine.js controla qué pestaña está activa: resumen, hechos, documentos o bitácora --}}
 <div x-data="{ tab: 'resumen' }">
-    {{-- ─── [ENCABEZADO Y ACCIONES DEL CASO] ──────── ──}}
+    {{-- ─── [ENCABEZADO Y ACCIONES DEL CASO] ──────── --}}
     {{-- Número de expediente, nombre del cliente, tipo de trámite, badge de estado --}}
     {{-- Botones contextuales: Reasignar, Editar (solo Director), Cerrar caso (solo Director si activo) --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
