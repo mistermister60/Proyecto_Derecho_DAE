@@ -16,16 +16,16 @@
  *   Scrollbar personalizado (dark mode)
  */
 
-// ═══════════════════════════════════════════════════════
-// TAILWIND v4 — Importación base
-// ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════
+   TAILWIND v4 — Importación base
+   ═══════════════════════════════════════════════════════ */
 @import 'tailwindcss';
 
-// ═══════════════════════════════════════════════════════
-// VARIANTE PERSONALIZADA: modo oscuro
-// ═══════════════════════════════════════════════════════
-// Aplica estilos cuando el elemento <html> tiene la clase .dark
-// Uso en Blade: <html class="dark">
+/* ═══════════════════════════════════════════════════════
+   VARIANTE PERSONALIZADA: modo oscuro
+   ═══════════════════════════════════════════════════════
+   Aplica estilos cuando el elemento <html> tiene la clase .dark
+   Uso en Blade: <html class="dark"> */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
