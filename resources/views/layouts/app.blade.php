@@ -1,9 +1,16 @@
 {{--
-    Vista: layouts/app
-    Propósito: Layout principal del sistema autenticado. Incluye sidebar de navegación lateral con iconos SVG, topbar con buscador, notificaciones y menú de usuario. El sidebar se adapta según el rol (procurador ve menos opciones). Contiene el slot @yield('content') para el contenido dinámico.
-    Variables: $notificaciones (colección de notificaciones del usuario), $notificacionesPendientes (conteo de notificaciones sin leer)
-    @yield: title, content
-    @stack: scripts
+    ═══════════════════════════════════════════════════════
+    VISTA: layouts/app
+    ═══════════════════════════════════════════════════════
+    Layout principal del sistema autenticado. Incluye sidebar de navegación
+    lateral con iconos SVG, topbar con buscador global typeahead (Alpine.js),
+    notificaciones y menú de usuario. El sidebar se adapta según el rol
+    (procurador ve menos opciones). Contiene el slot @yield('content') para
+    el contenido dinámico de cada página.
+    ───────────────────────────────────────────────────────
+    Variables que recibe: $notificaciones, $notificacionesPendientes
+    Secciones que define: @yield('title'), @yield('content'), @stack('scripts')
+    Componentes que usa: <x:app-footer>, <x:mobile-navigation>
 --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -31,6 +38,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- ─── Meta etiquetas PWA ─────────────────────────── ──}}
+    {{-- Configuración de Progressive Web App: manifest, theme color, íconos --}}
     <!-- PWA Head -->
     <meta name="theme-color" content="#1E3A5F">
     <meta name="mobile-web-app-capable" content="yes">
@@ -454,7 +463,11 @@
     [x-cloak] { display: none !important; }
 </style>
 
+{{-- ─── Scripts de terceros (inyectados por vistas hijas) ── --}}
 @stack('scripts')
+{{-- ─── JavaScript global del layout ─────────────────── ──}}
+{{-- View Transitions API para navegación MPA fluida, SweetAlert2 para
+     confirmaciones, dark mode toggle y alertas flash. --}}
 <script>
     // View Transitions API for MPA Navigation (Emil Kowalski approach)
     if (!document.startViewTransition) {
@@ -593,6 +606,8 @@
         });
     });
 </script>
+{{-- ─── Navegación inferior móvil ─────────────────────── ──}}
+{{-- Barra de navegación fija en la parte inferior para móviles --}}
 <x:mobile-navigation />
 </body>
 </html>

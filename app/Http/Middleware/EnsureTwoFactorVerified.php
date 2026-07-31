@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * MIDDLEWARE: EnsureTwoFactorVerified
+ * ═══════════════════════════════════════════════════════
+ * Verifica que el usuario haya completado la autenticación
+ * de dos factores (2FA) mediante OTP enviado por correo.
+ *
+ * El Director (super admin) omite el 2FA automáticamente.
+ * Si el código 2FA expiró o nunca se generó, fuerza un
+ * re-login completo por seguridad.
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -9,22 +21,35 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureTwoFactorVerified
 {
     /**
-     * Handle an incoming request.
+     * Validar que el usuario haya verificado el código 2FA antes de acceder.
      *
-     * @param  Closure(Request): (Response)  $next
+     * Comprueba:
+     * - Si la sesión tiene la marca 'two_factor_verified', permite el paso.
+     * - Si el email del usuario coincide con el super admin (Director),
+     *   omite el 2FA automáticamente marcando la sesión.
+     * - Si no hay código 2FA en sesión (expirado o nunca generado),
+     *   redirige al login para reiniciar el flujo de autenticación.
+     * - Si hay código pero no está verificado, redirige al formulario 2FA.
+     *
+     * Si falla: redirige al login o al formulario 2FA según el caso.
+     *
+     * @param  Request  $request  Petición HTTP entrante.
+     * @param  Closure  $next  Siguiente middleware/controlador en la cadena.
+     * @return Response Respuesta HTTP con redirección o contenido normal.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && !session()->has('two_factor_verified')) {
+        if (auth()->check() && ! session()->has('two_factor_verified')) {
             // Solo el super admin original (director@usap.edu) omite 2FA
             $user = auth()->user();
             if ($user && $user->email === config('auth.super_admin_email')) {
                 session(['two_factor_verified' => true]);
+
                 return $next($request);
             }
 
             // Si no hay código 2FA en sesión (expirado o nunca generado), forzar re-login
-            if (!session()->has('two_factor_code')) {
+            if (! session()->has('two_factor_code')) {
                 return redirect()->route('login');
             }
 

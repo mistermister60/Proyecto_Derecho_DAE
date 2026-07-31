@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Cliente
+ * ═══════════════════════════════════════════════════════
+ * Representa a la persona física que contrata los servicios
+ * legales del despacho. Almacena datos personales, de contacto,
+ * información laboral y socioeconómica relevante para el caso.
+ */
+
+/**
  * Modelo que representa un cliente en el sistema de gestión de despachos judiciales.
  *
  * El cliente es la persona física que contrata los servicios legales del despacho.
@@ -43,6 +52,9 @@ class Cliente extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos personales, de contacto e información laboral
+    // y socioeconómica del cliente.
     protected $fillable = [
         'cliente_nombre',
         'cliente_apellido',
@@ -60,6 +72,9 @@ class Cliente extends Model
         'cliente_estado',
     ];
 
+    // ─── Accessor: nombre completo ──────────────────────────
+    // Concatena nombre y apellido para obtener el nombre
+    // completo del cliente de forma dinámica.
     /**
      * Obtener el nombre completo del cliente.
      */

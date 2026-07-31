@@ -5,16 +5,22 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request para almacenar un nuevo caso legal.
- *
- * Valida los datos necesarios para crear un caso en el sistema,
- * incluyendo las relaciones con cliente, tipo de trámite y procurador,
- * así como los detalles descriptivos del caso.
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Store Caso (Creación de Caso Legal)
+ * ═══════════════════════════════════════════════════════
+ * Valida los datos necesarios para crear un nuevo caso legal.
+ * Incluye las relaciones con cliente, tipo de trámite y procurador,
+ * así como los detalles descriptivos y observaciones del caso.
  */
 class StoreCasoRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Cualquier usuario autenticado puede crear un caso.
+     * El middleware 'auth' ya garantiza sesión activa.
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -22,23 +28,35 @@ class StoreCasoRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - cliente_id:           Obligatorio, debe existir en clientes
+     * - tipo_tramite_id:      Obligatorio, debe existir en tipos_trámite
+     * - procurador_id:        Obligatorio, debe existir en procuradores
+     * - caso_parte_representada: Obligatorio, texto, máx. 50 caracteres
+     * - caso_juzgado:         Opcional, texto, máx. 50 caracteres
+     * - caso_relacion_hechos: Obligatorio, texto largo
+     * - caso_observaciones_director: Opcional, texto largo
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, string>
      */
     public function rules(): array
     {
         return [
-            'cliente_id' => 'required|exists:clientes,cliente_id',
-            'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',
-            'procurador_id' => 'required|exists:procuradores,procurador_id',
-            'caso_parte_representada' => 'required|string|max:50',
-            'caso_juzgado' => 'nullable|string|max:50',
-            'caso_relacion_hechos' => 'required|string',
-            'caso_observaciones_director' => 'nullable|string',
+            'cliente_id' => 'required|exists:clientes,cliente_id',                                          // ─── Obligatorio, debe ser un cliente existente
+            'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',                             // ─── Obligatorio, debe ser un tipo de trámite existente
+            'procurador_id' => 'required|exists:procuradores,procurador_id',                                 // ─── Obligatorio, debe ser un procurador existente
+            'caso_parte_representada' => 'required|string|max:50',                                           // ─── Obligatorio, texto hasta 50 caracteres
+            'caso_juzgado' => 'nullable|string|max:50',                                                      // ─── Opcional, texto hasta 50 caracteres
+            'caso_relacion_hechos' => 'required|string',                                                     // ─── Obligatorio, texto libre (relato de los hechos)
+            'caso_observaciones_director' => 'nullable|string',                                              // ─── Opcional, texto libre (notas internas del director)
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *

@@ -5,15 +5,22 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request para validar las credenciales de inicio de sesión.
- *
- * Valida que el email tenga un formato correcto y que la contraseña
- * cumpla con la longitud mínima antes de intentar la autenticación.
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Login Credentials (Credenciales de Inicio de Sesión)
+ * ═══════════════════════════════════════════════════════
+ * Valida el email y la contraseña enviados en el formulario de login
+ * antes de que el controlador intente autenticar al usuario.
+ * Garantiza formato de email válido y longitud mínima de contraseña.
  */
 class LoginCredentialsRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Cualquier persona (sin autenticar) puede intentar iniciar sesión.
+     * Siempre retorna true porque el gate real está en el controlador.
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -21,18 +28,25 @@ class LoginCredentialsRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - email:       Obligatorio, texto, formato email, máx. 255 caracteres
+     * - contrasena:  Obligatorio, texto, mínimo 8 caracteres
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'contrasena' => ['required', 'string', 'min:8'],
+            'email' => ['required', 'string', 'email', 'max:255'],       // ─── Obligatorio, formato email válido, hasta 255 caracteres
+            'contrasena' => ['required', 'string', 'min:8'],              // ─── Obligatorio, mínimo 8 caracteres por seguridad
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation error messages.
      *

@@ -2,6 +2,18 @@
 
 namespace App\Http\Controllers;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: CasoController
+ * ═══════════════════════════════════════════════════════
+ * CRUD completo de casos legales con funcionalidades adicionales:
+ * reasignación de procurador y cierre con resolución.
+ * Rutas protegidas por middleware 'auth', 'otp', 'password.changed'.
+ * Permisos finos vía Gates: view, update, delete, reasignar,
+ * agregarSeguimiento. Los casos se identifican por número de
+ * expediente (string). Delega lógica de negocio en CasoService.
+ */
+
 use App\Http\Requests\StoreCasoRequest;
 use App\Http\Requests\UpdateCasoRequest;
 use App\Models\Caso;
@@ -43,8 +55,13 @@ class CasoController extends Controller
      */
     public function index()
     {
+        // ─── [Obtener datos filtrados y paginados] ──────────
+        // Delega en CasoService que aplica filtros por rol,
+        // búsqueda, estado y ordenamiento
         $data = $this->casoService->getIndexData();
 
+        // ─── [Renderizado de vista] ─────────────────────────
+        // Retorna la vista con los datos de casos y filtros
         return view('casos.index', $data);
     }
 
@@ -58,10 +75,14 @@ class CasoController extends Controller
      */
     public function create()
     {
+        // ─── [Precarga de catálogos para selects] ──────────
+        // Obtiene clientes activos, procuradores activos y
+        // tipos de trámite para poblar los campos del formulario
         $clientes = Cliente::where('cliente_estado', 'activo')->get();
         $procuradores = Procurador::where('procurador_estado', 'activo')->get();
         $tramites = TipoTramite::all();
 
+        // ─── [Renderizado de vista] ─────────────────────────
         return view('casos.create', compact('clientes', 'procuradores', 'tramites'));
     }
 
@@ -77,11 +98,17 @@ class CasoController extends Controller
      */
     public function store(StoreCasoRequest $request)
     {
+        // ─── [Validación y preparación de datos] ────────────
+        // Obtiene los datos validados por StoreCasoRequest y
+        // convierte el campo 'caso_admisible' a booleano
         $validated = $request->validated();
         $validated['caso_admisible'] = $request->boolean('caso_admisible', true);
 
+        // ─── [Delegar creación al servicio] ─────────────────
+        // CasoService se encarga de la lógica de persistencia
         $this->casoService->createCaso($validated);
 
+        // ─── [Redirección con mensaje de éxito] ─────────────
         return redirect()->route('casos.index')
             ->with('success', 'Caso creado exitosamente.');
     }
@@ -102,6 +129,10 @@ class CasoController extends Controller
      */
     public function show(string $expediente)
     {
+        // ─── [Consulta del caso con todas sus relaciones] ───
+        // Carga el caso con 7 relaciones (cliente, demandado,
+        // tipoTrámite, estado, procurador, entrevistas, seguimientos,
+        // audiencias y documentos) en eager loading para evitar N+1
         $caso = Caso::with([
             'cliente', 'demandado', 'tipoTramite', 'estado', 'procurador',
             'entrevistas.procurador', 'seguimientos.usuario',
@@ -110,8 +141,12 @@ class CasoController extends Controller
             ->where('caso_numero_expediente', $expediente)
             ->firstOrFail();
 
+        // ─── [Autorización: permiso 'view'] ─────────────────
+        // Verifica que el usuario tenga permiso para ver este caso
+        // mediante el Gate definido en App\Policies\CasoPolicy
         Gate::authorize('view', $caso);
 
+        // ─── [Renderizado de vista] ─────────────────────────
         return view('casos.show', compact('caso'));
     }
 
@@ -130,16 +165,22 @@ class CasoController extends Controller
      */
     public function edit(string $expediente)
     {
+        // ─── [Buscar el caso por expediente] ────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
+        // ─── [Autorización: permiso 'update'] ───────────────
         Gate::authorize('update', $caso);
 
+        // ─── [Precarga de catálogos para selects] ──────────
+        // Obtiene clientes activos, procuradores activos, tipos de
+        // trámite, estados ordenados y demandados activos
         $clientes = Cliente::where('cliente_estado', 'activo')->get();
         $procuradores = Procurador::where('procurador_estado', 'activo')->get();
         $tramites = TipoTramite::all();
         $estados = EstadoCaso::orderBy('estado_orden')->get();
         $demandados = Demandado::where('demandado_estado', 'activo')->get();
 
+        // ─── [Renderizado de vista] ─────────────────────────
         return view('casos.edit', compact('caso', 'clientes', 'procuradores', 'tramites', 'estados', 'demandados'));
     }
 
@@ -158,15 +199,23 @@ class CasoController extends Controller
      */
     public function update(UpdateCasoRequest $request, string $expediente)
     {
+        // ─── [Obtener el caso validado desde el Form Request] ──
+        // El UpdateCasoRequest ya cargó el caso y verificó permisos
         $caso = $request->caso;
 
+        // ─── [Validación y preparación de datos] ────────────
         $validated = $request->validated();
+
+        // ─── [Si el usuario es Director] ────────────────────
+        // Solo el Director puede modificar el campo 'caso_admisible'
         if ($request->esDirector()) {
             $validated['caso_admisible'] = $request->boolean('caso_admisible', true);
         }
 
+        // ─── [Delegar actualización al servicio] ────────────
         $this->casoService->updateCaso($caso, $validated);
 
+        // ─── [Redirección a vista de detalle] ───────────────
         return redirect()->route('casos.show', $expediente)
             ->with('success', 'Caso actualizado exitosamente.');
     }
@@ -184,9 +233,13 @@ class CasoController extends Controller
      */
     public function cerrar(string $expediente)
     {
+        // ─── [Buscar el caso por expediente] ────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        // ─── [Autorización: permiso 'delete' (solo Director)] ─
         Gate::authorize('delete', $caso);
 
+        // ─── [Renderizado del formulario de cierre] ─────────
         return view('casos.cerrar', compact('caso'));
     }
 
@@ -206,17 +259,25 @@ class CasoController extends Controller
      */
     public function storeCerrar(Request $request, string $expediente)
     {
+        // ─── [Buscar el caso por expediente] ────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
+
+        // ─── [Autorización: permiso 'delete' (solo Director)] ─
         Gate::authorize('delete', $caso);
 
+        // ─── [Validación de datos de resolución] ────────────
+        // El tipo de resolución debe ser uno de los valores
+        // predefinidos: ganado, perdido, conciliado, desistido, desestimado
         $validated = $request->validate([
             'resolucion_tipo' => 'required|in:ganado,perdido,conciliado,desistido,desestimado',
             'resolucion_fecha' => 'required|date',
             'resolucion_notas' => 'nullable|string|max:2000',
         ]);
 
+        // ─── [Delegar cierre al servicio] ───────────────────
         $this->casoService->closeCaso($caso, $validated);
 
+        // ─── [Redirección a vista de detalle] ───────────────
         return redirect()->route('casos.show', $expediente)
             ->with('success', 'Caso cerrado exitosamente con resolución.');
     }
@@ -236,12 +297,17 @@ class CasoController extends Controller
      */
     public function destroy(string $expediente)
     {
+        // ─── [Buscar el caso por expediente] ────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
+        // ─── [Autorización: permiso 'delete' (solo Director)] ─
         Gate::authorize('delete', $caso);
 
+        // ─── [Desactivación lógica del caso] ────────────────
+        // Conserva el registro en la BD para integridad histórica
         $this->casoService->deactivateCaso($caso);
 
+        // ─── [Redirección al índice con mensaje] ────────────
         return redirect()->route('casos.index')
             ->with('success', 'Caso desactivado exitosamente. El registro se conserva en el sistema.');
     }
@@ -260,14 +326,20 @@ class CasoController extends Controller
      */
     public function reasignar(string $expediente)
     {
+        // ─── [Buscar el caso con su procurador actual] ─────
         $caso = Caso::with(['procurador'])->where('caso_numero_expediente', $expediente)->firstOrFail();
 
+        // ─── [Autorización: permiso 'reasignar'] ────────────
         Gate::authorize('reasignar', $caso);
 
+        // ─── [Obtener procuradores disponibles] ─────────────
+        // Excluye al procurador actualmente asignado al caso
+        // para evitar reasignación al mismo responsable
         $procuradores = Procurador::where('procurador_estado', 'activo')
             ->where('procurador_id', '!=', $caso->procurador_id)
             ->get();
 
+        // ─── [Renderizado de vista] ─────────────────────────
         return view('casos.reasignar', compact('caso', 'procuradores'));
     }
 
@@ -287,17 +359,24 @@ class CasoController extends Controller
      */
     public function storeReasignacion(Request $request, string $expediente)
     {
+        // ─── [Buscar el caso por expediente] ────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
 
+        // ─── [Autorización: permiso 'reasignar'] ────────────
         Gate::authorize('reasignar', $caso);
 
+        // ─── [Validación de datos de reasignación] ──────────
+        // El procurador destino debe existir, estar activo y
+        // ser diferente del procurador origen actual
         $validated = $request->validate([
             'procurador_destino_id' => 'required|exists:procuradores,procurador_id|different:procurador_origen_id',
             'reasignacion_motivo' => 'required|string',
         ]);
 
+        // ─── [Delegar reasignación al servicio] ─────────────
         $this->casoService->reassignCaso($caso, $validated);
 
+        // ─── [Redirección a vista de detalle] ───────────────
         return redirect()->route('casos.show', $expediente)
             ->with('success', 'Caso reasignado exitosamente.');
     }

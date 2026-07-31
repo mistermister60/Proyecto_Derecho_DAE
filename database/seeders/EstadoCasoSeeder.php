@@ -5,10 +5,28 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * SEEDER: EstadoCasoSeeder
+ * ═══════════════════════════════════════════════════════
+ * Siembra los estados posibles del pipeline de un caso legal.
+ *
+ * - 8 estados de pipeline (flujo normal del caso)
+ * - 3 estados especiales (Inadmisible, Reasignado, Atrasado)
+ * - Cada estado tiene un color para la UI (formato hex)
+ * - El orden determina la progresión del caso
+ * - Independiente, puede ejecutarse en cualquier orden
+ */
 class EstadoCasoSeeder extends Seeder
 {
     public function run(): void
     {
+        // ─── Estados de pipeline ────────────────────────────
+        // Flujo normal que sigue un caso desde la entrevista
+        // hasta el cierre, coloreados en azul/verde.
+        // ─── Estados especiales ─────────────────────────────
+        // Estados atípicos: inadmisible (rojo), reasignado
+        // (púrpura) y atrasado (rojo intenso).
         $estados = [
             ['estado_nombre' => 'Entrevista',              'estado_orden' => 1,  'estado_color' => '#9CA3AF', 'estado_tipo' => 'pipeline'],
             ['estado_nombre' => 'Admitido',                 'estado_orden' => 2,  'estado_color' => '#60A5FA', 'estado_tipo' => 'pipeline'],

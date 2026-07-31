@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\EnsurePasswordChanged;
+use App\Http\Middleware\EnsureTwoFactorVerified;
 use App\Http\Middleware\SecurityHeadersMiddleware;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,9 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeadersMiddleware::class);
         $middleware->alias([
             'role' => CheckRole::class,
-            'otp' => \App\Http\Middleware\EnsureTwoFactorVerified::class,
-            'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
-            'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+            'otp' => EnsureTwoFactorVerified::class,
+            'password.changed' => EnsurePasswordChanged::class,
+            'password.confirm' => RequirePassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

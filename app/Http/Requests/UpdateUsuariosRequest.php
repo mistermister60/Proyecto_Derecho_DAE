@@ -6,8 +6,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
 /**
- * Form request para actualizar un usuario existente.
- *
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Update Usuario (Actualización de Usuario)
+ * ═══════════════════════════════════════════════════════
  * Usa "sometimes" en lugar de "required" para permitir actualizaciones
  * parciales. La validación de contraseña es condicional: solo se aplica
  * si el campo está presente. Excluye el email actual de la validación única.
@@ -15,7 +16,12 @@ use Illuminate\Validation\Rules\Password;
 class UpdateUsuariosRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Solo usuarios autenticados pueden actualizar usuarios.
+     * Verifica que exista una sesión activa mediante auth()->check().
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -23,21 +29,31 @@ class UpdateUsuariosRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - usuario_nombre:  Opcional (sometimes), texto, máx. 60 caracteres
+     * - email:           Opcional (sometimes), email, máx. 50, único (excluye actual), @usap.edu
+     * - contrasena:      Opcional (sometimes), texto, máx. 50, min 8, mayúsculas, minúsculas, números
+     * - rol_id:          Opcional (sometimes), debe existir en roles
+     * - procurador_id:   Opcional (nullable), debe existir en procuradores
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'usuario_nombre' => 'sometimes|string|max:60',
-            'email' => 'sometimes|email|max:50|unique:usuarios,email,'.$this->route('id').',usuario_id|ends_with:@usap.edu',
-            'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()],
-            'rol_id' => 'sometimes|exists:roles,rol_id',
-            'procurador_id' => 'nullable|exists:procuradores,procurador_id',
+            'usuario_nombre' => 'sometimes|string|max:60',                                                                                                      // ─── Opcional, nombre (máx. 60 caracteres)
+            'email' => 'sometimes|email|max:50|unique:usuarios,email,'.$this->route('id').',usuario_id|ends_with:@usap.edu',                                    // ─── Opcional, email único @usap.edu (excluye actual)
+            'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()],                                                        // ─── Opcional, contraseña segura (mín. 8, mayús, minús, números)
+            'rol_id' => 'sometimes|exists:roles,rol_id',                                                                                                        // ─── Opcional, rol existente
+            'procurador_id' => 'nullable|exists:procuradores,procurador_id',                                                                                    // ─── Opcional, procurador existente
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *

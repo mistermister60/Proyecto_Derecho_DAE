@@ -1,17 +1,29 @@
 @extends('layouts.app')
 {{--
-    Vista: casos/show
-    Propósito: Detalle completo de un caso con pestañas de Resumen, Relación de hechos, Documentos y Bitácora. Permite registrar entrevistas, subir documentos, agendar audiencias y agregar seguimientos.
-    Variables: $caso (modelo Caso con relaciones: cliente, demandado, procurador, estado, tipoTramite, entrevistas, documentos, seguimientos, audiencias)
-    @extends: layouts.app
-    @section: title, content
+    ═══════════════════════════════════════════════════════
+    VISTA: casos/show
+    ═══════════════════════════════════════════════════════
+    Propósito: Detalle completo de un caso con pestañas de Resumen,
+    Relación de hechos, Documentos y Bitácora. Permite registrar entrevistas,
+    subir documentos, agendar audiencias y agregar seguimientos.
+    Usada por Director y Procurador para la gestión diaria del expediente.
+    ───────────────────────────────────────────────────────
+    Variables: $caso (modelo Caso con relaciones: cliente, demandado,
+               procurador, estado, tipoTramite, entrevistas, documentos,
+               seguimientos, audiencias)
+    Secciones: @extends('layouts.app') @section('title') @section('content')
+    Componentes: <x-estado-badge>
 --}}
 
 @section('title', "Caso {$caso->caso_numero_expediente}")
 
 @section('content')
+{{-- ─── [CONTENEDOR PRINCIPAL CON PESTAÑAS] ─────── ──}}
+{{-- Alpine.js controla qué pestaña está activa: resumen, hechos, documentos o bitácora --}}
 <div x-data="{ tab: 'resumen' }">
-    {{-- Header --}}
+    {{-- ─── [ENCABEZADO Y ACCIONES DEL CASO] ──────── ──}}
+    {{-- Número de expediente, nombre del cliente, tipo de trámite, badge de estado --}}
+    {{-- Botones contextuales: Reasignar, Editar (solo Director), Cerrar caso (solo Director si activo) --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
         <div>
             <h1 class="text-lg md:text-xl font-bold" style="color: #111827;">Expediente {{ $caso->caso_numero_expediente }}</h1>

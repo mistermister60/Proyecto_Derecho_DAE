@@ -1,10 +1,17 @@
 @extends('layouts.app')
 {{--
-    Vista: casos/create
-    Propósito: Formulario para crear un nuevo caso. Incluye selección de cliente, tipo de trámite, parte representada, procurador asignado, juzgado y relación de hechos.
-    Variables: $clientes (Collection de modelos Cliente activos), $procuradores (Collection de modelos Procurador activos), $tramites (Collection de tipos de trámite activos)
-    @extends: layouts.app
-    @section: content
+    ═══════════════════════════════════════════════════════
+    VISTA: casos/create
+    ═══════════════════════════════════════════════════════
+    Propósito: Formulario para crear un nuevo caso. Incluye selección
+    de cliente, tipo de trámite, parte representada, procurador asignado,
+    juzgado y relación de hechos. Usada por Director y Procurador.
+    ───────────────────────────────────────────────────────
+    Variables: $clientes (Collection de modelos Cliente activos),
+               $procuradores (Collection de modelos Procurador activos),
+               $tramites (Collection de tipos de trámite activos)
+    Secciones: @extends('layouts.app') @section('content')
+    Componentes: Ninguno
 --}}
 
 @section('title', 'Nuevo caso')
@@ -12,7 +19,8 @@
 @section('content')
 <form action="{{ route('casos.store') }}" method="POST">
     @csrf
-    {{-- Header --}}
+    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── ──}}
+    {{-- Título del formulario, botón Cancelar (vuelve al listado) y botón Guardar caso --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <h1 class="text-xl font-bold" style="color: #111827;">Nuevo caso</h1>
         <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -27,7 +35,8 @@
         </div>
     </div>
 
-    {{-- Sección: Cliente --}}
+    {{-- ─── [SECCIÓN: SELECCIÓN DE CLIENTE] ──────── ──}}
+    {{-- Desplegable con clientes activos. Muestra nombre completo y DNI. --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Cliente</h3>
         <select name="cliente_id" required class="w-full rounded-lg px-3 py-2 text-sm outline-none" style="border: 1px solid #E5E7EB; color: #111827; background: #FFFFFF;">
@@ -43,7 +52,8 @@
         @enderror
     </div>
 
-    {{-- Sección: Tipo de trámite --}}
+    {{-- ─── [SECCIÓN: TIPO DE TRÁMITE Y PARTE] ───── ──}}
+    {{-- Selección del tipo de trámite (ej: divorcio, pensión) y la parte representada (Demandante/Demandado/Ambas) --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Tipo de trámite</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -76,7 +86,8 @@
         </div>
     </div>
 
-    {{-- Sección: Asignación --}}
+    {{-- ─── [SECCIÓN: ASIGNACIÓN Y JUZGADO] ───────── ──}}
+    {{-- Asignación del procurador responsable y juzgado donde se tramitará el caso (opcional) --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Asignación</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -101,7 +112,8 @@
         </div>
     </div>
 
-    {{-- Sección: Hechos --}}
+    {{-- ─── [SECCIÓN: RELACIÓN DE HECHOS] ─────────── ──}}
+    {{-- Narración detallada de los hechos del caso y observaciones internas del Director (opcional) --}}
     <div class="rounded-xl p-5 mb-4" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Relación de hechos</h3>
         <div>

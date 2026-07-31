@@ -20,13 +20,13 @@ class CasoFactory extends Factory
     public function definition(): array
     {
         return [
-            'caso_numero_expediente' => '0501-' . date('Y') . '-' . $this->faker->unique()->numerify('#####'),
+            'caso_numero_expediente' => '0501-'.date('Y').'-'.$this->faker->unique()->numerify('#####'),
             'cliente_id' => Cliente::factory(),
             'demandado_id' => Demandado::factory(),
             'tipo_tramite_id' => TipoTramite::factory(),
             'procurador_id' => Procurador::factory(),
             'caso_parte_representada' => $this->faker->randomElement(['Demandante', 'Demandado']),
-            'caso_juzgado' => $this->faker->optional()->company() . ' Juzgado',
+            'caso_juzgado' => $this->faker->optional()->company().' Juzgado',
             'caso_relacion_hechos' => $this->faker->paragraph(3),
             'caso_observaciones_director' => $this->faker->optional()->sentence(),
             'caso_fecha_interpuesta' => $this->faker->date(),

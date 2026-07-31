@@ -5,16 +5,23 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request para almacenar un nuevo procurador.
- *
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Store Procurador (Creación de Procurador)
+ * ═══════════════════════════════════════════════════════
  * Valida los datos personales y profesionales del procurador.
+ * DNI, email y carnet profesional deben ser únicos en el sistema.
  * La creación del usuario asociado se maneja en el controlador
  * dentro de una transacción.
  */
 class StoreProcuradorRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Solo usuarios autenticados pueden registrar procuradores.
+     * Verifica que exista una sesión activa mediante auth()->check().
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -22,28 +29,45 @@ class StoreProcuradorRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - procurador_nombre:          Obligatorio, texto, máx. 30 caracteres
+     * - procurador_apellido:        Obligatorio, texto, máx. 30 caracteres
+     * - procurador_dni:             Obligatorio, texto, máx. 20, único
+     * - procurador_telefono:        Obligatorio, texto, máx. 15 caracteres
+     * - procurador_direccion:       Obligatorio, texto, máx. 350 caracteres
+     * - procurador_email:           Obligatorio, email, máx. 50, único
+     * - procurador_fecha_nacimiento: Obligatorio, fecha válida
+     * - procurador_genero:          Obligatorio, valores: Masculino|Femenino
+     * - procurador_carnet:          Opcional, texto, máx. 50, único
+     * - procurador_estado:          Obligatorio, valores: activo|inactivo
+     * - procurador_foto:            Opcional, imagen JPEG/PNG, máx. 2MB
+     * - procurador_fecha_ingreso:   Obligatorio, fecha válida
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, string>
      */
     public function rules(): array
     {
         return [
-            'procurador_nombre' => 'required|string|max:30',
-            'procurador_apellido' => 'required|string|max:30',
-            'procurador_dni' => 'required|string|max:20|unique:procuradores,procurador_dni',
-            'procurador_telefono' => 'required|string|max:15',
-            'procurador_direccion' => 'required|string|max:350',
-            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email',
-            'procurador_fecha_nacimiento' => 'required|date',
-            'procurador_genero' => 'required|string|in:Masculino,Femenino',
-            'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet',
-            'procurador_estado' => 'required|string|in:activo,inactivo',
-            'procurador_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'procurador_fecha_ingreso' => ['required', 'date'],
+            'procurador_nombre' => 'required|string|max:30',                                           // ─── Obligatorio, nombre (máx. 30 caracteres)
+            'procurador_apellido' => 'required|string|max:30',                                         // ─── Obligatorio, apellido (máx. 30 caracteres)
+            'procurador_dni' => 'required|string|max:20|unique:procuradores,procurador_dni',           // ─── Obligatorio, DNI único (máx. 20 caracteres)
+            'procurador_telefono' => 'required|string|max:15',                                         // ─── Obligatorio, teléfono de contacto (máx. 15 caracteres)
+            'procurador_direccion' => 'required|string|max:350',                                       // ─── Obligatorio, dirección (máx. 350 caracteres)
+            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email',        // ─── Obligatorio, email único, formato válido
+            'procurador_fecha_nacimiento' => 'required|date',                                          // ─── Obligatorio, fecha de nacimiento válida
+            'procurador_genero' => 'required|string|in:Masculino,Femenino',                            // ─── Obligatorio, solo Masculino o Femenino
+            'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet',     // ─── Opcional, carnet profesional único
+            'procurador_estado' => 'required|string|in:activo,inactivo',                               // ─── Obligatorio, activo o inactivo
+            'procurador_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',                         // ─── Opcional, imagen JPEG/PNG, máximo 2MB
+            'procurador_fecha_ingreso' => ['required', 'date'],                                        // ─── Obligatorio, fecha de inicio en la práctica
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *
@@ -79,7 +103,7 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_foto.mimes' => 'La foto debe estar en formato JPEG o PNG.',
             'procurador_foto.max' => 'La foto no puede superar los 2 MB.',
             'procurador_fecha_ingreso.required' => 'La fecha de inicio de práctica es obligatoria.',
-'procurador_fecha_ingreso.date' => 'La fecha de inicio de práctica debe ser una fecha válida.',
+            'procurador_fecha_ingreso.date' => 'La fecha de inicio de práctica debe ser una fecha válida.',
         ];
     }
 }

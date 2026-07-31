@@ -6,16 +6,22 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
 /**
- * Form request para almacenar un nuevo usuario.
- *
- * Valida los datos del usuario incluyendo la regla Password de Laravel
- * (mínimo 8 caracteres, mayúsculas, minúsculas y números).
- * La contraseña se encripta en el controlador.
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Store Usuario (Creación de Usuario)
+ * ═══════════════════════════════════════════════════════
+ * Valida los datos para crear un nuevo usuario del sistema.
+ * Incluye validación de contraseña segura (mín. 8 chars, mayúsculas, minúsculas, números).
+ * El email debe ser institucional (@usap.edu). La contraseña se encripta en el controlador.
  */
 class StoreUsuariosRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Solo usuarios autenticados pueden crear nuevos usuarios.
+     * Verifica que exista una sesión activa mediante auth()->check().
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -23,21 +29,32 @@ class StoreUsuariosRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - usuario_nombre: Obligatorio, texto, máx. 60 caracteres
+     * - email:          Obligatorio, email, máx. 50, único en usuarios, termina en @usap.edu
+     * - contrasena:     Opcional (a veces se genera automáticamente), string, máx. 50,
+     *                   mínimo 8 caracteres, mayúsculas, minúsculas y números
+     * - rol_id:         Obligatorio, debe existir en tabla roles
+     * - procurador_id:  Opcional, debe existir en tabla procuradores
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'usuario_nombre' => 'required|string|max:60',
-            'email' => 'required|email|max:50|unique:usuarios,email|ends_with:@usap.edu',
-            'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()],
-            'rol_id' => 'required|exists:roles,rol_id',
-            'procurador_id' => 'nullable|exists:procuradores,procurador_id',
+            'usuario_nombre' => 'required|string|max:60',                                             // ─── Obligatorio, nombre de usuario (máx. 60 caracteres)
+            'email' => 'required|email|max:50|unique:usuarios,email|ends_with:@usap.edu',             // ─── Obligatorio, email institucional único
+            'contrasena' => ['sometimes', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()], // ─── Opcional, contraseña segura (8+ chars, mayúsculas, minúsculas, números)
+            'rol_id' => 'required|exists:roles,rol_id',                                               // ─── Obligatorio, rol existente
+            'procurador_id' => 'nullable|exists:procuradores,procurador_id',                          // ─── Opcional, procurador asociado existente
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *

@@ -1,7 +1,14 @@
 {{--
-    Vista: layouts/guest
-    Propósito: Layout público para páginas de autenticación (login, registro, recuperación de contraseña). Incluye el logo de la aplicación y un contenedor centrado con el slot $slot.
-    Variables: $slot (contenido principal de la vista)
+    ═══════════════════════════════════════════════════════
+    VISTA: layouts/guest
+    ═══════════════════════════════════════════════════════
+    Layout público para páginas de autenticación (login, registro,
+    recuperación de contraseña). Incluye el logo de la aplicación y un
+    contenedor centrado con el slot $slot para el contenido.
+    ───────────────────────────────────────────────────────
+    Variables que recibe: $slot (contenido principal)
+    Secciones que define: ninguna (usa $slot de componente)
+    Componentes que usa: <x-application-logo>
 --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -31,7 +38,9 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
+    {{-- ─── Cuerpo de la página ─────────────────────────── ──}}
     <body class="font-sans text-gray-900 antialiased">
+        {{-- ─── Contenedor principal centrado ─────────────── ──}}
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
@@ -40,6 +49,7 @@
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                {{-- ─── Contenido dinámico (slot) ─────────────── ──}}
                 {{ $slot }}
             </div>
         </div>

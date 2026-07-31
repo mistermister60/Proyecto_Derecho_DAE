@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Rutas web del sistema DAE (Dirección de Asuntos Estudiantiles).
- *
- * Organización de rutas:
- * - Autenticación: login/logout
- * - Panel principal (Dashboard): /
- * - Recursos protegidos por auth:
- *   - Casos: CRUD completo + Kanban + reasignación
- *   - Clientes, Demandados, Procuradores, Usuarios
- *   - Audiencias, Entrevistas, Seguimiento, Documentos (anidados bajo casos)
- *   - Agenda, Dashboard, Perfil
- * - PWA: VAPID key, push subscription/unsubscription
- * - Middleware role:Director en rutas administrativas (procuradores, usuarios, borrado/reasignación de casos)
+ * ═══════════════════════════════════════════════════════
+ * ARCHIVO DE RUTAS WEB
+ * ═══════════════════════════════════════════════════════
+ * Define TODAS las rutas del sistema organizadas por:
+ * - Autenticación (login/logout/2FA)
+ * - Recuperación de contraseña
+ * - Recursos protegidos (Casos, Clientes, etc.)
+ * - PWA (Service Worker, notificaciones push)
+ * - Búsqueda global
+ * ───────────────────────────────────────────────────────
+ * Middleware pipeline: auth → otp → password.changed
+ * Rol: Director (rol_id=1), Procurador (rol_id=2)
  */
 
 use App\Http\Controllers\AgendaController;
@@ -27,13 +27,21 @@ use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PDFController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProcuradorController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\UsuariosController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+
+// ═══════════════════════════════════════════════════════
+// RUTAS PÚBLICAS — Sin autenticación
+// ═══════════════════════════════════════════════════════
+// Redirección raíz y archivos estáticos (PWA: manifest, offline, logo)
 
 // Ruta raíz redirige al dashboard (o login si no autenticado)
 Route::get('/', function () {
@@ -44,6 +52,12 @@ Route::get('/', function () {
 Route::get('/api/health', function () {
     return response()->noContent();
 });
+
+// ═══════════════════════════════════════════════════════
+// ARCHIVOS ESTÁTICOS PWA
+// ═══════════════════════════════════════════════════════
+// Se sirven desde PHP para poder aplicar cabeceras de caché.
+// sw.js se sirve directamente desde public/ (sin closure PHP).
 
 // Archivos estáticos PWA (para servir en test y producción)
 Route::get('/manifest.json', function () {
@@ -84,82 +98,123 @@ Route::get('/logo.png', function () {
     ]);
 })->name('pwa.logo_png');
 
-// Autenticación (públicas)
+// ═══════════════════════════════════════════════════════
+// AUTENTICACIÓN — Login / Logout
+// ═══════════════════════════════════════════════════════
+// Rutas públicas (sin middleware).
+// Login con rate limiting (5 intentos → bloqueo 5 min).
+// Logout destruye sesión y revoca token Sanctum.
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// === RECUPERACIÓN DE CONTRASEÑA (Auto-servicio por email) ===
+// ═══════════════════════════════════════════════════════
+// RECUPERACIÓN DE CONTRASEÑA — Auto-servicio por email
+// ═══════════════════════════════════════════════════════
+// Rutas públicas. El usuario solicita un token por correo
+// y luego restablece su contraseña.
 Route::get('/olvide-mi-contrasena', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('/olvide-mi-contrasena', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
 Route::get('/restablecer-contrasena/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update');
-// =============================================================
 
-// === CONFIRMACIÓN DE CONTRASEÑA (Para acciones sensibles) ===
+// ═══════════════════════════════════════════════════════
+// CONFIRMACIÓN DE CONTRASEÑA — Acciones sensibles
+// ═══════════════════════════════════════════════════════
+// Protegida con middleware 'auth' (no requiere 2FA ni cambio de password).
+// Se pide antes de eliminar registros o cambiar datos críticos.
+// La sesión se marca como "password_confirmed_at" con límite de tiempo.
 Route::middleware('auth')->group(function () {
     Route::get('/confirmar-contrasena', function () {
         return view('auth.confirm-password');
     })->name('password.confirm');
 
-    Route::post('/confirmar-contrasena', function (\Illuminate\Http\Request $request) {
+    Route::post('/confirmar-contrasena', function (Request $request) {
         $request->validate(['password' => 'required']);
-        
-        if (!\Illuminate\Support\Facades\Hash::check($request->password, $request->user()->contrasena)) {
+
+        if (! Hash::check($request->password, $request->user()->contrasena)) {
             return back()->withErrors(['password' => 'La contraseña no coincide.']);
         }
-        
+
         $request->user()->confirmPassword();
+
         return redirect()->intended(route('dashboard'))->with('success', 'Contraseña confirmada.');
     })->name('password.confirm.store');
 });
-// =============================================================
 
-// === NUEVAS RUTAS DE DOBLE FACTOR (2FA) ===
+// ═══════════════════════════════════════════════════════
+// VERIFICACIÓN EN DOS PASOS (2FA) — OTP por email
+// ═══════════════════════════════════════════════════════
+// Públicas (sin middleware). Se accede tras login exitoso.
+// El usuario ingresa un código de 6 dígitos enviado a su correo.
+// El Director (rol_id=1) omite este paso automáticamente.
 Route::get('/verify-two-factor', function () {
     return view('auth.two-factor');
 })->name('auth.two-factor');
 
 Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
-// ==========================================
 
-// === RUTAS DE PERFIL DE USUARIO ===
+// ═══════════════════════════════════════════════════════
+// PERFIL DE USUARIO
+// ═══════════════════════════════════════════════════════
+// Protegido con auth + otp + password.changed.
+// Edición de datos personales, cierre de cuenta y cambio de contraseña.
 Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
-    // Cambio de contraseña desde perfil
-    Route::put('/profile/password', function (\Illuminate\Http\Request $request) {
+
+    // Cambio de contraseña desde perfil (validate current password)
+    Route::put('/profile/password', function (Request $request) {
         $request->validate([
             'current_password' => 'required',
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
-        
-        if (!\Illuminate\Support\Facades\Hash::check($request->current_password, $request->user()->contrasena)) {
+
+        if (! Hash::check($request->current_password, $request->user()->contrasena)) {
             return back()->withErrors(['current_password' => 'La contraseña actual no coincide.']);
         }
-        
-        $request->user()->contrasena = \Illuminate\Support\Facades\Hash::make($request->password);
+
+        $request->user()->contrasena = Hash::make($request->password);
         $request->user()->save();
-        
+
         return back()->with('status', 'password-updated');
     })->name('profile.password.update');
 });
-// =====================================
 
-// Rutas protegidas (requieren autenticación, 2FA verificado y contraseña cambiada)
+// ═══════════════════════════════════════════════════════
+// RUTAS PROTEGIDAS (auth + otp + password.changed)
+// ═══════════════════════════════════════════════════════
+// Pipeline completo: autenticado, 2FA verificado, contraseña ya cambiada.
+// Agrupa todos los recursos del sistema: Casos, Clientes, Demandados,
+// Procuradores, Usuarios, Agenda, Audiencias, Documentos, etc.
+// ───────────────────────────────────────────────────────
+// Middleware adicional:
+//   - role:Director  → solo Director (rol_id=1)
+//   - role:Procurador→ solo Procurador (rol_id=2)
 Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 
-    // Cambio obligatorio de contraseña (el middleware password.changed permite estas rutas)
+    // ═══════════════════════════════════════════════════════
+    // CAMBIO OBLIGATORIO DE CONTRASEÑA
+    // ═══════════════════════════════════════════════════════
+    // El middleware password.changed permite explícitamente estas rutas
+    // para que el usuario pueda cambiar su contraseña en el primer inicio.
     Route::get('/cambiar-contrasena', [PasswordChangeController::class, 'showChangeForm'])->name('password.change');
     Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.change.update');
 
-    // Dashboard
+    // ═══════════════════════════════════════════════════════
+    // DASHBOARD — Panel principal
+    // ═══════════════════════════════════════════════════════
+    // Estadísticas generales del consultorio: casos activos,
+    // próximos vencimientos, gráficos de carga laboral.
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Casos
+    // ═══════════════════════════════════════════════════════
+    // CASOS — CRUD + Kanban + Reasignación + PDF
+    // ═══════════════════════════════════════════════════════
+    // Recurso principal del sistema. Cada caso tiene un expediente único.
+    // Acciones destructivas y reasignación requieren rol Director.
     Route::get('/casos/crear', [CasoController::class, 'create'])->name('casos.create');
     Route::post('/casos', [CasoController::class, 'store'])->name('casos.store');
     Route::get('/casos/{expediente}/editar', [CasoController::class, 'edit'])->name('casos.edit');
@@ -177,7 +232,12 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 
     Route::get('/casos', [CasoController::class, 'index'])->name('casos.index');
 
-    // Clientes
+    // ═══════════════════════════════════════════════════════
+    // CLIENTES — CRUD completo
+    // ═══════════════════════════════════════════════════════
+    // Personas representadas por el consultorio.
+    // La clave primaria es 'identidad' (DNI/número de identidad).
+    // Se pueden activar/desactivar (borrado lógico).
     Route::get('/clientes/crear', [ClienteController::class, 'create'])->name('clientes.create');
     Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
     Route::get('/clientes/{identidad}/editar', [ClienteController::class, 'edit'])->name('clientes.edit');
@@ -186,11 +246,15 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::post('/clientes/{identidad}/activar', [ClienteController::class, 'activar'])->name('clientes.activar');
     Route::get('/clientes/{identidad}', [ClienteController::class, 'show'])->name('clientes.show');
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-    
-    // Cliente search API (autocomplete/typeahead)
+
+    // API de búsqueda de clientes para autocomplete (typeahead en formularios)
     Route::get('/clientes/buscar', [ClienteController::class, 'search'])->name('clientes.search');
 
-    // Usuarios (solo Director)
+    // ═══════════════════════════════════════════════════════
+    // USUARIOS DEL SISTEMA — Solo Director
+    // ═══════════════════════════════════════════════════════
+    // CRUD completo de usuarios. Solo accesible por Director (rol_id=1).
+    // Incluye activar/desactivar cuentas y resetear contraseña.
     Route::middleware('role:Director')->group(function () {
         Route::get('/usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
         Route::get('/usuarios/crear', [UsuariosController::class, 'create'])->name('usuarios.create');
@@ -203,7 +267,11 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
         Route::get('/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
     });
 
-    // Demandados
+    // ═══════════════════════════════════════════════════════
+    // DEMANDADOS — CRUD completo
+    // ═══════════════════════════════════════════════════════
+    // Contraparte del caso. Clave primaria: 'identidad'.
+    // Soporta borrado lógico (activar/desactivar).
     Route::get('/demandados', [DemandadoController::class, 'index'])->name('demandados.index');
     Route::get('/demandados/crear', [DemandadoController::class, 'create'])->name('demandados.create');
     Route::post('/demandados', [DemandadoController::class, 'store'])->name('demandados.store');
@@ -213,7 +281,11 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::post('/demandados/{identidad}/activar', [DemandadoController::class, 'activar'])->name('demandados.activar');
     Route::get('/demandados/{identidad}', [DemandadoController::class, 'show'])->name('demandados.show');
 
-    // Procuradores (solo Director)
+    // ═══════════════════════════════════════════════════════
+    // PROCURADORES — Solo Director
+    // ═══════════════════════════════════════════════════════
+    // Gestión de procuradores (practicantes/abogados). Solo Director.
+    // Incluye generación de constancia de práctica en PDF.
     Route::middleware('role:Director')->group(function () {
         Route::get('/procuradores', [ProcuradorController::class, 'index'])->name('procuradores.index');
         Route::get('/procuradores/crear', [ProcuradorController::class, 'create'])->name('procuradores.create');
@@ -226,22 +298,37 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
         Route::get('/procuradores/{identidad}/constancia', [PDFController::class, 'constanciaPracticante'])->name('procuradores.constancia');
     });
 
-    // Agenda
+    // ═══════════════════════════════════════════════════════
+    // AGENDA — Calendario general
+    // ═══════════════════════════════════════════════════════
+    // Vista general de todas las audiencias y eventos próximos.
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
 
-    // Seguimiento
+    // ═══════════════════════════════════════════════════════
+    // SEGUIMIENTO — Avances del caso
+    // ═══════════════════════════════════════════════════════
+    // Registro de seguimiento/progreso vinculado a un caso.
     Route::post('/casos/{caso_id}/seguimiento', [SeguimientoController::class, 'store'])->name('seguimientos.store');
 
-    // Audiencias (dentro del expediente)
+    // ═══════════════════════════════════════════════════════
+    // AUDIENCIAS — Anidadas bajo el expediente
+    // ═══════════════════════════════════════════════════════
+    // Las audiencias pertenecen a un caso y se gestionan desde ahí.
     Route::post('/casos/{expediente}/audiencias', [AudienciaController::class, 'store'])->name('audiencias.store');
     Route::delete('/casos/{expediente}/audiencias/{audiencia_id}', [AudienciaController::class, 'destroy'])->name('audiencias.destroy');
 
-    // Documentos (dentro del expediente)
+    // ═══════════════════════════════════════════════════════
+    // DOCUMENTOS — Anidados bajo el expediente
+    // ═══════════════════════════════════════════════════════
+    // Subida, descarga y eliminación de documentos del caso.
     Route::post('/casos/{expediente}/documentos', [DocumentoController::class, 'store'])->name('documentos.store');
     Route::get('/casos/{expediente}/documentos/{documento_id}', [DocumentoController::class, 'download'])->name('documentos.download');
     Route::delete('/casos/{expediente}/documentos/{documento_id}', [DocumentoController::class, 'destroy'])->name('documentos.destroy');
 
-    // Entrevistas (dentro del expediente)
+    // ═══════════════════════════════════════════════════════
+    // ENTREVISTAS — Anidadas bajo el expediente
+    // ═══════════════════════════════════════════════════════
+    // Registro de entrevistas realizadas con cliente/demandado.
     Route::post('/casos/{expediente}/entrevistas', [EntrevistaController::class, 'store'])->name('entrevistas.store');
     Route::delete('/casos/{expediente}/entrevistas/{entrevista_id}', [EntrevistaController::class, 'destroy'])->name('entrevistas.destroy');
 

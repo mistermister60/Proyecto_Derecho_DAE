@@ -3,6 +3,9 @@
 namespace App\Enums;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * ENUM: RolEnum
+ * ═══════════════════════════════════════════════════════
  * Roles de usuarios dentro del sistema de gestión de la Dirección de Asuntos Estudiantiles (DAE).
  *
  * Define los perfiles de acceso y responsabilidades que puede tener un usuario

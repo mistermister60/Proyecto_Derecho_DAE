@@ -1,9 +1,21 @@
 <?php
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * TEST: TestCase (Clase Base)
+ * ═══════════════════════════════════════════════════════
+ * Clase base abstracta para todos los tests de la aplicación.
+ * Extiende TestCase de Laravel, deshabilita middlewares que
+ * interfieren con los tests (2FA, cambio de contraseña, CSRF)
+ * y provee el helper actingAsAuthenticated para simular
+ * sesiones completamente autenticadas y verificadas.
+ */
+
 namespace Tests;
 
 use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\EnsureTwoFactorVerified;
+use App\Models\Usuario;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -28,7 +40,10 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        // Deshabilitar middlewares que bloquean los tests
+        // ─── Configuración inicial ──────────────────────────
+        // Deshabilita los middlewares de 2FA, cambio de
+        // contraseña obligatorio y CSRF para evitar
+        // interferencias en todos los tests.
         $this->withoutMiddleware([
             EnsureTwoFactorVerified::class,
             EnsurePasswordChanged::class,
@@ -41,17 +56,18 @@ abstract class TestCase extends BaseTestCase
      *
      * Útil para tests que necesitan un usuario autenticado y verificado.
      *
-     * @param  \App\Models\Usuario  $user
+     * @param  Usuario  $user
      * @return $this
      */
     protected function actingAsAuthenticated($user)
     {
+        // ─── [ACT] Iniciar sesión como el usuario ──────────
         $this->actingAs($user);
 
-        // Simular que el usuario ya pasó el 2FA
+        // ─── Simular verificación 2FA ──────────────────────
         session(['two_factor_verified' => true]);
 
-        // Simular que el usuario ya cambió la contraseña si era necesario
+        // ─── Simular cambio de contraseña si aplica ────────
         if ($user->debe_cambiar_contrasena) {
             $user->update(['debe_cambiar_contrasena' => false]);
         }

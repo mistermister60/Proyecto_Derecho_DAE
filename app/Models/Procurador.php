@@ -10,6 +10,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Procurador
+ * ═══════════════════════════════════════════════════════
+ * Representa un abogado o procurador del despacho. Es el
+ * profesional que representa legalmente a los clientes, asignado
+ * a casos, audiencias y entrevistas. Puede tener un usuario
+ * asociado para acceder al sistema.
+ */
+
+/**
  * Modelo que representa un procurador (abogado) en el sistema de gestión de despachos judiciales.
  *
  * Los procuradores son los profesionales que representan legalmente a los clientes
@@ -27,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $procurador_telefono
  * @property string|null $procurador_direccion
  * @property string $procurador_estado
+ * @property string|null $procurador_foto
+ * @property string|null $procurador_fecha_ingreso
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Caso> $casos
@@ -45,6 +57,9 @@ class Procurador extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos personales, profesionales y de contacto del
+    // procurador, incluyendo carnet, foto y fecha de ingreso.
     protected $fillable = [
         'procurador_nombre',
         'procurador_apellido',
@@ -60,6 +75,9 @@ class Procurador extends Model
         'procurador_fecha_ingreso',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // Las fechas de nacimiento e ingreso se castean a objetos
+    // Carbon (date) para manipulación nativa de fechas.
     protected function casts(): array
     {
         return [
@@ -68,6 +86,9 @@ class Procurador extends Model
         ];
     }
 
+    // ─── Accessor: nombre completo ──────────────────────────
+    // Concatena nombre y apellido para obtener el nombre
+    // completo del procurador de forma dinámica.
     /**
      * Obtener el nombre completo del procurador.
      */

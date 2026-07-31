@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Documento
+ * ═══════════════════════════════════════════════════════
+ * Representa un archivo digital adjunto a un caso judicial.
+ * Almacena la metadata del documento: nombre, tipo, ruta,
+ * tamaño y descripción.
+ */
+
+/**
  * Modelo que representa un documento adjunto a un caso judicial.
  *
  * Los documentos son archivos digitales (PDF, imágenes, etc.) asociados
@@ -35,6 +44,9 @@ class Documento extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Metadata del documento: caso al que pertenece, nombre,
+    // tipo de archivo, ruta de almacenamiento, tamaño y estado.
     protected $fillable = [
         'caso_id',
         'documento_nombre',
@@ -45,6 +57,9 @@ class Documento extends Model
         'documento_estado',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // documento_tamano se castea a entero para operaciones
+    // numéricas de tamaño de archivo.
     protected function casts(): array
     {
         return [

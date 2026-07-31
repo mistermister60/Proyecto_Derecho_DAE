@@ -5,10 +5,24 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * SEEDER: DemandadoSeeder
+ * ═══════════════════════════════════════════════════════
+ * Siembra 8 demandados de prueba, cada uno vinculable
+ * a los clientes existentes.
+ *
+ * - Datos personales y laborales de cada demandado
+ * - Independiente (no depende de otros seeders)
+ * - Los IDs son referenciados desde CasoSeeder
+ */
 class DemandadoSeeder extends Seeder
 {
     public function run(): void
     {
+        // ─── Demandados de prueba ───────────────────────────
+        // Contrapartes en los procesos legales, con datos
+        // personales y de contacto.
         DB::table('demandados')->insert([
             [
                 'demandado_nombre' => 'Carlos Fernando',

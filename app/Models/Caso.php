@@ -10,6 +10,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Caso
+ * ═══════════════════════════════════════════════════════
+ * Representa un expediente judicial en el sistema. Es la entidad
+ * central que agrupa a cliente, demandado, procurador, tipo de
+ * trámite, estado, y todos los elementos asociados (seguimientos,
+ * audiencias, documentos, entrevistas, reasignaciones).
+ */
+
+/**
  * Modelo que representa un caso judicial en el sistema de gestión de despachos.
  *
  * Un caso es el expediente central del sistema, vinculando a un cliente con un demandado,
@@ -30,6 +40,9 @@ use Illuminate\Support\Carbon;
  * @property bool|null $caso_admisible
  * @property string|null $caso_fecha_asignacion
  * @property string $caso_estado
+ * @property string|null $resolucion_tipo
+ * @property string|null $resolucion_fecha
+ * @property string|null $resolucion_notas
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Cliente $cliente
@@ -53,6 +66,10 @@ class Caso extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Todos los datos que definen un caso: número de expediente,
+    // partes involucradas, fechas clave, admisibilidad, resolución,
+    // y toda la metadata del expediente judicial.
     protected $fillable = [
         'caso_numero_expediente',
         'cliente_id',
@@ -73,6 +90,9 @@ class Caso extends Model
         'resolucion_notas',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // Los campos booleanos y de fecha se castean automáticamente
+    // para garantizar tipos nativos de PHP al accederlos.
     protected function casts(): array
     {
         return [

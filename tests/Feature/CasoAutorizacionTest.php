@@ -24,11 +24,17 @@ class CasoAutorizacionTest extends TestCase
     use RefreshDatabase;
 
     protected $procuradorA;
+
     protected $procuradorB;
+
     protected $director;
+
     protected $casoDeA;
+
     protected $cliente;
+
     protected $tipoTramite;
+
     protected $estadoAdmitidoId;
 
     protected function setUp(): void

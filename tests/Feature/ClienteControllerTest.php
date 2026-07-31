@@ -58,13 +58,13 @@ class ClienteControllerTest extends TestCase
         $this->actingAsAuthenticated($director);
 
         $this->post(route('clientes.store'), [
-                'nombre_completo' => 'Juan Pérez',
-                'cliente_dni' => '0501199900011',
-                'cliente_estado_civil' => 'Soltero',
-                'cliente_telefono' => '9000-0001',
-                'cliente_direccion' => 'Calle Falsa 123',
-                'cliente_numero_hijos' => 0,
-            ])
+            'nombre_completo' => 'Juan Pérez',
+            'cliente_dni' => '0501199900011',
+            'cliente_estado_civil' => 'Soltero',
+            'cliente_telefono' => '9000-0001',
+            'cliente_direccion' => 'Calle Falsa 123',
+            'cliente_numero_hijos' => 0,
+        ])
             ->assertRedirect(route('clientes.index'));
 
         $this->assertDatabaseHas('clientes', [
@@ -98,15 +98,15 @@ class ClienteControllerTest extends TestCase
         ]);
 
         $this->put(route('clientes.update', ['identidad' => $cliente->cliente_dni]), [
-                'cliente_nombre' => 'María José',
-                'cliente_apellido' => 'Gómez',
-                'cliente_dni' => '0501199900022',
-                'cliente_estado_civil' => 'Casado',
-                'cliente_telefono' => '9000-0002',
-                'cliente_direccion' => 'Av. Principal',
-                'cliente_numero_hijos' => 2,
-                'cliente_profesion' => 'Ingeniera Senior',
-            ])
+            'cliente_nombre' => 'María José',
+            'cliente_apellido' => 'Gómez',
+            'cliente_dni' => '0501199900022',
+            'cliente_estado_civil' => 'Casado',
+            'cliente_telefono' => '9000-0002',
+            'cliente_direccion' => 'Av. Principal',
+            'cliente_numero_hijos' => 2,
+            'cliente_profesion' => 'Ingeniera Senior',
+        ])
             ->assertRedirect(route('clientes.show', $cliente->cliente_dni));
 
         $this->assertDatabaseHas('clientes', [

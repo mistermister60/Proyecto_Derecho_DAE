@@ -1,14 +1,30 @@
 @extends('layouts.app')
+{{--
+    ═══════════════════════════════════════════════════════
+    VISTA: casos/cerrar
+    ═══════════════════════════════════════════════════════
+    Propósito: Formulario de cierre de caso. Permite al Director seleccionar
+    el tipo de resolución (ganado, perdido, conciliado, desistido, desestimado),
+    ingresar la fecha de resolución y notas adicionales.
+    ───────────────────────────────────────────────────────
+    Variables: $caso (modelo Caso con relaciones cliente, procurador)
+    Secciones: @extends('layouts.app') @section('title') @section('content')
+    Componentes: Ninguno
+--}}
 
 @section('title', "Cerrar {$caso->caso_numero_expediente}")
 
 @section('content')
+{{-- ─── [CONTENEDOR CENTRADO] ────────────────────── ──}}
 <div class="max-w-2xl mx-auto">
+    {{-- ─── [ENCABEZADO DEL FORMULARIO] ───────────── ──}}
+    {{-- Título "Cerrar caso" con identificación del expediente y cliente --}}
     <h1 class="text-lg md:text-xl font-bold mb-2" style="color: #111827;">Cerrar caso</h1>
     <p class="text-sm mb-6" style="color: #6B7280;">
         Expediente {{ $caso->caso_numero_expediente }} — {{ $caso->cliente?->nombre_completo ?? 'Sin cliente' }}
     </p>
 
+    {{-- ─── [FORMULARIO DE CIERRE] ────────────────── ──}}
     <div class="rounded-xl p-6" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <form action="{{ route('casos.storeCerrar', $caso->caso_numero_expediente) }}" method="POST" class="space-y-5">
             @csrf

@@ -6,13 +6,31 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * SEEDER: UsuarioSeeder
+ * ═══════════════════════════════════════════════════════
+ * Crea las cuentas de acceso al sistema para el Director
+ * y los 5 Procuradores.
+ *
+ * - Depende de: RolSeeder, ProcuradorSeeder
+ * - Cada usuario tiene contraseña 'password' (hash Bcrypt)
+ * - El Director no tiene procurador asociado (procurador_id = null)
+ * - Los procuradores se vinculan por procurador_id
+ */
 class UsuarioSeeder extends Seeder
 {
     public function run(): void
     {
+        // ─── Obtener IDs de roles ───────────────────────────
+        // Se consultan dinámicamente para no depender de IDs
+        // fijos, permitiendo ejecución en cualquier orden.
         $directorId = DB::table('roles')->where('rol_nombre', 'Director')->value('rol_id');
         $procuradorId = DB::table('roles')->where('rol_nombre', 'Procurador')->value('rol_id');
 
+        // ─── Usuarios del sistema ───────────────────────────
+        // Se crea un usuario por rol. El Director (rol_id=1)
+        // omite 2FA; los procuradores requieren OTP por email.
         DB::table('usuarios')->insert([
             [
                 'rol_id' => $directorId,

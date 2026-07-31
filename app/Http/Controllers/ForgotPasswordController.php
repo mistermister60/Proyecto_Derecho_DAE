@@ -14,15 +14,26 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Controlador para la recuperación de contraseña por email (auto-servicio).
- *
- * Permite a cualquier usuario (incluyendo Procuradores) solicitar un enlace
- * de restablecimiento de contraseña a su correo institucional.
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: ForgotPasswordController
+ * ═══════════════════════════════════════════════════════
+ * Recuperación de contraseña por email (auto-servicio).
+ * Permite solicitar enlace de restablecimiento a correo institucional.
+ * Genera token aleatorio, hashea SHA-256, guarda en password_reset_tokens,
+ * envía email via ResetPasswordMail. Rate limiting por IP (3 intentos/60s).
+ * Rutas: GET /password/forgot, POST /password/forgot
+ * Middleware: guest
+ * Roles: Cualquier usuario con email @usap.edu
  */
 class ForgotPasswordController extends BaseController
 {
     /**
+     * ═══════════════════════════════════════════════════════
+     * showLinkRequestForm
+     * ───────────────────────────────────────────────────────
      * Muestra el formulario para solicitar restablecimiento de contraseña.
+     * Respuesta: Vista auth.forgot-password
+     * ═══════════════════════════════════════════════════════
      */
     public function showLinkRequestForm()
     {
@@ -30,10 +41,18 @@ class ForgotPasswordController extends BaseController
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * sendResetLinkEmail
+     * ───────────────────────────────────────────────────────
      * Procesa la solicitud de restablecimiento y envía el email.
+     * Valida email institucional, rate limiting por IP (3/60s),
+     * genera token, guarda hash SHA-256 en BD, envía email.
+     * Respuesta: Redirect back con status success.
+     * ═══════════════════════════════════════════════════════
      */
     public function sendResetLinkEmail(Request $request): RedirectResponse
     {
+        // ─── [Validar email institucional] ────────────────────────────
         $request->validate([
             'email' => 'required|email|exists:usuarios,email|ends_with:@usap.edu',
         ], [
@@ -43,8 +62,8 @@ class ForgotPasswordController extends BaseController
             'email.ends_with' => 'El correo debe ser institucional (@usap.edu).',
         ]);
 
-        // Rate limiting por IP para evitar abuso del formulario de recuperación
-        $key = 'forgot-password:' . $request->ip();
+        // ─── [Rate limiting por IP] ───────────────────────────────────
+        $key = 'forgot-password:'.$request->ip();
         if (RateLimiter::tooManyAttempts($key, 3)) {
             $seconds = RateLimiter::availableIn($key);
             throw ValidationException::withMessages([
@@ -53,12 +72,12 @@ class ForgotPasswordController extends BaseController
         }
         RateLimiter::hit($key, 60);
 
+        // ─── [Obtener usuario] ────────────────────────────────────────
         $usuario = Usuario::where('email', $request->email)->first();
 
-        // Generar token de restablecimiento (usando el sistema nativo de Laravel Password Reset)
+        // ─── [Generar y guardar token (hash SHA-256)] ─────────────────
         $token = Str::random(60);
-        
-        // Guardar en tabla password_reset_tokens (Laravel 11+)
+
         \DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $usuario->email],
             [
@@ -67,7 +86,7 @@ class ForgotPasswordController extends BaseController
             ]
         );
 
-        // Enviar email con el token
+        // ─── [Enviar email con token] ─────────────────────────────────
         Mail::to($usuario->email)->send(new ResetPasswordMail($token, $usuario->usuario_nombre, $usuario->email));
 
         return back()->with('status', 'Hemos enviado un enlace de restablecimiento a tu correo institucional.');

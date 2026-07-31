@@ -6,6 +6,19 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * SEEDER: OTPTestSeeder
+ * ═══════════════════════════════════════════════════════
+ * Crea datos de prueba específicos para tests de OTP
+ * (autenticación de dos factores por email).
+ *
+ * - Inserta procuradores y usuarios de forma segura
+ *   sin duplicar registros existentes (upsert implícito)
+ * - Usa correos institucionales (@usap.edu)
+ * - Crea directores de prueba para verificar omisión de 2FA
+ * - Ideal para ejecutar en entornos de testing
+ */
 class OTPTestSeeder extends Seeder
 {
     /**
@@ -13,6 +26,9 @@ class OTPTestSeeder extends Seeder
      */
     public function run(): void
     {
+        // ─── Obtener o crear rol de Director ─────────────────
+        // Busca el rol 'Director' existente; si no lo encuentra,
+        // lo crea con datos mínimos.
         $directorRoleId = DB::table('roles')
             ->where('rol_nombre', 'Director')
             ->value('rol_id');
@@ -25,6 +41,7 @@ class OTPTestSeeder extends Seeder
             ]);
         }
 
+        // ─── Obtener o crear rol de Procurador ───────────────
         $procuradorRoleId = DB::table('roles')
             ->where('rol_nombre', 'Procurador')
             ->value('rol_id');
@@ -37,6 +54,9 @@ class OTPTestSeeder extends Seeder
             ]);
         }
 
+        // ─── Procuradores de prueba ─────────────────────────
+        // Sus correos institucionales se usan para enviar
+        // el código OTP durante la autenticación.
         $procuradores = [
             [
                 'procurador_nombre' => 'Carlos',
@@ -64,8 +84,10 @@ class OTPTestSeeder extends Seeder
             ],
         ];
 
-        // Se cambiaron los correos para que no colisionen con los de procuradores
-        // e incluyan los correos requeridos en el test.
+        // ─── Directores de prueba ───────────────────────────
+        // Se cambiaron los correos para que no colisionen con
+        // los de procuradores e incluyan los correos requeridos
+        // en el test de OTP.
         $directores = [
             [
                 'usuario_nombre' => 'Director Test',
@@ -77,6 +99,9 @@ class OTPTestSeeder extends Seeder
             ],
         ];
 
+        // ─── Insertar procuradores y sus usuarios ───────────
+        // Verifica existencia por DNI o email para evitar
+        // duplicados (idempotente).
         foreach ($procuradores as $procuradorData) {
             $existingProcurador = DB::table('procuradores')
                 ->where('procurador_dni', $procuradorData['procurador_dni'])
@@ -89,6 +114,8 @@ class OTPTestSeeder extends Seeder
                 $procuradorId = DB::table('procuradores')->insertGetId($procuradorData);
             }
 
+            // ─── Crear usuario del procurador ────────────────
+            // Solo si no existe ya una cuenta con ese email.
             $existingUsuario = DB::table('usuarios')
                 ->where('email', $procuradorData['procurador_email'])
                 ->first();
@@ -105,6 +132,8 @@ class OTPTestSeeder extends Seeder
             }
         }
 
+        // ─── Insertar usuarios directores ───────────────────
+        // Los directores no tienen procurador asociado.
         foreach ($directores as $directorData) {
             $existingDirector = DB::table('usuarios')
                 ->where('email', $directorData['email'])

@@ -55,14 +55,14 @@ class ClienteNombresHijosTest extends TestCase
         $this->actingAsAuthenticated($director);
 
         $this->post(route('clientes.store'), [
-                'nombre_completo' => 'Juan Pérez',
-                'cliente_dni' => '0501199900022',
-                'cliente_estado_civil' => 'Casado',
-                'cliente_telefono' => '9999-1111',
-                'cliente_direccion' => 'San Pedro Sula',
-                'cliente_numero_hijos' => 2,
-                'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
-            ])
+            'nombre_completo' => 'Juan Pérez',
+            'cliente_dni' => '0501199900022',
+            'cliente_estado_civil' => 'Casado',
+            'cliente_telefono' => '9999-1111',
+            'cliente_direccion' => 'San Pedro Sula',
+            'cliente_numero_hijos' => 2,
+            'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
+        ])
             ->assertRedirect(route('clientes.index'));
 
         $this->assertDatabaseHas('clientes', [
@@ -95,15 +95,15 @@ class ClienteNombresHijosTest extends TestCase
         ]);
 
         $this->put(route('clientes.update', ['identidad' => $cliente->cliente_dni]), [
-                'cliente_nombre' => 'Juan',
-                'cliente_apellido' => 'Pérez Modificado',
-                'cliente_dni' => '0501199900022',
-                'cliente_estado_civil' => 'Casado',
-                'cliente_telefono' => '9999-1111',
-                'cliente_direccion' => 'San Pedro Sula',
-                'cliente_numero_hijos' => 2,
-                'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
-            ])
+            'cliente_nombre' => 'Juan',
+            'cliente_apellido' => 'Pérez Modificado',
+            'cliente_dni' => '0501199900022',
+            'cliente_estado_civil' => 'Casado',
+            'cliente_telefono' => '9999-1111',
+            'cliente_direccion' => 'San Pedro Sula',
+            'cliente_numero_hijos' => 2,
+            'cliente_nombres_hijos' => 'Ana Pérez, Luis Pérez',
+        ])
             ->assertRedirect(route('clientes.show', $cliente->cliente_dni));
 
         $this->assertDatabaseHas('clientes', [

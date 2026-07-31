@@ -15,31 +15,45 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * Controlador para la búsqueda global typeahead.
- *
- * Busca en tiempo real sobre TODAS las entidades del sistema:
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: SearchController
+ * ═══════════════════════════════════════════════════════
+ * Búsqueda global typeahead (autocompletado en tiempo real).
+ * Busca en TODAS las entidades del sistema:
  * Casos, Clientes, Demandados, Procuradores, Audiencias,
  * Documentos, Entrevistas y Seguimientos.
- *
- * Respeta el filtrado por procurador: si el usuario es Procurador,
- * solo ve resultados vinculados a sus propios casos.
+ * ───────────────────────────────────────────────────────
+ * Respeta el filtrado por procurador: si el usuario es
+ * Procurador, solo ve resultados vinculados a sus propios
+ * casos. Endpoint: GET /api/search?q={termino}
+ * ───────────────────────────────────────────────────────
+ * Rutas protegidas: middleware ['auth', 'otp', 'password.changed']
+ * Roles: Director (ve todo), Procurador (solo sus casos)
+ * Límite: 8 resultados por entidad para mantener rápido el typeahead
  */
 class SearchController extends Controller
 {
     /**
-     * Ejecuta la búsqueda global y retorna resultados categorizados.
+     * ═══════════════════════════════════════════════════════
+     * __invoke
+     * ───────────────────────────────────────────────────────
+     * Ejecuta la búsqueda global y retorna resultados
+     * categorizados por tipo de entidad. Invocable directo
+     * desde la ruta (Route::get('/api/search', SearchController::class)).
+     * ═══════════════════════════════════════════════════════
      *
      * @param  Request  $request  Parámetros: q (término de búsqueda)
-     * @return JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {
+        // ─── [Validación y sanitización del término] ───────────
         $q = trim($request->validate(['q' => 'required|string|max:100'])['q']);
 
         if ($q === '') {
             return response()->json(['results' => []]);
         }
 
+        // ─── [Determinar rol y filtro de procurador] ───────────
         $user = $request->user();
         $esProcurador = RolEnum::equals($user->rol?->rol_nombre, RolEnum::PROCURADOR);
         $procuradorId = $esProcurador ? $user->procurador_id : null;
@@ -47,9 +61,9 @@ class SearchController extends Controller
         $results = [];
         $limit = 8; // máximos por entidad para mantener rápido el typeahead
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 1. CASOS — por expediente, juzgado o parte
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $casosQuery = Caso::select('casos.caso_id', 'casos.caso_numero_expediente', 'casos.caso_juzgado')
             ->where(function ($qry) use ($q) {
                 $qry->where('caso_numero_expediente', 'like', "%{$q}%")
@@ -71,9 +85,9 @@ class SearchController extends Controller
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 2. CLIENTES — por nombre, apellido o DNI
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $clientesQuery = Cliente::select('clientes.cliente_id', 'clientes.cliente_nombre', 'clientes.cliente_apellido', 'clientes.cliente_dni')
             ->where(function ($qry) use ($q) {
                 $qry->where('cliente_nombre', 'like', "%{$q}%")
@@ -95,9 +109,9 @@ class SearchController extends Controller
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 3. DEMANDADOS — por nombre, apellido o DNI
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $demandadosQuery = Demandado::select('demandados.demandado_id', 'demandados.demandado_nombre', 'demandados.demandado_apellido', 'demandados.demandado_dni')
             ->where(function ($qry) use ($q) {
                 $qry->where('demandado_nombre', 'like', "%{$q}%")
@@ -119,9 +133,9 @@ class SearchController extends Controller
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 4. PROCURADORES — por nombre, apellido, DNI, carnet o email
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $procuradoresQuery = Procurador::select(
             'procuradores.procurador_id',
             'procuradores.procurador_nombre',
@@ -149,9 +163,9 @@ class SearchController extends Controller
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 5. AUDIENCIAS — por tipo, juzgado o fecha (con el caso relacionado)
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $audienciasQuery = Audiencia::select(
             'audiencias.audiencia_id',
             'audiencias.caso_id',
@@ -181,9 +195,9 @@ class SearchController extends Controller
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 6. DOCUMENTOS — por nombre o descripción
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $documentosQuery = Documento::select(
             'documentos.documento_id',
             'documentos.caso_id',
@@ -205,14 +219,14 @@ class SearchController extends Controller
             $results[] = [
                 'type' => 'Documento',
                 'label' => $documento->documento_nombre,
-                'sub' => "Caso: {$expediente}" . ($documento->documento_descripcion ? " · {$documento->documento_descripcion}" : ''),
+                'sub' => "Caso: {$expediente}".($documento->documento_descripcion ? " · {$documento->documento_descripcion}" : ''),
                 'url' => route('casos.show', $expediente),
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 7. ENTREVISTAS — por relación de hechos u observaciones
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $entrevistasQuery = Entrevista::select(
             'entrevistas.entrevista_id',
             'entrevistas.caso_id',
@@ -232,7 +246,7 @@ class SearchController extends Controller
         foreach ($entrevistasQuery->limit($limit)->get() as $entrevista) {
             $expediente = $entrevista->caso?->caso_numero_expediente ?? 'N/A';
             $hechos = $entrevista->entrevista_relacion_hechos
-                ? substr($entrevista->entrevista_relacion_hechos, 0, 60) . (strlen($entrevista->entrevista_relacion_hechos) > 60 ? '…' : '')
+                ? substr($entrevista->entrevista_relacion_hechos, 0, 60).(strlen($entrevista->entrevista_relacion_hechos) > 60 ? '…' : '')
                 : 'Sin detalle';
             $results[] = [
                 'type' => 'Entrevista',
@@ -242,9 +256,9 @@ class SearchController extends Controller
             ];
         }
 
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         // 8. SEGUIMIENTOS — por descripción
-        // ═══════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════
         $seguimientosQuery = Seguimiento::select(
             'seguimientos.seguimiento_id',
             'seguimientos.caso_id',
@@ -262,7 +276,7 @@ class SearchController extends Controller
         foreach ($seguimientosQuery->limit($limit)->get() as $seguimiento) {
             $expediente = $seguimiento->caso?->caso_numero_expediente ?? 'N/A';
             $desc = substr($seguimiento->seguimiento_descripcion, 0, 60)
-                . (strlen($seguimiento->seguimiento_descripcion) > 60 ? '…' : '');
+                .(strlen($seguimiento->seguimiento_descripcion) > 60 ? '…' : '');
             $results[] = [
                 'type' => 'Seguimiento',
                 'label' => "{$seguimiento->seguimiento_tipo} — {$expediente}",
@@ -271,6 +285,7 @@ class SearchController extends Controller
             ];
         }
 
+        // ─── [Respuesta JSON] ──────────────────────────────────
         return response()->json(['results' => $results]);
     }
 }

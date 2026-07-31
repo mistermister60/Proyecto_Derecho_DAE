@@ -15,6 +15,16 @@ use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Usuario
+ * ═══════════════════════════════════════════════════════
+ * Representa una cuenta de acceso al sistema. Cada usuario
+ * tiene un rol que determina sus permisos, puede estar asociado
+ * a un procurador, y registra los seguimientos de actividad
+ * sobre los casos.
+ */
+
+/**
  * Modelo que representa un usuario del sistema de gestión de despachos judiciales.
  *
  * Los usuarios son las personas que acceden al sistema, con roles y permisos
@@ -27,6 +37,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $email
  * @property string $contrasena
  * @property string $usuario_estado
+ * @property bool|null $debe_cambiar_contrasena
  * @property string|null $remember_token
  * @property string|null $push_notification_token
  * @property string|null $push_subscription
@@ -46,6 +57,10 @@ class Usuario extends Model implements AuthenticatableContract, AuthorizableCont
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos de la cuenta de usuario: rol, procurador asociado,
+    // nombre, email, contraseña, estado y configuraciones de
+    // notificaciones push.
     protected $fillable = [
         'rol_id',
         'procurador_id',
@@ -58,6 +73,9 @@ class Usuario extends Model implements AuthenticatableContract, AuthorizableCont
         'push_subscription',
     ];
 
+    // ─── Atributos ocultos en serialización ─────────────────
+    // La contraseña, token de recordatorio y tokens de
+    // notificaciones push se excluyen de JSON/arrays.
     protected $hidden = [
         'contrasena',
         'remember_token',
@@ -65,6 +83,9 @@ class Usuario extends Model implements AuthenticatableContract, AuthorizableCont
         'push_subscription',
     ];
 
+    // ─── Autenticación ──────────────────────────────────────
+    // Implementa el método requerido por AuthenticatableContract
+    // para obtener la contraseña del usuario.
     /**
      * Obtener la contraseña para la autenticación.
      */
@@ -97,6 +118,9 @@ class Usuario extends Model implements AuthenticatableContract, AuthorizableCont
         return $this->hasMany(Seguimiento::class, 'usuario_id');
     }
 
+    // ─── Confirmación de contraseña ─────────────────────────
+    // Establece un timestamp en la sesión para marcar que el
+    // usuario confirmó su contraseña para acciones sensibles.
     /**
      * Marca la sesión como confirmada para acciones sensibles.
      * Establece el timestamp 'auth.password_confirmed_at' en la sesión.

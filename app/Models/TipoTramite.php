@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: TipoTramite
+ * ═══════════════════════════════════════════════════════
+ * Cataloga los casos según la materia legal que corresponden
+ * (ej: divorcio, pensión alimenticia, sucesión, etc.). Cada
+ * tipo de trámite puede tener múltiples casos asociados.
+ */
+
+/**
  * Modelo que representa un tipo de trámite judicial en el sistema.
  *
  * Los tipos de trámite categorizan los casos según la materia legal
@@ -32,6 +41,9 @@ class TipoTramite extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos del tipo de trámite: nombre, descripción y estado
+    // de activación en el sistema.
     protected $fillable = [
         'tramite_nombre',
         'tramite_descripcion',

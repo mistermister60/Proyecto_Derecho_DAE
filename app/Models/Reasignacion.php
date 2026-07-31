@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Reasignacion
+ * ═══════════════════════════════════════════════════════
+ * Representa la transferencia de un caso entre procuradores.
+ * Registra el procurador origen, destino, fecha, motivo y
+ * observaciones del cambio de asignación.
+ */
+
+/**
  * Modelo que representa una reasignación de un caso entre procuradores.
  *
  * Las reasignaciones registran el cambio de un caso de un procurador origen
@@ -37,6 +46,9 @@ class Reasignacion extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos de la reasignación: caso, procuradores origen y
+    // destino, fecha, motivo, observaciones y estado.
     protected $fillable = [
         'caso_id',
         'procurador_origen_id',
@@ -47,6 +59,9 @@ class Reasignacion extends Model
         'reasignacion_estado',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // reasignacion_fecha se castea a objeto Carbon (date) para
+    // manejo nativo de fechas en PHP.
     protected function casts(): array
     {
         return [

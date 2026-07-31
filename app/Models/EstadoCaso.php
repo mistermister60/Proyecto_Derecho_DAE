@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: EstadoCaso
+ * ═══════════════════════════════════════════════════════
+ * Define los posibles estados del pipeline de un caso judicial
+ * (ej: ingresado, en trámite, resuelto, etc.). Cada estado tiene
+ * un nombre, orden de visualización, color y tipo asociado.
+ */
+
+/**
  * Modelo que representa un estado posible de un caso judicial en el sistema.
  *
  * Los estados definen la etapa del pipeline del caso (ej: ingresado, en trámite,
@@ -34,6 +43,9 @@ class EstadoCaso extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos del estado: nombre, orden de visualización, color
+    // (para UI), tipo de estado y estado del registro.
     protected $fillable = [
         'estado_nombre',
         'estado_orden',

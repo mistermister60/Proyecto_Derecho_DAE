@@ -7,6 +7,9 @@ use App\Models\Caso;
 use App\Models\Usuario;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * POLICY: CasoPolicy
+ * ═══════════════════════════════════════════════════════
  * Policy de autorización para el modelo Caso.
  *
  * Define las reglas de acceso sobre los casos judiciales del sistema de gestión

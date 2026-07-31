@@ -7,17 +7,22 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * Form request para actualizar el perfil del usuario autenticado.
- *
- * Valida el nombre y el correo electrónico, asegurando que el email
- * sea único en la tabla de usuarios (excluyendo al usuario actual).
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Profile Update (Actualización de Perfil)
+ * ═══════════════════════════════════════════════════════
+ * Valida los datos enviados al actualizar el perfil del usuario autenticado.
+ * Asegura que el email sea único en la tabla de usuarios,
+ * excluyendo al usuario actual de la verificación de unicidad.
  */
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
      * Cualquier usuario autenticado puede actualizar su propio perfil.
+     * El middleware 'auth' ya garantiza que hay sesión activa.
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -25,25 +30,34 @@ class ProfileUpdateRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - usuario_nombre: Obligatorio, texto, máx. 255 caracteres
+     * - email:          Obligatorio, texto, minúsculas, formato email,
+     *                   máx. 255 caracteres, único en usuarios
+     *                   (ignora el ID del usuario actual)
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, array<int, Rule|string>>
      */
     public function rules(): array
     {
         return [
-            'usuario_nombre' => ['required', 'string', 'max:255'],
+            'usuario_nombre' => ['required', 'string', 'max:255'],       // ─── Obligatorio, texto hasta 255 caracteres
             'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(Usuario::class)->ignore($this->user()->usuario_id, 'usuario_id'),
+                'required',                                               // ─── Campo obligatorio
+                'string',                                                 // ─── Debe ser texto
+                'lowercase',                                              // ─── Se convierte/valida a minúsculas
+                'email',                                                  // ─── Formato email válido
+                'max:255',                                                // ─── Máximo 255 caracteres
+                Rule::unique(Usuario::class)->ignore($this->user()->usuario_id, 'usuario_id'), // ─── Único, excepto el propio usuario
             ],
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *

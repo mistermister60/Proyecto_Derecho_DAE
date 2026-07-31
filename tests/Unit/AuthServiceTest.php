@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Exceptions\AccountInactiveException;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\RateLimitExceededException;
+use App\Http\DTOs\AuthResponse;
 use App\Models\Rol;
 use App\Models\Usuario;
 use App\Services\AuthService;
@@ -51,7 +52,7 @@ class AuthServiceTest extends TestCase
 
         $result = $this->authService->attemptLogin('test@usap.edu', 'Password123!');
 
-        $this->assertInstanceOf(\App\Http\DTOs\AuthResponse::class, $result);
+        $this->assertInstanceOf(AuthResponse::class, $result);
         $this->assertNotEmpty($result->token);
         $this->assertEquals(3600, $result->expiresIn);
         $this->assertEquals($usuario->usuario_id, $result->user['id']);
@@ -336,7 +337,7 @@ class AuthServiceTest extends TestCase
 
         $response = $method->invoke($this->authService, $usuario, 'test-token');
 
-        $this->assertInstanceOf(\App\Http\DTOs\AuthResponse::class, $response);
+        $this->assertInstanceOf(AuthResponse::class, $response);
         $this->assertEquals('test-token', $response->token);
         $this->assertEquals(3600, $response->expiresIn);
         $this->assertEquals($usuario->usuario_id, $response->user['id']);

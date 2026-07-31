@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * AuthService — Servicio de autenticación con control de intentos y rate limiting.
+ * ═══════════════════════════════════════════════════════
+ * SERVICE: AuthService
+ * ═══════════════════════════════════════════════════════
+ * Servicio de autenticación con control de intentos y rate limiting.
  *
  * Gestiona el ciclo completo de inicio y cierre de sesión del sistema DAE.
  * Incorpora protección contra fuerza bruta mediante rate limiting con caché,

@@ -5,15 +5,21 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request para actualizar un demandado existente.
- *
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Update Demandado (Actualización de Demandado)
+ * ═══════════════════════════════════════════════════════
  * Valida los campos editables del demandado. Excluye el DNI actual
  * de la validación única para permitir mantener el mismo valor.
  */
 class UpdateDemandadoRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Solo usuarios autenticados pueden actualizar demandados.
+     * Verifica que exista una sesión activa mediante auth()->check().
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -21,25 +27,39 @@ class UpdateDemandadoRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - demandado_nombre:           Obligatorio, texto, máx. 100 caracteres
+     * - demandado_apellido:         Obligatorio, texto, máx. 100 caracteres
+     * - demandado_dni:              Obligatorio, texto, máx. 20, único (excluye actual)
+     * - demandado_telefono:         Opcional, texto, máx. 20 caracteres
+     * - demandado_direccion:        Obligatorio, texto libre
+     * - demandado_profesion:        Opcional, texto, máx. 100 caracteres
+     * - demandado_lugar_trabajo:    Opcional, texto, máx. 100 caracteres
+     * - demandado_direccion_trabajo: Opcional, texto, máx. 350 caracteres
+     * - demandado_telefono_trabajo: Opcional, texto, máx. 29 caracteres
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, string>
      */
     public function rules(): array
     {
         return [
-            'demandado_nombre' => 'required|string|max:100',
-            'demandado_apellido' => 'required|string|max:100',
-            'demandado_dni' => 'required|string|max:20|unique:demandados,demandado_dni,'.$this->route('identidad').',demandado_dni',
-            'demandado_telefono' => 'nullable|string|max:20',
-            'demandado_direccion' => 'required|string',
-            'demandado_profesion' => 'nullable|string|max:100',
-            'demandado_lugar_trabajo' => 'nullable|string|max:100',
-            'demandado_direccion_trabajo' => 'nullable|string|max:350',
-            'demandado_telefono_trabajo' => 'nullable|string|max:29',
+            'demandado_nombre' => 'required|string|max:100',                                                                          // ─── Obligatorio, nombre (máx. 100 caracteres)
+            'demandado_apellido' => 'required|string|max:100',                                                                        // ─── Obligatorio, apellido (máx. 100 caracteres)
+            'demandado_dni' => 'required|string|max:20|unique:demandados,demandado_dni,'.$this->route('identidad').',demandado_dni',  // ─── Obligatorio, DNI único (excluye el actual)
+            'demandado_telefono' => 'nullable|string|max:20',                                                                         // ─── Opcional, teléfono (máx. 20 caracteres)
+            'demandado_direccion' => 'required|string',                                                                               // ─── Obligatorio, dirección (texto libre)
+            'demandado_profesion' => 'nullable|string|max:100',                                                                       // ─── Opcional, profesión (máx. 100 caracteres)
+            'demandado_lugar_trabajo' => 'nullable|string|max:100',                                                                   // ─── Opcional, lugar de trabajo (máx. 100 caracteres)
+            'demandado_direccion_trabajo' => 'nullable|string|max:350',                                                               // ─── Opcional, dirección trabajo (máx. 350 caracteres)
+            'demandado_telefono_trabajo' => 'nullable|string|max:29',                                                                 // ─── Opcional, teléfono trabajo (máx. 29 caracteres)
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *

@@ -4,39 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Audiencia;
 use App\Models\Caso;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Controlador para la gestión de audiencias dentro de un caso.
- *
- * Permite crear y eliminar audiencias asociadas a un caso específico.
- * Todas las operaciones requieren autorización 'update' sobre el caso.
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: AudienciaController
+ * ═══════════════════════════════════════════════════════
+ * Gestiona audiencias dentro de un caso (crear, eliminar).
+ * Rutas: POST /casos/{expediente}/audiencias, DELETE /casos/{expediente}/audiencias/{audiencia}
+ * Middleware: auth, otp, password.changed
+ * Roles: Procurador (dueño del caso), Director
+ * Autorización: Gate 'update' sobre el Caso
  */
 class AudienciaController extends Controller
 {
     /**
+     * ═══════════════════════════════════════════════════════
+     * store
+     * ───────────────────────────────────────────────────────
      * Registra una nueva audiencia para el caso.
-     *
-     * Valida los datos de la audiencia (fecha, hora, tipo, juzgado,
-     * observaciones), asigna automáticamente el caso y el procurador
-     * responsable, y establece el estado inicial como 'pendiente'.
-     *
-     * @param  Request  $request  Datos de la audiencia
-     * @param  string  $expediente  Número de expediente del caso
-     * @return RedirectResponse Redirección a la página anterior
-     *
-     * @throws AuthorizationException Si no tiene permiso 'update'
-     * @throws ModelNotFoundException Si el caso no existe
+     * Valida fecha, hora, tipo, juzgado, observaciones.
+     * Asigna caso_id, procurador_id y estado 'pendiente'.
+     * Respuesta: Redirect back con mensaje success.
+     * ═══════════════════════════════════════════════════════
      */
     public function store(Request $request, string $expediente)
     {
+        // ─── [Obtener caso y autorizar] ───────────────────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
         Gate::authorize('update', $caso);
 
+        // ─── [Validar datos de entrada] ───────────────────────────────
         $validated = $request->validate([
             'audiencia_fecha' => 'required|date',
             'audiencia_hora' => 'nullable|date_format:H:i',
@@ -45,37 +44,38 @@ class AudienciaController extends Controller
             'audiencia_observaciones' => 'nullable|string',
         ]);
 
+        // ─── [Asignar relaciones y estado inicial] ────────────────────
         $validated['caso_id'] = $caso->caso_id;
         $validated['procurador_id'] = $caso->procurador_id;
         $validated['audiencia_estado'] = 'pendiente';
 
+        // ─── [Crear audiencia y responder] ────────────────────────────
         Audiencia::create($validated);
 
         return back()->with('success', 'Audiencia agendada.');
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * destroy
+     * ───────────────────────────────────────────────────────
      * Elimina una audiencia del caso.
-     *
-     * Busca la audiencia por ID dentro del caso especificado y la elimina
-     * físicamente de la base de datos.
-     *
-     * @param  string  $expediente  Número de expediente del caso
-     * @param  int  $audiencia_id  ID de la audiencia a eliminar
-     * @return RedirectResponse Redirección a la página anterior
-     *
-     * @throws AuthorizationException Si no tiene permiso 'update'
-     * @throws ModelNotFoundException Si el caso o la audiencia no existen
+     * Busca por ID dentro del caso y elimina físicamente.
+     * Respuesta: Redirect back con mensaje success.
+     * ═══════════════════════════════════════════════════════
      */
     public function destroy(string $expediente, int $audiencia_id)
     {
+        // ─── [Obtener caso y autorizar] ───────────────────────────────
         $caso = Caso::where('caso_numero_expediente', $expediente)->firstOrFail();
         Gate::authorize('update', $caso);
 
+        // ─── [Buscar audiencia dentro del caso] ───────────────────────
         $audiencia = Audiencia::where('audiencia_id', $audiencia_id)
             ->where('caso_id', $caso->caso_id)
             ->firstOrFail();
 
+        // ─── [Eliminar y responder] ───────────────────────────────────
         $audiencia->delete();
 
         return back()->with('success', 'Audiencia eliminada.');

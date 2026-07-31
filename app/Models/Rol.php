@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Rol
+ * ═══════════════════════════════════════════════════════
+ * Define los roles de usuario en el sistema (administrador,
+ * procurador, director, etc.). Cada rol determina los permisos
+ * y responsabilidades del usuario dentro del sistema.
+ */
+
+/**
  * Modelo que representa un rol de usuario en el sistema de gestión de despachos judiciales.
  *
  * Los roles definen los permisos y responsabilidades de cada usuario dentro del sistema,
@@ -32,6 +41,9 @@ class Rol extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos del rol: nombre descriptivo, descripción y estado
+    // de activación.
     protected $fillable = [
         'rol_nombre',
         'rol_descripcion',

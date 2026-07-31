@@ -6,7 +6,10 @@ use App\Models\Usuario;
 use Illuminate\Support\Facades\Log;
 
 /**
- * PwaService — Servicio de notificaciones push para la PWA del sistema DAE.
+ * ═══════════════════════════════════════════════════════
+ * SERVICE: PwaService
+ * ═══════════════════════════════════════════════════════
+ * Servicio de notificaciones push para la PWA del sistema DAE.
  *
  * Gestiona el ciclo de vida completo de las suscripciones push del navegador:
  * alta, baja, consulta y envío de notificaciones. Las suscripciones se

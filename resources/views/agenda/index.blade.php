@@ -1,14 +1,24 @@
 @extends('layouts.app')
 {{--
-    Vista: agenda/index
-    Propósito: Calendario de audiencias con vista mensual interactiva. Incluye lista de próximas audiencias y tabla completa de todas las audiencias registradas.
-    Variables: $audiencias (Collection de modelos Audiencia), $proximas (Collection de audiencias próximas), $esDirector (bool), $esProcurador (bool)
+    ═══════════════════════════════════════════════════════
+    VISTA: agenda/index
+    ═══════════════════════════════════════════════════════
+    Calendario de audiencias con vista mensual interactiva (Alpine.js).
+    Incluye lista de próximas audiencias y tabla completa de todas las
+    audiencias registradas.
+    ───────────────────────────────────────────────────────
+    Variables:
+        $audiencias     (Collection de modelos Audiencia)
+        $proximas       (Collection de audiencias próximas)
+        $esDirector     (bool)
+        $esProcurador   (bool)
     @extends: layouts.app
     @section: content
 --}}
 
 @section('title', 'Agenda')
 
+{{-- Preparación de datos JSON para Alpine.js: mapea audiencias a array plano --}}
 @php
     $audienciasJson = $audiencias->map(fn($a) => [
         'audiencia_fecha' => $a->audiencia_fecha,

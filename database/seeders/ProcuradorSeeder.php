@@ -5,10 +5,25 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * SEEDER: ProcuradorSeeder
+ * ═══════════════════════════════════════════════════════
+ * Siembra 5 procuradores (estudiantes practicantes) con
+ * datos realistas para el consultorio jurídico.
+ *
+ * - Cada procurador tiene datos personales completos
+ * - Induce registros en la tabla 'procuradores'
+ * - Independiente, no depende de otros seeders
+ * - Los usuarios se crean aparte en UsuarioSeeder
+ */
 class ProcuradorSeeder extends Seeder
 {
     public function run(): void
     {
+        // ─── Procuradores registrados ───────────────────────
+        // Estudiantes de Derecho que atienden casos en el
+        // consultorio jurídico de la USAP.
         DB::table('procuradores')->insert([
             [
                 'procurador_nombre' => 'Iris Lizeth',

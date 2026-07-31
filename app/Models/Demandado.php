@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Demandado
+ * ═══════════════════════════════════════════════════════
+ * Representa a la persona o entidad contra la cual se interpone
+ * una demanda. Almacena datos personales, de contacto e información
+ * laboral del demandado.
+ */
+
+/**
  * Modelo que representa un demandado en el sistema de gestión de despachos judiciales.
  *
  * El demandado es la persona o entidad contra la cual se interpone una demanda.
@@ -39,6 +48,9 @@ class Demandado extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos personales, de contacto e información laboral
+    // del demandado.
     protected $fillable = [
         'demandado_nombre',
         'demandado_apellido',
@@ -52,6 +64,9 @@ class Demandado extends Model
         'demandado_estado',
     ];
 
+    // ─── Accessor: nombre completo ──────────────────────────
+    // Concatena nombre y apellido para obtener el nombre
+    // completo del demandado de forma dinámica.
     /**
      * Obtener el nombre completo del demandado.
      */

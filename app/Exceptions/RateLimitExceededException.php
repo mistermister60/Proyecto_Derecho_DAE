@@ -3,7 +3,10 @@
 namespace App\Exceptions;
 
 /**
- * RateLimitExceededException — Límite de intentos de autenticación excedido.
+ * ═══════════════════════════════════════════════════════
+ * EXCEPTION: RateLimitExceededException
+ * ═══════════════════════════════════════════════════════
+ * Límite de intentos de autenticación excedido.
  *
  * Se lanza cuando un usuario supera el número máximo de intentos
  * de inicio de sesión permitidos en un período de tiempo determinado,

@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Audiencia
+ * ═══════════════════════════════════════════════════════
+ * Representa una audiencia judicial programada dentro de un caso.
+ * Cada audiencia está asociada a un caso y asignada a un procurador,
+ * registrando fecha, hora, juzgado y estado de la misma.
+ */
+
+/**
  * Modelo que representa una audiencia judicial dentro de un caso.
  *
  * Las audiencias son citaciones programadas ante un juzgado, asociadas
@@ -37,6 +46,9 @@ class Audiencia extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos esenciales de la audiencia: caso, procurador, fecha,
+    // hora, juzgado, tipo, estado y observaciones.
     protected $fillable = [
         'caso_id',
         'procurador_id',
@@ -48,6 +60,9 @@ class Audiencia extends Model
         'audiencia_observaciones',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // audiencia_fecha se castea a objeto Carbon (date) para
+    // facilitar su manipulación como fecha nativa de PHP.
     protected function casts(): array
     {
         return [

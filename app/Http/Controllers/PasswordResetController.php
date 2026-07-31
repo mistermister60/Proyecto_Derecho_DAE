@@ -7,20 +7,28 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 /**
- * Controlador para el flujo de "Olvidé mi contraseña" (Password Reset).
- *
- * Permite a cualquier usuario (incluyendo Procuradores) solicitar un enlace
- * de restablecimiento por correo y establecer una nueva contraseña.
- * No requiere autenticación previa.
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: PasswordResetController
+ * ═══════════════════════════════════════════════════════
+ * Flujo "Olvidé mi contraseña" usando broker nativo de Laravel.
+ * Permite solicitar enlace de restablecimiento por email y establecer
+ * nueva contraseña. No requiere autenticación previa.
+ * Rutas: GET /password/reset, POST /password/email, GET /password/reset/{token}, POST /password/reset
+ * Middleware: guest (sin autenticación)
+ * Roles: Cualquier usuario (incluye Procuradores)
+ * Broker: 'users' (tabla password_reset_tokens, expiración 60 min)
  */
 class PasswordResetController extends BaseController
 {
     /**
-     * Muestra el formulario para solicitar el enlace de restablecimiento.
+     * ═══════════════════════════════════════════════════════
+     * showLinkRequestForm
+     * ───────────────────────────────────────────────────────
+     * Muestra el formulario para solicitar enlace de restablecimiento.
+     * Respuesta: Vista auth.forgot-password
+     * ═══════════════════════════════════════════════════════
      */
     public function showLinkRequestForm()
     {
@@ -28,19 +36,24 @@ class PasswordResetController extends BaseController
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * sendResetLinkEmail
+     * ───────────────────────────────────────────────────────
      * Envía el enlace de restablecimiento al correo del usuario.
-     *
-     * Utiliza el broker de passwords de Laravel (tabla password_reset_tokens).
-     * El enlace expira a los 60 minutos por defecto.
+     * Usa broker 'users' de Laravel (tabla password_reset_tokens).
+     * Valida email existe en usuarios. Respuesta: Redirect back con status/error.
+     * ═══════════════════════════════════════════════════════
      */
     public function sendResetLinkEmail(Request $request): RedirectResponse
     {
+        // ─── [Validar email] ──────────────────────────────────────────
         $request->validate([
             'email' => 'required|email|exists:usuarios,email',
         ], [
             'email.exists' => 'No existe ninguna cuenta asociada a este correo electrónico.',
         ]);
 
+        // ─── [Enviar enlace via broker nativo] ────────────────────────
         $status = Password::broker('users')->sendResetLink(
             $request->only('email')
         );
@@ -51,7 +64,12 @@ class PasswordResetController extends BaseController
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * showResetForm
+     * ───────────────────────────────────────────────────────
      * Muestra el formulario para restablecer la contraseña con el token.
+     * Respuesta: Vista auth.reset-password con token
+     * ═══════════════════════════════════════════════════════
      */
     public function showResetForm(Request $request, $token)
     {
@@ -59,14 +77,19 @@ class PasswordResetController extends BaseController
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * reset
+     * ───────────────────────────────────────────────────────
      * Procesa el restablecimiento de la contraseña.
-     *
-     * Valida el token, actualiza la contraseña y limpia el token usado.
-     * IMPORTANTE: Si el usuario tenía 'debe_cambiar_contrasena = true',
-     * lo mantenemos en true para que el flujo de primer login siga vigente.
+     * Valida token, actualiza contraseña y limpia token usado.
+     * IMPORTANTE: Si usuario tenía 'debe_cambiar_contrasena = true',
+     * se mantiene en true para que el flujo de primer login siga vigente.
+     * Respuesta: Redirect login con success o back con errors.
+     * ═══════════════════════════════════════════════════════
      */
     public function reset(Request $request): RedirectResponse
     {
+        // ─── [Validar datos de entrada] ───────────────────────────────
         $request->validate([
             'token' => 'required',
             'email' => 'required|email|exists:usuarios,email',
@@ -82,6 +105,7 @@ class PasswordResetController extends BaseController
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ]);
 
+        // ─── [Restablecer via broker nativo] ──────────────────────────
         $status = Password::broker('users')->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (Usuario $user, string $password) {

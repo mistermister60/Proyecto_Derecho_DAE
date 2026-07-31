@@ -1,8 +1,20 @@
 @extends('layouts.app')
 {{--
-    Vista: dashboard/index
-    Propósito: Panel principal con KPIs (casos activos, nuevos del mes, audiencias, cerrados, atrasados), gráficas de pipeline y tipo de trámite, próximas audiencias y carga de trabajo por procurador.
-    Variables: $casosActivos, $nuevosEsteMes, $audienciasEstaSemana, $cerrados, $atrasados (conteos), $proximasAudiencias (Collection), $procuradores (Collection con total_casos y activos), $pipelineLabels, $pipelineData, $pipelineColors, $tipoLabels, $tipoData (arrays para Chart.js)
+    ═══════════════════════════════════════════════════════
+    VISTA: dashboard/index
+    ═══════════════════════════════════════════════════════
+    Panel principal con KPIs, gráficas Chart.js (pipeline, tipo de trámite,
+    resoluciones), próximas audiencias y carga de trabajo por procurador.
+    ───────────────────────────────────────────────────────
+    Variables:
+        $casosActivos, $nuevosEsteMes, $audienciasEstaSemana,
+        $cerrados, $atrasados  (conteos numéricos)
+        $proximasAudiencias    (Collection de Audiencias)
+        $procuradores          (Collection con total_casos, activos)
+        $pipelineLabels, $pipelineData, $pipelineColors   (arrays Chart.js)
+        $tipoLabels, $tipoData                             (arrays Chart.js)
+        $resolucionesLabels, $resolucionesData, $resolucionesColors (arrays)
+        $esProcurador          (bool)
     @extends: layouts.app
     @section: content
     @push: scripts
@@ -10,9 +22,10 @@
 
 @section('title', 'Dashboard')
 
+{{-- Contenido principal del Dashboard —}}
 @section('content')
 <div x-data="dashboardData()" x-init="initCharts()">
-    {{-- KPIs --}}
+    {{-- KPIs: Tarjetas de resumen (casos activos, nuevos, audiencias, cerrados, atrasados) --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4 mb-6">
         <x-kpi-card titulo="Casos activos" :valor="$casosActivos" color="#2563EB"
             icono='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' />
@@ -116,6 +129,7 @@
     </div>
 </div>
 
+{{-- Script de inicialización de gráficas Chart.js (pipeline, tipo de trámite, resoluciones) —}}
 @push('scripts')
 <script>
 function dashboardData() {

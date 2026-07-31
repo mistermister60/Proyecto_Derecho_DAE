@@ -8,10 +8,12 @@ use App\Models\Demandado;
 use App\Models\EstadoCaso;
 use App\Models\Procurador;
 use App\Models\Reasignacion;
+use App\Models\Rol;
 use App\Models\TipoTramite;
 use App\Models\Usuario;
-use App\Models\Rol;
 use App\Services\CasoService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,9 +31,13 @@ class CasoServiceTest extends TestCase
 
     // Datos de prueba creados en setUp
     private int $estadoEntrevistaId;
+
     private int $estadoEnProcesoId;
+
     private int $estadoCerradoId;
+
     private int $tipoTramiteCivilId;
+
     private int $tipoTramitePenalId;
 
     protected function setUp(): void
@@ -44,24 +50,24 @@ class CasoServiceTest extends TestCase
 
         // Crear estados de caso necesarios con IDs fijos
         $this->estadoEntrevistaId = EstadoCaso::factory()->create([
-            'estado_id' => 1, 'estado_nombre' => 'Entrevista', 'estado_tipo' => 'pipeline', 'estado_orden' => 1, 'estado_color' => '#3B82F6'
+            'estado_id' => 1, 'estado_nombre' => 'Entrevista', 'estado_tipo' => 'pipeline', 'estado_orden' => 1, 'estado_color' => '#3B82F6',
         ])->estado_id;
 
         $this->estadoEnProcesoId = EstadoCaso::factory()->create([
-            'estado_id' => 2, 'estado_nombre' => 'En Proceso', 'estado_tipo' => 'pipeline', 'estado_orden' => 2, 'estado_color' => '#F59E0B'
+            'estado_id' => 2, 'estado_nombre' => 'En Proceso', 'estado_tipo' => 'pipeline', 'estado_orden' => 2, 'estado_color' => '#F59E0B',
         ])->estado_id;
 
         $this->estadoCerradoId = EstadoCaso::factory()->create([
-            'estado_id' => 3, 'estado_nombre' => 'Cerrado', 'estado_tipo' => 'cerrado', 'estado_orden' => 3, 'estado_color' => '#10B981'
+            'estado_id' => 3, 'estado_nombre' => 'Cerrado', 'estado_tipo' => 'cerrado', 'estado_orden' => 3, 'estado_color' => '#10B981',
         ])->estado_id;
 
         // Crear tipos de trámite con IDs fijos
         $this->tipoTramiteCivilId = TipoTramite::factory()->create([
-            'tipo_tramite_id' => 1, 'tramite_nombre' => 'Civil'
+            'tipo_tramite_id' => 1, 'tramite_nombre' => 'Civil',
         ])->tipo_tramite_id;
 
         $this->tipoTramitePenalId = TipoTramite::factory()->create([
-            'tipo_tramite_id' => 2, 'tramite_nombre' => 'Penal'
+            'tipo_tramite_id' => 2, 'tramite_nombre' => 'Penal',
         ])->tipo_tramite_id;
 
         $this->casoService = new CasoService;
@@ -143,7 +149,7 @@ class CasoServiceTest extends TestCase
             $casos[] = $this->casoService->createCaso($data);
         }
 
-        $correlativos = array_map(fn($c) => (int) substr($c->caso_numero_expediente, -5), $casos);
+        $correlativos = array_map(fn ($c) => (int) substr($c->caso_numero_expediente, -5), $casos);
         $this->assertEquals(range($correlativos[0], $correlativos[0] + 4), $correlativos);
     }
 
@@ -157,7 +163,7 @@ class CasoServiceTest extends TestCase
 
         // Crear caso manualmente con datos del setUp
         $caso = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00001',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00001',
             'cliente_id' => $cliente->cliente_id,
             'demandado_id' => $demandado->demandado_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
@@ -195,7 +201,7 @@ class CasoServiceTest extends TestCase
         $procuradorOrigen = Procurador::factory()->create();
 
         $caso = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00002',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00002',
             'cliente_id' => $cliente->cliente_id,
             'demandado_id' => $demandado->demandado_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
@@ -214,7 +220,7 @@ class CasoServiceTest extends TestCase
             'reasignacion_motivo' => 'Motivo',
         ];
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->casoService->reassignCaso($caso, $data);
 
         // Verificar que el caso no cambió de procurador (rollback)
@@ -226,7 +232,7 @@ class CasoServiceTest extends TestCase
     public function test_close_caso_marca_como_cerrado_y_guarda_resolucion(): void
     {
         $caso = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00003',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00003',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -258,7 +264,7 @@ class CasoServiceTest extends TestCase
     public function test_close_caso_usa_fecha_actual_si_no_se_proporciona(): void
     {
         $caso = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00004',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00004',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -285,7 +291,7 @@ class CasoServiceTest extends TestCase
     public function test_deactivate_caso_cambia_estado_a_inactivo(): void
     {
         $caso = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00005',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00005',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -316,7 +322,7 @@ class CasoServiceTest extends TestCase
         $this->assertArrayHasKey('estados', $data);
         $this->assertArrayHasKey('tramites', $data);
         $this->assertArrayHasKey('columnas', $data);
-        $this->assertInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class, $data['casos']);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $data['casos']);
     }
 
     /** @test */
@@ -331,7 +337,7 @@ class CasoServiceTest extends TestCase
 
         // Crear caso propio
         $casoPropio = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00006',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00006',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => $procurador->procurador_id,
@@ -345,7 +351,7 @@ class CasoServiceTest extends TestCase
 
         // Caso de otro procurador
         Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00007',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00007',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -371,7 +377,7 @@ class CasoServiceTest extends TestCase
 
         // Crear casos con estados específicos usando IDs del setUp
         Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00008',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00008',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -384,7 +390,7 @@ class CasoServiceTest extends TestCase
         ]);
 
         Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00009',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00009',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -397,7 +403,7 @@ class CasoServiceTest extends TestCase
         ]);
 
         Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00010',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00010',
             'cliente_id' => Cliente::factory()->create()->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,
@@ -426,7 +432,7 @@ class CasoServiceTest extends TestCase
 
         $cliente = Cliente::factory()->create();
         $caso = Caso::create([
-            'caso_numero_expediente' => '0501-' . date('Y') . '-00011',
+            'caso_numero_expediente' => '0501-'.date('Y').'-00011',
             'cliente_id' => $cliente->cliente_id,
             'tipo_tramite_id' => $this->tipoTramiteCivilId,
             'procurador_id' => Procurador::factory()->create()->procurador_id,

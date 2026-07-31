@@ -5,17 +5,21 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request para almacenar una suscripción de notificación push.
- *
- * Valida que el payload de suscripción sea un string válido.
- * El usuario se obtiene de auth()->id() en el controlador.
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Store Push Notification (Suscripción Push)
+ * ═══════════════════════════════════════════════════════
+ * Valida el payload de suscripción a notificaciones push (Web Push).
+ * El usuario autenticado se obtiene en el controlador vía auth()->id().
  */
 class StorePushNotificationRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * Las notificaciones push están permitidas para todos los usuarios autenticados.
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
+     * Cualquier usuario autenticado puede suscribirse a notificaciones push.
+     * El middleware 'auth' ya garantiza que hay sesión activa.
+     * ═══════════════════════════════════════════════
      */
     public function authorize(): bool
     {
@@ -23,17 +27,23 @@ class StorePushNotificationRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * - subscription: Obligatorio, string (JSON serializado del objeto PushSubscription)
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
         return [
-            'subscription' => ['required', 'string'],
+            'subscription' => ['required', 'string'],       // ─── Obligatorio, JSON serializado de la suscripción push
         ];
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation error messages.
      *

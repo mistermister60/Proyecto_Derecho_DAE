@@ -2,17 +2,30 @@
 
 namespace App\Http\Controllers;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: AuthController
+ * ═══════════════════════════════════════════════════════
+ * Gestiona la autenticación de usuarios del sistema DAE.
+ * Atiende las rutas: login, 2FA (OTP por email), logout.
+ * Middleware: 'guest' para showLogin/login, 'auth' para logout.
+ * Roles: accesible para cualquier usuario con credenciales.
+ * Delega la lógica de autenticación en AuthService.
+ * El superadmin omite el 2FA automáticamente.
+ */
+
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginCredentialsRequest;
-use App\Services\AuthService;
 use App\Mail\CodigoVerificacionMail;
+use App\Services\AuthService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 /**
  * Controlador para la autenticación de usuarios en el sistema DAE.
@@ -57,7 +70,9 @@ class AuthController extends BaseController
 
             $user = auth()->user();
 
-            // Solo el super admin original omite 2FA (configurado en config/auth.php)
+            // ─── [Super Admin: omite 2FA automáticamente] ────
+            // Si el email coincide con el configurado como super_admin
+            // en config/auth.php, se salta el paso de verificación 2FA
             if ($user && $user->email === config('auth.super_admin_email')) {
                 Session::put('two_factor_verified', true);
 
@@ -69,14 +84,16 @@ class AuthController extends BaseController
                 return redirect()->intended(route('dashboard'));
             }
 
-            // 1. Generamos un código aleatorio de 6 dígitos
+            // ─── [Generación del código 2FA] ──────────────────
+            // Crea un código aleatorio seguro de 6 dígitos para
+            // el segundo factor de autenticación
             $codigo2FA = random_int(100000, 999999);
 
             // 2. Guardamos los datos temporalmente en la sesión para validarlos después
             session([
                 'two_factor_code' => $codigo2FA,
                 'two_factor_expires_at' => Carbon::now()->addMinutes(15),
-                'two_factor_email' => $request->input('email')
+                'two_factor_email' => $request->input('email'),
             ]);
 
             // 3. Enviamos el correo real utilizando el módulo que creaste
@@ -92,22 +109,43 @@ class AuthController extends BaseController
         }
     }
 
-    public function verifyTwoFactor(\Illuminate\Http\Request $request)
+    /**
+     * ═══════════════════════════════════════════════════
+     * verifyTwoFactor
+     * ───────────────────────────────────────────────────
+     * Verifica el código OTP de 6 dígitos enviado al correo
+     * del usuario durante el 2FA. Comprueba que coincida con
+     * el almacenado en sesión y que no haya expirado (15 min).
+     * Si es válido, marca la sesión como verificada y redirige
+     * al dashboard. En caso contrario, retorna error al formulario.
+     * ═══════════════════════════════════════════════════
+     */
+    public function verifyTwoFactor(Request $request)
     {
+        // ─── [Validación del código ingresado] ────────────────
+        // El código debe ser un valor numérico obligatorio
         $request->validate([
             'code' => 'required|numeric',
         ]);
 
+        // ─── [Verificación del código contra la sesión] ──────
+        // Comprueba coincidencia exacta y que la fecha actual
+        // esté dentro del margen de 15 minutos desde su generación
         if ($request->input('code') == session('two_factor_code') &&
-            \Carbon\Carbon::now()->isBefore(session('two_factor_expires_at'))) {
+            Carbon::now()->isBefore(session('two_factor_expires_at'))) {
 
-            // Si el código es correcto y no ha expirado, limpiamos la sesión y marcamos como verificado
+            // ─── [Código válido: limpiar sesión y autorizar] ─
+            // Elimina los datos temporales del 2FA y marca al
+            // usuario como verificado para el resto de la sesión
             session()->forget(['two_factor_code', 'two_factor_expires_at']);
             session(['two_factor_verified' => true]);
 
             return redirect()->intended(route('dashboard'));
         }
 
+        // ─── [Código inválido o expirado] ────────────────────
+        // Devuelve error sin revelar si el código era incorrecto
+        // o ya expiró, por seguridad
         return back()->withErrors(['code' => 'El código de verificación es inválido o ha expirado.']);
     }
 
@@ -121,12 +159,19 @@ class AuthController extends BaseController
      */
     public function logout(): RedirectResponse
     {
+        // ─── [Revocación del token en AuthService] ──────────
+        // Intenta revocar el token Sanctum del usuario; si falla
+        // (por ejemplo, si el usuario ya no tiene token), se
+        // captura silenciosamente para no interrumpir el cierre
         try {
             $this->authService->logout(auth()->id());
         } catch (\Throwable) {
             // Silently handle token revocation errors
         }
 
+        // ─── [Cierre de sesión de Laravel] ──────────────────
+        // Limpia la sesión, invalida el ID de sesión actual
+        // y regenera el token CSRF por seguridad
         Auth::logout();
         Session::invalidate();
         Session::regenerateToken();

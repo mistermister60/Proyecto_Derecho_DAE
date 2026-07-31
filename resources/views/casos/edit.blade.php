@@ -1,21 +1,33 @@
 @extends('layouts.app')
 {{--
-    Vista: casos/edit
-    Propósito: Formulario de edición de caso. Permite modificar partes involucradas, tipo de trámite, estado del pipeline, procurador asignado, fechas y relación de hechos. Los campos críticos son solo editables por el Director.
-    Variables: $caso (modelo Caso), $estados (Collection de estados del pipeline), $tramites (Collection de tipos de trámite), $clientes (Collection de modelos Cliente), $demandados (Collection de modelos Demandado), $procuradores (Collection de modelos Procurador)
-    @extends: layouts.app
-    @section: content
+    ═══════════════════════════════════════════════════════
+    VISTA: casos/edit
+    ═══════════════════════════════════════════════════════
+    Propósito: Formulario de edición de caso. Permite modificar partes
+    involucradas, tipo de trámite, estado del pipeline, procurador asignado,
+    fechas y relación de hechos. Los campos críticos (cliente, demandado,
+    procurador, estado registro, fecha interposición) son solo editables por el Director.
+    ───────────────────────────────────────────────────────
+    Variables: $caso (modelo Caso), $estados (Collection de estados del pipeline),
+               $tramites (Collection de tipos de trámite), $clientes (Collection de modelos Cliente),
+               $demandados (Collection de modelos Demandado),
+               $procuradores (Collection de modelos Procurador)
+    Secciones: @extends('layouts.app') @section('content')
+    Componentes: <x-estado-badge>
 --}}
 
 @section('title', 'Editar Caso — ' . $caso->caso_numero_expediente)
 
 @section('content')
+{{-- ─── [DETECCIÓN DE ROL DIRECTOR] ──────────────── ──}}
+{{-- Variable booleana que controla la edición de campos restringidos --}}
 @php($esDirector = \App\Enums\RolEnum::equals(auth()->user()->rol?->rol_nombre, \App\Enums\RolEnum::DIRECTOR))
 <form action="{{ route('casos.update', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
     @method('PUT')
     
-    {{-- Header --}}
+    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── ──}}
+    {{-- Muestra el número de expediente como identificador, botón Cancelar (vuelve a show) y Guardar cambios --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>
             <h1 class="text-xl font-bold" style="color: #111827;">Editar caso</h1>

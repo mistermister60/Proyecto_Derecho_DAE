@@ -5,6 +5,19 @@ use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 use Laravel\Sanctum\Sanctum;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * CONFIG: sanctum.php (secciones personalizadas)
+ * ═══════════════════════════════════════════════════════
+ * Configuración de Laravel Sanctum para autenticación SPA/API.
+ *
+ * Secciones personalizadas del proyecto DAE:
+ * - stateful: Dominios stateful para cookies de sesión (incluye puerto de Vite).
+ * - guard: Guardia 'web' para autenticación de primera parte.
+ * - expiration: null = tokens sin expiración automática (gestionada por AuthService: 1 hora).
+ * - token_prefix: Prefijo opcional para detección de secretos en GitHub.
+ * - middleware: Middleware de sesión, cookies y CSRF para SPA.
+ */
 return [
 
     /*

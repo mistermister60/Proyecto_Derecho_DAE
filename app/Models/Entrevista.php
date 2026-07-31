@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Entrevista
+ * ═══════════════════════════════════════════════════════
+ * Representa una reunión o entrevista entre el procurador y
+ * el cliente dentro del contexto de un caso. Documenta la
+ * relación de hechos y observaciones relevantes.
+ */
+
+/**
  * Modelo que representa una entrevista realizada a un cliente en el contexto de un caso.
  *
  * Las entrevistas registran las reuniones entre el procurador y el cliente,
@@ -35,6 +44,9 @@ class Entrevista extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos de la entrevista: caso y procurador involucrados,
+    // fecha, relación de hechos, observaciones y estado.
     protected $fillable = [
         'caso_id',
         'procurador_id',
@@ -44,6 +56,9 @@ class Entrevista extends Model
         'entrevista_estado',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // entrevista_fecha se castea a objeto Carbon (date) para
+    // manejo nativo de fechas en PHP.
     protected function casts(): array
     {
         return [

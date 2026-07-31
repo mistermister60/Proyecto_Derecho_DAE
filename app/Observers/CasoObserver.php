@@ -6,6 +6,9 @@ use App\Models\Caso;
 use Illuminate\Support\Facades\Log;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * OBSERVER: CasoObserver
+ * ═══════════════════════════════════════════════════════
  * Observer para el modelo Caso.
  *
  * Responde a eventos del ciclo de vida del modelo (created, updated, etc.)

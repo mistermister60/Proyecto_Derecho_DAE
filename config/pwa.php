@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * CONFIG: pwa.php
+ * ═══════════════════════════════════════════════════════
+ * Configuración de la Progressive Web App (PWA) del sistema DAE.
+ *
+ * Incluye:
+ * - Botón de instalación
+ * - Manifiesto PWA (nombre, iconos, shortcuts, colores, etc.)
+ * - Claves VAPID para notificaciones push
+ * - Estrategia de cache offline
+ * - Configuración de debug y Livewire
+ *
+ * Ejecutar: php artisan erag:update-manifest para actualizar el manifiesto.
+ */
 return [
 
     /*

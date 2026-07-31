@@ -3,7 +3,10 @@
 namespace App\Exceptions;
 
 /**
- * AccountInactiveException — Cuenta de usuario desactivada.
+ * ═══════════════════════════════════════════════════════
+ * EXCEPTION: AccountInactiveException
+ * ═══════════════════════════════════════════════════════
+ * Cuenta de usuario desactivada.
  *
  * Se lanza cuando un usuario intenta autenticarse pero su cuenta
  * se encuentra desactivada o suspendida, impidiendo el acceso al sistema.

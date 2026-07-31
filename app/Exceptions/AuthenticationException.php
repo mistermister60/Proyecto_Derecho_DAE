@@ -5,7 +5,10 @@ namespace App\Exceptions;
 use Exception;
 
 /**
- * AuthenticationException — Excepción base del dominio de autenticación.
+ * ═══════════════════════════════════════════════════════
+ * EXCEPTION: AuthenticationException
+ * ═══════════════════════════════════════════════════════
+ * Excepción base del dominio de autenticación.
  *
  * Sirve como clase padre para todas las excepciones relacionadas con
  * el proceso de autenticación (credenciales inválidas, cuenta inactiva,

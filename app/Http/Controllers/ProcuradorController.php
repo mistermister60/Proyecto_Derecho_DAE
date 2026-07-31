@@ -15,24 +15,34 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
- * Controlador para la gestión de procuradores.
- *
- * CRUD completo de procuradores con creación simultánea de usuario asociado.
- * La creación, desactivación y reactivación usan DB::transaction para
- * mantener consistencia entre las tablas procuradores y usuarios.
- * Solo accesible para usuarios con rol Director. La búsqueda de registros
- * se realiza por DNI (no por ID).
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: ProcuradorController
+ * ═══════════════════════════════════════════════════════
+ * CRUD completo de procuradores con creación simultánea
+ * de usuario asociado. La creación, desactivación y
+ * reactivación usan DB::transaction para mantener
+ * consistencia entre las tablas procuradores y usuarios.
+ * Solo accesible para usuarios con rol Director.
+ * La búsqueda de registros se realiza por DNI (no por ID).
+ * ───────────────────────────────────────────────────────
+ * Rutas protegidas: middleware ['auth', 'otp', 'password.changed'] + 'role:Director'
+ * Roles: Solo Director
+ * Validación: StoreProcuradorRequest / UpdateProcuradorRequest
  */
 class ProcuradorController extends Controller
 {
     /**
+     * ═══════════════════════════════════════════════════════
+     * index
+     * ───────────────────────────────────────────────────────
      * Lista los procuradores con paginación y búsqueda.
-     *
-     * Incluye contador de casos asociados. Busca por DNI, teléfono, nombre,
-     * apellido o email. Ordena por apellido y nombre.
+     * Incluye contador de casos asociados. Busca por DNI,
+     * teléfono, nombre, apellido o email. Ordena por apellido y nombre.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  Request  $request  Contiene el parámetro opcional 'search'
      * @return View Vista index con procuradores paginados
@@ -41,7 +51,9 @@ class ProcuradorController extends Controller
     {
         $search = trim($request->query('search', ''));
 
+        // ─── [Consulta base con contador de casos] ────────────
         $procuradores = Procurador::withCount('casos')
+            // ─── [Búsqueda por múltiples campos] ───────────────
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('procurador_dni', 'like', "%{$search}%")
@@ -51,15 +63,21 @@ class ProcuradorController extends Controller
                         ->orWhere('procurador_email', 'like', "%{$search}%");
                 });
             })
+            // ─── [Ordenamiento y paginación] ────────────────────
             ->orderBy('procurador_apellido')
             ->orderBy('procurador_nombre')
             ->paginate(20);
 
+        // ─── [Renderizado de vista] ────────────────────────────
         return view('procuradores.index', compact('procuradores'));
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * create
+     * ───────────────────────────────────────────────────────
      * Muestra el formulario de creación de un nuevo procurador.
+     * ═══════════════════════════════════════════════════════
      *
      * @return View Vista create del formulario
      */
@@ -69,11 +87,16 @@ class ProcuradorController extends Controller
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * store
+     * ───────────────────────────────────────────────────────
      * Registra un nuevo procurador y su usuario asociado.
-     *
-     * Valida datos personales y profesionales. Dentro de una transacción
-     * crea el procurador y simultáneamente genera un usuario con rol
-     * 'Procurador', contraseña temporal 'Procurador.{dni}!' y estado activo.
+     * Valida datos personales y profesionales. Dentro de una
+     * transacción crea el procurador y simultáneamente genera
+     * un usuario con rol 'Procurador', contraseña temporal
+     * 'Procurador.{dni}!' y estado activo. Envía email de
+     * bienvenida con credenciales.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  Request  $request  Datos del procurador
      * @return RedirectResponse Redirección al índice con mensaje
@@ -86,18 +109,22 @@ class ProcuradorController extends Controller
 
         $validated['procurador_estado'] = 'activo';
 
-        // Manejar foto si se subió
+        // ─── [Manejo de foto si se subió] ──────────────────────
         if ($request->hasFile('procurador_foto')) {
             $path = $request->file('procurador_foto')->store('procuradores/fotos', 'public');
             $validated['procurador_foto'] = $path;
         }
 
-        // Generar contraseña temporal ANTES de la transacción para poder enviarla por email
-        // Formato: Procurador.{dni}!
-        $tempPassword = 'Procurador.' . \Illuminate\Support\Str::random(12) . '!';
+        // ─── [Generar contraseña temporal ANTES de la transacción] ─
+        // Para poder enviarla por email; formato: Procurador.{random}!
+        $tempPassword = 'Procurador.'.Str::random(12).'!';
 
+        // ─── [Transacción: crear procurador + usuario] ──────────
         DB::transaction(function () use ($validated, $tempPassword) {
+            // ─── [Crear procurador] ─────────────────────────────
             $procurador = Procurador::create($validated);
+
+            // ─── [Crear usuario asociado] ───────────────────────
             $usuario = Usuario::create([
                 'rol_id' => Rol::where('rol_nombre', 'Procurador')->value('rol_id'),
                 'procurador_id' => $procurador->procurador_id,
@@ -108,7 +135,8 @@ class ProcuradorController extends Controller
                 'debe_cambiar_contrasena' => true, // Forzar cambio en primer login
             ]);
 
-            // Enviar email de bienvenida con credenciales (cola, se envía tras commit)
+            // ─── [Enviar email de bienvenida con credenciales] ───
+            // Se envía tras commit de la transacción (cola)
             Mail::to($usuario->email)->send(new BienvenidaProcuradorMail(
                 $usuario->usuario_nombre,
                 $usuario->email,
@@ -117,15 +145,19 @@ class ProcuradorController extends Controller
             ));
         });
 
+        // ─── [Redirección con mensaje] ─────────────────────────
         return redirect()->route('procuradores.index')
             ->with('success', 'Procurador y usuario registrados exitosamente. Se han enviado las credenciales al correo institucional.');
     }
 
     /**
-     * Muestra los detalles de un procurador con sus casos y usuario asociado.
-     *
-     * Realiza eager loading de casos (con estado, tipo de trámite y
-     * procurador) y del usuario vinculado.
+     * ═══════════════════════════════════════════════════════
+     * show
+     * ───────────────────────────────────────────────────────
+     * Muestra los detalles de un procurador con sus casos y
+     * usuario asociado. Realiza eager loading de casos (con
+     * estado, tipo de trámite y procurador) y del usuario vinculado.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  string  $identidad  Número de DNI del procurador
      * @return View Vista show con procurador y relaciones
@@ -134,15 +166,21 @@ class ProcuradorController extends Controller
      */
     public function show(string $identidad)
     {
+        // ─── [Consulta con eager loading] ──────────────────────
         $procurador = Procurador::with(['casos.estado', 'casos.tipoTramite', 'casos.procurador', 'usuario'])
             ->where('procurador_dni', $identidad)
             ->firstOrFail();
 
+        // ─── [Renderizado de vista] ────────────────────────────
         return view('procuradores.show', compact('procurador'));
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * edit
+     * ───────────────────────────────────────────────────────
      * Muestra el formulario de edición de un procurador.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  string  $identidad  Número de DNI del procurador
      * @return View Vista edit con datos del procurador
@@ -151,16 +189,22 @@ class ProcuradorController extends Controller
      */
     public function edit(string $identidad)
     {
+        // ─── [Búsqueda del procurador por DNI] ─────────────────
         $procurador = Procurador::where('procurador_dni', $identidad)->firstOrFail();
 
+        // ─── [Renderizado de vista] ────────────────────────────
         return view('procuradores.edit', compact('procurador'));
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * update
+     * ───────────────────────────────────────────────────────
      * Actualiza los datos de un procurador existente.
-     *
-     * Valida campos editables incluyendo unicidad de DNI, carnet y email
-     * (excluyendo el registro actual). No modifica el usuario asociado.
+     * Valida campos editables incluyendo unicidad de DNI,
+     * carnet y email (excluyendo el registro actual).
+     * No modifica el usuario asociado. Maneja subida de foto.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  Request  $request  Datos actualizados del procurador
      * @param  string  $identidad  Número de DNI del procurador
@@ -170,31 +214,37 @@ class ProcuradorController extends Controller
      */
     public function update(UpdateProcuradorRequest $request, string $identidad)
     {
+        // ─── [Búsqueda del procurador] ─────────────────────────
         $procurador = Procurador::where('procurador_dni', $identidad)->firstOrFail();
 
         $validated = $request->validated();
 
-        // Manejar foto si se subió una nueva
+        // ─── [Manejo de foto si se subió una nueva] ────────────
         if ($request->hasFile('procurador_foto')) {
-            // Eliminar foto anterior si existe
+            // ─── [Eliminar foto anterior si existe] ────────────
             if ($procurador->procurador_foto && Storage::disk('public')->exists($procurador->procurador_foto)) {
                 Storage::disk('public')->delete($procurador->procurador_foto);
             }
             $validated['procurador_foto'] = $request->file('procurador_foto')->store('procuradores', 'public');
         }
 
+        // ─── [Actualización del registro] ──────────────────────
         $procurador->update($validated);
 
+        // ─── [Redirección con mensaje] ─────────────────────────
         return redirect()->route('procuradores.show', $procurador->fresh()->procurador_dni)
             ->with('success', 'Procurador actualizado exitosamente.');
     }
 
     /**
-     * Desactiva un procurador y su usuario asociado (eliminación lógica).
-     *
-     * Dentro de una transacción cambia el estado del procurador y, si existe,
-     * del usuario vinculado a 'inactivo'. Los registros se conservan para
-     * integridad histórica.
+     * ═══════════════════════════════════════════════════════
+     * destroy
+     * ───────────────────────────────────────────────────────
+     * Desactiva un procurador y su usuario asociado (eliminación
+     * lógica). Dentro de una transacción cambia el estado del
+     * procurador y, si existe, del usuario vinculado a 'inactivo'.
+     * Los registros se conservan para integridad histórica.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  string  $identidad  Número de DNI del procurador
      * @return RedirectResponse Redirección al índice con mensaje
@@ -204,8 +254,10 @@ class ProcuradorController extends Controller
      */
     public function destroy(string $identidad)
     {
+        // ─── [Búsqueda del procurador] ─────────────────────────
         $procurador = Procurador::where('procurador_dni', $identidad)->firstOrFail();
 
+        // ─── [Transacción: desactivar procurador + usuario] ─────
         DB::transaction(function () use ($procurador) {
             $procurador->update(['procurador_estado' => 'inactivo']);
             if ($procurador->usuario) {
@@ -213,15 +265,19 @@ class ProcuradorController extends Controller
             }
         });
 
+        // ─── [Redirección con mensaje] ─────────────────────────
         return redirect()->route('procuradores.index')
             ->with('success', 'Procurador desactivado exitosamente. El registro se conserva en el sistema.');
     }
 
     /**
+     * ═══════════════════════════════════════════════════════
+     * activar
+     * ───────────────────────────────────────────────────────
      * Reactiva un procurador y su usuario asociado.
-     *
-     * Dentro de una transacción cambia el estado del procurador y, si existe,
-     * del usuario vinculado a 'activo'.
+     * Dentro de una transacción cambia el estado del procurador
+     * y, si existe, del usuario vinculado a 'activo'.
+     * ═══════════════════════════════════════════════════════
      *
      * @param  string  $identidad  Número de DNI del procurador
      * @return RedirectResponse Redirección a vista show con mensaje
@@ -231,8 +287,10 @@ class ProcuradorController extends Controller
      */
     public function activar(string $identidad)
     {
+        // ─── [Búsqueda del procurador] ─────────────────────────
         $procurador = Procurador::where('procurador_dni', $identidad)->firstOrFail();
 
+        // ─── [Transacción: reactivar procurador + usuario] ──────
         DB::transaction(function () use ($procurador) {
             $procurador->update(['procurador_estado' => 'activo']);
 
@@ -241,6 +299,7 @@ class ProcuradorController extends Controller
             }
         });
 
+        // ─── [Redirección con mensaje] ─────────────────────────
         return redirect()->route('procuradores.show', $identidad)
             ->with('success', 'Procurador reactivado exitosamente.');
     }

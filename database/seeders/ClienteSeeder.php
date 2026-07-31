@@ -5,10 +5,25 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * ═══════════════════════════════════════════════════════
+ * SEEDER: ClienteSeeder
+ * ═══════════════════════════════════════════════════════
+ * Siembra 12 clientes de prueba con datos detallados:
+ * información personal, laboral, familiar y salarial.
+ *
+ * - Representan perfiles variados (solteros, casados,
+ *   divorciados, con hijos, distintas profesiones)
+ * - Independiente (no depende de otros seeders)
+ * - Los IDs generados aquí son referenciados por CasoSeeder
+ */
 class ClienteSeeder extends Seeder
 {
     public function run(): void
     {
+        // ─── Clientes de prueba ─────────────────────────────
+        // Cada cliente incluye datos personales, laborales,
+        // familiares y de contacto para simular casos reales.
         $clientes = [
             [
                 'cliente_nombre' => 'María José',

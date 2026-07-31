@@ -1,17 +1,28 @@
 @extends('layouts.app')
 {{--
-    Vista: casos/index
-    Propósito: Listado de casos con dos vistas intercambiables: tabla (con paginación y filtros) y kanban (columnas por estado del pipeline).
-    Variables: $casos (paginator de modelos Caso), $estados (Collection de estados del pipeline), $tramites (Collection de tipos de trámite), $columnas (array agrupado por estado para vista kanban)
-    @extends: layouts.app
-    @section: content
+    ═══════════════════════════════════════════════════════
+    VISTA: casos/index
+    ═══════════════════════════════════════════════════════
+    Propósito: Listado de casos con dos vistas intercambiables:
+    tabla (con paginación y filtros) y kanban (columnas por estado del pipeline).
+    Usada por Director y Procurador para visualizar y gestionar casos activos.
+    ───────────────────────────────────────────────────────
+    Variables: $casos (paginator de modelos Caso),
+               $estados (Collection de estados del pipeline),
+               $tramites (Collection de tipos de trámite),
+               $columnas (array agrupado por estado para vista kanban)
+    Secciones: @extends('layouts.app') @section('content')
+    Componentes: <x-tabla>, <x-estado-badge>
 --}}
 
 @section('title', 'Casos')
 
 @section('content')
+{{-- ─── [CONTENEDOR PRINCIPAL CON ALPINE.JS] ─────── ──}}
+{{-- Controla el toggle entre vista 'tabla' y 'kanban', y los filtros de búsqueda --}}
 <div x-data="{ vista: 'tabla', search: '', filtroEstado: '', filtroTramite: '' }">
-    {{-- Header --}}
+    {{-- ─── [ENCABEZADO Y BARRA DE ACCIONES] ───────── ──}}
+    {{-- Título de la página, botones de cambio de vista (Tabla/Kanban), filtros desplegables y botón "Nuevo caso" --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
         <div class="flex items-center gap-3">
             <div class="flex rounded-lg overflow-hidden" style="border: 1px solid #E5E7EB;">
@@ -54,7 +65,9 @@
         </div>
     </div>
 
-    {{-- ==================== VISTA TABLA ==================== --}}
+    {{-- ─── [VISTA TABLA] ─────────────────────────── ──}}
+    {{-- Tabla responsiva con columnas: Expediente, Cliente, Trámite, Parte, Procurador, Juzgado, Estado, Fecha --}}
+    {{-- Cada fila es clickeable y redirige al detalle del caso --}}
     <div x-show="vista === 'tabla'">
         <x-tabla :encabezados="['No. Expediente', 'Cliente', 'Tipo de trámite', 'Parte', 'Procurador', 'Juzgado', 'Estado', 'Última actualización']">
             @forelse ($casos as $caso)
@@ -69,11 +82,14 @@
                 <td class="px-4 py-3 text-sm" style="color: #9CA3AF;">{{ $caso->created_at->format('d/m/Y') }}</td>
             </tr>
             @empty
+            {{-- Mensaje cuando no hay casos registrados --}}
             <tr>
                 <td colspan="8" class="px-4 py-8 text-center text-sm" style="color: #9CA3AF;">No hay casos registrados</td>
             </tr>
             @endforelse
         </x-tabla>
+        {{-- ─── [PAGINACIÓN] ───────────────────────── ──}}
+        {{-- Solo se muestra si hay más de una página de resultados --}}
         @if ($casos->hasPages())
         <div class="px-4 py-3 border-t" style="border-color: #E5E7EB;">
             {{ $casos->links() }}
@@ -81,7 +97,9 @@
         @endif
     </div>
 
-    {{-- ==================== VISTA KANBAN ==================== --}}
+    {{-- ─── [VISTA KANBAN] ───────────────────────── ──}}
+    {{-- Columnas agrupadas por estado del pipeline, cada columna contiene tarjetas de caso --}}
+    {{-- Las tarjetas muestran: cliente, tipo de trámite, y fecha (si existe) --}}
     <div x-show="vista === 'kanban'" class="flex gap-3 md:gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
         @foreach ($columnas as $estado => [$color, $tarjetas])
         <div class="flex flex-col rounded-xl shrink-0 min-w-[200px] md:min-w-[220px]" style="background: #F3F4F6;">
@@ -91,10 +109,12 @@
                 <span class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-full" style="background: #E5E7EB; color: #6B7280;">{{ count($tarjetas) }}</span>
             </div>
             <div class="flex-1 px-3 pb-3 space-y-2">
+                {{-- ─── [TARJETA DE CASO EN KANBAN] ─────── ──}}
                 @forelse ($tarjetas as $exp => [$cliente, $tipo, $fecha])
                 <div class="rounded-lg p-3 cursor-pointer transition-shadow" style="background: #FFFFFF; border: 1px solid #E5E7EB; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onclick="window.location='{{ route('casos.show', $exp) }}'" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';" onmouseout="this.style.boxShadow='0 1px 2px rgba(0,0,0,0.04)';">
                     <p class="text-sm font-medium" style="color: #111827;">{{ $cliente }}</p>
                     <p class="text-xs mt-1" style="color: #6B7280;">{{ $tipo }}</p>
+                    {{-- Badge de fecha (amarillo) solo si existe fecha asociada --}}
                     @if ($fecha)
                     <div class="flex items-center gap-1 mt-2 text-xs" style="color: #F59E0B;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -103,6 +123,7 @@
                     @endif
                 </div>
                 @empty
+                {{-- Columna vacía --}}
                 <div class="flex items-center justify-center py-8 text-xs" style="color: #9CA3AF;">
                     Sin casos
                 </div>

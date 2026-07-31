@@ -11,20 +11,30 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Controlador para el cambio obligatorio de contraseña en el primer inicio de sesión.
- *
- * Gestiona la vista donde el usuario (típicamente un Procurador recién creado)
- * cambia su contraseña temporal por una definitiva, y la actualización en BD.
+ * ═══════════════════════════════════════════════════════
+ * CONTROLADOR: PasswordChangeController
+ * ═══════════════════════════════════════════════════════
+ * Gestiona el cambio obligatorio de contraseña en primer inicio de sesión.
+ * Flujo: Usuario nuevo (Procurador) → login → OTP → formulario cambio → dashboard.
+ * Rutas: GET /password/cambio, PUT /password/cambio
+ * Middleware: auth, otp, password.changed (excepto showChangeForm)
+ * Roles: Procurador (recién creado), Director
  */
 class PasswordChangeController extends BaseController
 {
     /**
+     * ═══════════════════════════════════════════════════════
+     * showChangeForm
+     * ───────────────────────────────────────────────────────
      * Muestra el formulario de cambio de contraseña obligatorio.
+     * Si el usuario ya cambió su contraseña, redirige al dashboard.
+     * Respuesta: Vista auth.password-change
+     * ═══════════════════════════════════════════════════════
      */
     public function showChangeForm(Request $request)
     {
-        // Si el usuario no necesita cambiar la contraseña, ir al dashboard
-        if (!auth()->user()->debe_cambiar_contrasena) {
+        // ─── [Verificar si ya cambió contraseña] ──────────────────────
+        if (! auth()->user()->debe_cambiar_contrasena) {
             return redirect()->route('dashboard');
         }
 
@@ -32,16 +42,18 @@ class PasswordChangeController extends BaseController
     }
 
     /**
-     * Procesa el cambio de contraseña.
-     *
-     * Valida que la nueva contraseña cumpla con los requisitos de seguridad,
-     * que no sea igual a la actual, actualiza el hash en BD y desactiva la
-     * bandera debe_cambiar_contrasena.
-     *
-     * @throws ValidationException Si la nueva contraseña es igual a la actual.
+     * ═══════════════════════════════════════════════════════
+     * update
+     * ───────────────────────────────────────────────────────
+     * Procesa el cambio de contraseña obligatorio.
+     * Valida contraseña actual, nueva (con requisitos de seguridad),
+     * confirma que no sea igual a la actual, actualiza hash y desactiva
+     * la bandera debe_cambiar_contrasena. Respuesta: Redirect dashboard con success.
+     * ═══════════════════════════════════════════════════════
      */
     public function update(Request $request): RedirectResponse
     {
+        // ─── [Validar datos de entrada] ───────────────────────────────
         $validated = $request->validate([
             'contrasena_actual' => ['required'],
             'nueva_contrasena' => [
@@ -64,21 +76,21 @@ class PasswordChangeController extends BaseController
 
         $usuario = auth()->user();
 
-        // Verificar que la contraseña actual sea correcta
-        if (!Hash::check($request->input('contrasena_actual'), $usuario->contrasena)) {
+        // ─── [Verificar contraseña actual correcta] ───────────────────
+        if (! Hash::check($request->input('contrasena_actual'), $usuario->contrasena)) {
             throw ValidationException::withMessages([
                 'contrasena_actual' => 'La contraseña actual es incorrecta.',
             ]);
         }
 
-        // Verificar que la nueva no sea igual a la actual
+        // ─── [Verificar que nueva no sea igual a la actual] ───────────
         if (Hash::check($request->input('nueva_contrasena'), $usuario->contrasena)) {
             throw ValidationException::withMessages([
                 'nueva_contrasena' => 'La nueva contraseña no puede ser igual a la actual.',
             ]);
         }
 
-        // Actualizar contraseña y desactivar la bandera
+        // ─── [Actualizar contraseña y desactivar bandera] ─────────────
         $usuario->contrasena = Hash::make($request->input('nueva_contrasena'));
         $usuario->debe_cambiar_contrasena = false;
         $usuario->save();

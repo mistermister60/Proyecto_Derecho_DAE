@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * MODELO: Seguimiento
+ * ═══════════════════════════════════════════════════════
+ * Registra la bitácora de actividades y eventos de un caso.
+ * Documenta acciones, cambios de estado, comentarios y cualquier
+ * evento relevante en el ciclo de vida del expediente.
+ */
+
+/**
  * Modelo que representa un seguimiento o registro de actividad en un caso.
  *
  * Los seguimientos documentan las acciones realizadas sobre un caso,
@@ -35,6 +44,9 @@ class Seguimiento extends Model
 
     public $timestamps = true;
 
+    // ─── Atributos asignables masivamente ───────────────────
+    // Datos del seguimiento: caso y usuario involucrados,
+    // fecha, tipo de evento, descripción y estado.
     protected $fillable = [
         'caso_id',
         'usuario_id',
@@ -44,6 +56,9 @@ class Seguimiento extends Model
         'seguimiento_estado',
     ];
 
+    // ─── Castings de tipos ──────────────────────────────────
+    // seguimiento_fecha se castea a objeto Carbon (date) para
+    // manejo nativo de fechas en PHP.
     protected function casts(): array
     {
         return [

@@ -3,7 +3,10 @@
 namespace App\Http\DTOs;
 
 /**
- * AuthResponse — DTO para la respuesta de autenticación.
+ * ═══════════════════════════════════════════════════════
+ * DTO: AuthResponse
+ * ═══════════════════════════════════════════════════════
+ * DTO para la respuesta de autenticación.
  *
  * Transporta los datos que se devuelven al cliente tras un inicio
  * de sesión exitoso: token JWT, tipo de token, tiempo de expiración,

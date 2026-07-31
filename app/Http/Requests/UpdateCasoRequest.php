@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request para actualizar un caso legal existente.
- *
- * Incluye lógica de autorización basada en policies de Laravel y validación
- * condicional: los usuarios con rol de Director tienen reglas adicionales
- * que el resto de los usuarios no pueden modificar.
+ * ═══════════════════════════════════════════════════════
+ * FORM REQUEST: Update Caso (Actualización de Caso Legal)
+ * ═══════════════════════════════════════════════════════
+ * Valida la actualización de un caso legal existente.
+ * Incluye autorización basada en policies de Laravel y validación condicional:
+ * los usuarios con rol de Director tienen reglas adicionales que el resto
+ * de usuarios no pueden modificar.
  */
 class UpdateCasoRequest extends FormRequest
 {
@@ -23,11 +25,12 @@ class UpdateCasoRequest extends FormRequest
     public ?Caso $caso = null;
 
     /**
-     * Determine if the user is authorized to make this request.
-     *
+     * ═══════════════════════════════════════════════
+     * AUTORIZACIÓN
+     * ───────────────────────────────────────────────
      * Resuelve el caso a partir del parámetro de ruta 'expediente' y
      * delega la autorización a la CasoPolicy.
-     *
+     * ═══════════════════════════════════════════════
      *
      * @throws ModelNotFoundException
      */
@@ -39,21 +42,35 @@ class UpdateCasoRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * ═══════════════════════════════════════════════
+     * REGLAS DE VALIDACIÓN
+     * ───────────────────────────────────────────────
+     * Reglas base (todos los usuarios):
+     * - estado_id:                Obligatorio, debe existir en estados_caso
+     * - caso_parte_representada:  Obligatorio, texto, máx. 50 caracteres
+     * - caso_juzgado:             Opcional, texto, máx. 50 caracteres
+     * - caso_relacion_hechos:     Obligatorio, texto libre
      *
-     * Las reglas base aplican a todos los usuarios. Si el usuario autenticado
-     * tiene rol de Director, se agregan reglas adicionales (cliente, demandado,
-     * tipo_trámite, procurador, fecha, observaciones, admisibilidad y estado).
+     * Reglas adicionales SOLO para Director:
+     * - cliente_id:               Obligatorio, debe existir en clientes
+     * - demandado_id:             Opcional, debe existir en demandados
+     * - tipo_tramite_id:          Obligatorio, debe existir en tipos_tramite
+     * - procurador_id:            Obligatorio, debe existir en procuradores
+     * - caso_fecha_interpuesta:   Opcional, fecha válida
+     * - caso_observaciones_director: Opcional, texto libre
+     * - caso_admisible:           Booleano
+     * - caso_estado:              Obligatorio, valores del Enum CasoEstadoEnum
+     * ═══════════════════════════════════════════════
      *
      * @return array<string, string>
      */
     public function rules(): array
     {
         $comunes = [
-            'estado_id' => 'required|exists:estados_caso,estado_id',
-            'caso_parte_representada' => 'required|string|max:50',
-            'caso_juzgado' => 'nullable|string|max:50',
-            'caso_relacion_hechos' => 'required|string',
+            'estado_id' => 'required|exists:estados_caso,estado_id',                                          // ─── Obligatorio, estado del caso existente
+            'caso_parte_representada' => 'required|string|max:50',                                            // ─── Obligatorio, parte representada (máx. 50 caracteres)
+            'caso_juzgado' => 'nullable|string|max:50',                                                       // ─── Opcional, juzgado (máx. 50 caracteres)
+            'caso_relacion_hechos' => 'required|string',                                                      // ─── Obligatorio, relato de los hechos
         ];
 
         if (! $this->esDirector()) {
@@ -61,18 +78,20 @@ class UpdateCasoRequest extends FormRequest
         }
 
         return array_merge($comunes, [
-            'cliente_id' => 'required|exists:clientes,cliente_id',
-            'demandado_id' => 'nullable|exists:demandados,demandado_id',
-            'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',
-            'procurador_id' => 'required|exists:procuradores,procurador_id',
-            'caso_fecha_interpuesta' => 'nullable|date',
-            'caso_observaciones_director' => 'nullable|string',
-            'caso_admisible' => 'boolean',
+            'cliente_id' => 'required|exists:clientes,cliente_id',                                            // ─── Obligatorio, cliente existente
+            'demandado_id' => 'nullable|exists:demandados,demandado_id',                                      // ─── Opcional, demandado existente
+            'tipo_tramite_id' => 'required|exists:tipos_tramite,tipo_tramite_id',                             // ─── Obligatorio, tipo de trámite existente
+            'procurador_id' => 'required|exists:procuradores,procurador_id',                                  // ─── Obligatorio, procurador existente
+            'caso_fecha_interpuesta' => 'nullable|date',                                                      // ─── Opcional, fecha válida
+            'caso_observaciones_director' => 'nullable|string',                                               // ─── Opcional, observaciones del director
+            'caso_admisible' => 'boolean',                                                                    // ─── Booleano: admisible o no
             // Sustitución de string mágico por validación estricta basada en Enum
-            'caso_estado' => 'required|in:'.implode(',', CasoEstadoEnum::values()),
+            'caso_estado' => 'required|in:'.implode(',', CasoEstadoEnum::values()),                           // ─── Obligatorio, estado válido del Enum
         ]);
     }
 
+    // ─── Mensajes personalizados de error ───────────────────────────────
+    // Traduce los errores de validación a español para el usuario final.
     /**
      * Get the custom validation messages.
      *

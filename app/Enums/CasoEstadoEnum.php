@@ -3,6 +3,9 @@
 namespace App\Enums;
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * ENUM: CasoEstadoEnum
+ * ═══════════════════════════════════════════════════════
  * Estados posibles de un caso estudiantil en el sistema DAE.
  *
  * Representa el ciclo de vida de un caso dentro de la Dirección de Asuntos

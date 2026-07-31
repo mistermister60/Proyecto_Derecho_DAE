@@ -1,18 +1,26 @@
 @extends('layouts.app')
 {{--
-    Vista: casos/reasignar
-    Propósito: Permite al Director reasignar un caso a otro procurador. Muestra información actual del caso y una lista de procuradores disponibles con radio buttons.
-    Variables: $caso (modelo Caso con relaciones cliente y procurador), $procuradores (Collection de modelos Procurador activos)
-    @extends: layouts.app
-    @section: content
+    ═══════════════════════════════════════════════════════
+    VISTA: casos/reasignar
+    ═══════════════════════════════════════════════════════
+    Propósito: Permite al Director reasignar un caso a otro procurador.
+    Muestra información actual del caso (expediente, cliente, procurador actual)
+    y una lista de procuradores disponibles con radio buttons.
+    ───────────────────────────────────────────────────────
+    Variables: $caso (modelo Caso con relaciones cliente y procurador),
+               $procuradores (Collection de modelos Procurador activos)
+    Secciones: @extends('layouts.app') @section('title') @section('content')
+    Componentes: Ninguno
 --}}
 
 @section('title', 'Reasignar caso')
 
 @section('content')
+{{-- ─── [FORMULARIO DE REASIGNACIÓN] ─────────────── ──}}
 <form action="{{ route('casos.storeReasignacion', $caso->caso_numero_expediente) }}" method="POST">
     @csrf
-    {{-- Header --}}
+    {{-- ─── [ENCABEZADO Y BOTONES DE ACCIÓN] ──────── ──}}
+    {{-- Título, número de expediente, botón Cancelar y Confirmar reasignación --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>
             <h1 class="text-xl font-bold" style="color: #111827;">Reasignar caso</h1>

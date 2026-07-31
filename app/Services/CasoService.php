@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
- * CasoService — Servicio de gestión de casos legales del sistema DAE.
+ * ═══════════════════════════════════════════════════════
+ * SERVICE: CasoService
+ * ═══════════════════════════════════════════════════════
+ * Servicio de gestión de casos legales del sistema DAE.
  *
  * Provee las operaciones centrales del módulo de casos: listado con soporte
  * de vista Kanban, creación con generación automática de número de expediente
@@ -162,7 +165,7 @@ class CasoService
 
             $data['caso_numero_expediente'] = config('app.oficina_receptora').'-'.now()->year.'-'.str_pad($correlativo, 5, '0', STR_PAD_LEFT);
             $estadoId = EstadoCaso::where('estado_nombre', config('app.estados_caso.entrevista'))->value('estado_id');
-            if (!$estadoId) {
+            if (! $estadoId) {
                 throw new \RuntimeException('El estado "Entrevista" no existe en la base de datos. Ejecuta los seeders.');
             }
             $data['estado_id'] = $estadoId;
