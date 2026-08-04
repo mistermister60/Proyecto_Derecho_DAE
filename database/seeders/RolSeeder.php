@@ -19,9 +19,7 @@ class RolSeeder extends Seeder
 {
     public function run(): void
     {
-        // ─── Roles del sistema ──────────────────────────────
-        // Director: administrador del consultorio, omite 2FA
-        // Procurador: estudiante practicante, pasa por 2FA OTP
+
         DB::table('roles')->insert([
             [
                 'rol_nombre' => 'Director',

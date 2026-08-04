@@ -38,11 +38,7 @@ class DatabaseSeeder extends Seeder
             ProcuradorSeeder::class,
 
             // Datos de prueba (dependen de catálogos)
-            ClienteSeeder::class,
-            DemandadoSeeder::class,
             UsuarioSeeder::class,
-            CasoSeeder::class,
-            AudienciaSeeder::class,
         ]);
     }
 }
