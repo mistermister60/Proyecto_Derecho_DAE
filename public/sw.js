@@ -20,18 +20,26 @@
 
 // use strict;
 
-const CACHE_NAME = "pwa-app-v2";
+const CACHE_NAME = "pwa-app-v1";
 const OFFLINE_URL = '/offline.html';
-const CACHE_DATE_SUFFIX = '.cache-date';
 
 /**
  * Assets estáticos precacheados durante la instalación del SW.
- * Incluye únicamente recursos públicos y fallback offline.
+ * Incluye rutas de navegación principales y recursos compartidos.
  * @type {string[]}
  */
 const STATIC_CACHE = [
     OFFLINE_URL,
     '/',
+    '/dashboard',
+    '/casos',
+    '/clientes',
+    '/usuarios',
+    '/demandados',
+    '/procuradores',
+    '/agenda',
+    '/css/app.css',
+    '/js/app.js',
     '/manifest.json',
     '/logo.png'
 ];
@@ -86,11 +94,6 @@ self.addEventListener("fetch", (event) => {
     const request = event.request;
     const url = new URL(request.url);
 
-    // No interceptar recursos de origen cruzado.
-    if (url.origin !== self.location.origin) {
-        return;
-    }
-
     // Usar strategy: network-first para navegación (navegar)
     if (request.mode === 'navigate') {
         event.respondWith(
@@ -99,15 +102,17 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // Evitar cachear rutas privadas completas que pueden devolver HTML de sesión.
-    if (url.pathname.startsWith('/api/')) {
+    // API requests: network-first con fallback a cache
+    if (url.pathname.startsWith('/api/') || url.pathname.includes('/casos') || 
+        url.pathname.includes('/clientes') || url.pathname.includes('/agenda') ||
+        url.pathname.includes('/seguimientos')) {
         event.respondWith(
             networkFirstAPI(request, url)
         );
         return;
     }
 
-    // Archivos estáticos: cache-first con expiración para recursos públicos.
+    // Archivos estáticos: cache-first con expiración
     event.respondWith(
         cacheFirstStatic(request, url)
     );
@@ -221,10 +226,9 @@ async function cacheFirstStatic(request, url) {
     const cachedResponse = await cache.match(request);
     if (cachedResponse) {
         // Verificar si está obsoleto (después de 7 días)
-        const cacheDateResponse = await cache.match(request.url + CACHE_DATE_SUFFIX);
-        if (cacheDateResponse) {
-            const cacheDateText = await cacheDateResponse.text();
-            const cachedTime = new Date(cacheDateText);
+        const cacheDate = await cache.match(request + '.cache-date');
+        if (cacheDate) {
+            const cachedTime = new Date(cacheDate.url);
             const now = new Date();
             const diffDays = (now - cachedTime) / (1000 * 60 * 60 * 24);
             
@@ -245,14 +249,12 @@ async function cacheFirstStatic(request, url) {
     try {
         const networkResponse = await fetch(request);
         
-        // Cachear la respuesta solo si es exitosa (status 200)
-        if (networkResponse.ok && networkResponse.status === 200) {
-            await cache.put(request, networkResponse.clone());
-            
-            // Guardar fecha de cache
-            const dateResponse = new Response(new Date().toISOString());
-            await cache.put(request.url + CACHE_DATE_SUFFIX, dateResponse);
-        }
+        // Cachear la respuesta
+        await cache.put(request, networkResponse.clone());
+        
+        // Guardar fecha de cache
+        const dateResponse = new Response(new Date().toString());
+        await cache.put(request + '.cache-date', dateResponse);
         
         return networkResponse;
     } catch (error) {

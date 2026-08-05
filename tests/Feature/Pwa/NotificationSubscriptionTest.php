@@ -115,7 +115,7 @@ class NotificationSubscriptionTest extends TestCase
         $this->assertFileExists($path);
 
         $content = file_get_contents($path);
-        $this->assertStringContainsString('pwa-app-v2', $content);
+        $this->assertStringContainsString('pwa-app-v1', $content);
         $this->assertStringContainsString('OFFLINE_URL', $content);
         $this->assertStringContainsString('networkFirstNavigate', $content);
     }
