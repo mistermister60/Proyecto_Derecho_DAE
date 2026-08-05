@@ -36,9 +36,9 @@ class SecurityHeadersMiddleware
         $response = $next($request);
 
         if (method_exists($response, 'header')) {
-            $response->header('X-Frame-Options', 'DENY');
-            $response->header('X-Content-Type-Options', 'nosniff');
-            $response->header('Referrer-Policy', 'strict-origin-when-cross-origin');
+            //$response->header('X-Frame-Options', 'DENY');
+            //$response->header('X-Content-Type-Options', 'nosniff');
+            //$response->header('Referrer-Policy', 'strict-origin-when-cross-origin');
 
             // CSP optimizado para producción Laravel Cloud + Vite + PWA + Alpine.js
             // Permite: scripts propios, inline (View Transitions), módulos ES, SW, fuentes, imágenes
@@ -52,7 +52,7 @@ class SecurityHeadersMiddleware
                    "worker-src 'self' blob:; ".
                    "manifest-src 'self';";
 
-            $response->header('Content-Security-Policy', $csp);
+            //$response->header('Content-Security-Policy', $csp);
         }
 
         return $response;
