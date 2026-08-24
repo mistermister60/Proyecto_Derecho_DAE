@@ -70,20 +70,6 @@ class AuthController extends BaseController
 
             $user = auth()->user();
 
-            // ─── [Super Admin: omite 2FA automáticamente] ────
-            // Si el email coincide con el configurado como super_admin
-            // en config/auth.php, se salta el paso de verificación 2FA
-            if ($user && $user->email === config('auth.super_admin_email')) {
-                Session::put('two_factor_verified', true);
-
-                // Verificar si debe cambiar contraseña (primer login)
-                if ($user->debe_cambiar_contrasena) {
-                    return redirect()->route('password.change');
-                }
-
-                return redirect()->intended(route('dashboard'));
-            }
-
             // ─── [Generación del código 2FA] ──────────────────
             // Crea un código aleatorio seguro de 6 dígitos para
             // el segundo factor de autenticación

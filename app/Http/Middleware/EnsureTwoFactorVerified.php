@@ -7,7 +7,7 @@
  * Verifica que el usuario haya completado la autenticación
  * de dos factores (2FA) mediante OTP enviado por correo.
  *
- * El Director (super admin) omite el 2FA automáticamente.
+ * Verifica la marca de sesión 'two_factor_verified' antes de permitir el acceso.
  * Si el código 2FA expiró o nunca se generó, fuerza un
  * re-login completo por seguridad.
  */
@@ -25,8 +25,7 @@ class EnsureTwoFactorVerified
      *
      * Comprueba:
      * - Si la sesión tiene la marca 'two_factor_verified', permite el paso.
-     * - Si el email del usuario coincide con el super admin (Director),
-     *   omite el 2FA automáticamente marcando la sesión.
+     * - El flujo 2FA es obligatorio para todos los roles (incluido el Director).
      * - Si no hay código 2FA en sesión (expirado o nunca generado),
      *   redirige al login para reiniciar el flujo de autenticación.
      * - Si hay código pero no está verificado, redirige al formulario 2FA.
@@ -40,14 +39,6 @@ class EnsureTwoFactorVerified
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check() && ! session()->has('two_factor_verified')) {
-            // Solo el super admin original (director@usap.edu) omite 2FA
-            $user = auth()->user();
-            if ($user && $user->email === config('auth.super_admin_email')) {
-                session(['two_factor_verified' => true]);
-
-                return $next($request);
-            }
-
             // Si no hay código 2FA en sesión (expirado o nunca generado), forzar re-login
             if (! session()->has('two_factor_code')) {
                 return redirect()->route('login');

@@ -106,7 +106,7 @@ http://proyecto-derecho-dae.test
 **Detalles:**
 - ✅ Código expira en **15 minutos**
 - ✅ Máximo **5 intentos fallidos** → bloqueo 5 minutos
-- ✅ **Director (super_admin_email)** omite 2FA automáticamente
+- ✅ El 2FA es **obligatorio para todos los roles** (incluido el Director)
 - ✅ Si es **primer login** → redirige a cambio obligatorio de contraseña
 
 ### Si no llega el código

@@ -20,20 +20,18 @@ class RolSeeder extends Seeder
     public function run(): void
     {
         // ─── Roles del sistema ──────────────────────────────
-        // Director: administrador del consultorio, omite 2FA
+        // Director: administrador del consultorio
         // Procurador: estudiante practicante, pasa por 2FA OTP
         DB::table('roles')->insert([
             [
                 'rol_nombre' => 'Director',
                 'rol_descripcion' => 'Director del Consultorio Jurídico',
                 'rol_estado' => 'activo',
-                'es_superadmin' => true,
             ],
             [
                 'rol_nombre' => 'Procurador',
                 'rol_descripcion' => 'Estudiante practicante',
                 'rol_estado' => 'activo',
-                'es_superadmin' => false,
             ],
         ]);
     }
