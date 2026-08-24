@@ -48,6 +48,8 @@ class ProcuradoresTemporalesSeeder extends Seeder
             'Youssef Isai Pineda Fajardo' => '1201069',
             'Valerie Abigail Jimenez Arzú' => '2220090',
             'Brenda Flores' => '1894189',
+            'Perla Fabiola Gonzalez Martinez' => '3240520',
+            'Shermine Nicolle Parada Najar' => '1230634',
         ];
 
         foreach ($estudiantes as $nombreCompleto => $cuenta) {
