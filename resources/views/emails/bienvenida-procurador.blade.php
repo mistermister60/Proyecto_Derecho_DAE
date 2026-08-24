@@ -72,6 +72,7 @@
             <li style="margin-bottom: 8px;">Ingresa tu <strong>correo</strong> y la <strong>contraseña temporal</strong> (copia y pega para evitar errores)</li>
             <li style="margin-bottom: 8px;">Recibirás un <strong>código OTP de 6 dígitos por correo</strong> (autenticación de dos factores)</li>
             <li style="margin-bottom: 8px;">Ingresa el código OTP (expira en 15 minutos)</li>
+            <li style="margin-bottom: 8px;"><strong>Completa tu perfil:</strong> ingresa tu DNI (cédula), fecha de nacimiento, número de celular actual y contacto de emergencia (datos obligatorios).</li>
             <li><strong>Cambia tu contraseña obligatoriamente</strong> — la temporal expira en el primer uso</li>
         </ol>
     </div>

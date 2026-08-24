@@ -54,7 +54,7 @@ class AuthenticationTest extends TestCase
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
         $user = Usuario::factory()->create([
-            'email' => 'test@example.com',
+            'email' => 'test@usap.edu',
             'contrasena' => bcrypt('password'),
             'usuario_estado' => 'activo',
             'rol_id' => 2, // Procurador
@@ -90,7 +90,7 @@ class AuthenticationTest extends TestCase
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = Usuario::factory()->create([
-            'email' => 'test@example.com',
+            'email' => 'test@usap.edu',
             'contrasena' => bcrypt('password'),
             'usuario_estado' => 'activo',
             'rol_id' => 2,

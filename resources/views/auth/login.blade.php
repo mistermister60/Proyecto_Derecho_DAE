@@ -47,9 +47,9 @@
 
                 <div class="mb-5">
                     <label class="text-sm font-medium mb-1.5 block" style="color: #374151;">Contraseña</label>
-                    <input type="password" name="contrasena" required
+                    <x-password-input name="contrasena" id="contrasena" required
                            class="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors border border-gray-200 text-gray-900 bg-white focus:border-blue-600 min-h-[44px]"
-                           placeholder="••••••••">
+                           placeholder="••••••••" />
                 </div>
 
                 <div class="mb-5 text-right">

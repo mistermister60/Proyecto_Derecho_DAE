@@ -49,27 +49,57 @@ window.addEventListener('offline', () => {
 
 // PWA Installation
 let deferredPrompt;
+
+/**
+ * Obtiene todos los botones de instalación PWA disponibles en el DOM
+ * (footer de escritorio e menú "Más" de navegación móvil).
+ *
+ * @return {HTMLElement[]}
+ */
+function getInstallButtons() {
+    const ids = ['install-pwa-button', 'install-pwa-button-mas'];
+    return ids
+        .map((id) => document.getElementById(id))
+        .filter((btn) => btn !== null);
+}
+
+/**
+ * Muestra los botones de instalación PWA y les asigna el listener de clic.
+ *
+ * @return {void}
+ */
+function showInstallButtons() {
+    getInstallButtons().forEach((btn) => {
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+        btn.addEventListener('click', triggerInstall);
+    });
+}
+
+/**
+ * Oculta todos los botones de instalación PWA.
+ *
+ * @return {void}
+ */
+function hideInstallButtons() {
+    getInstallButtons().forEach((btn) => {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+    });
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
     // Prevenir el mini-infobar nativo de Chrome para usar nuestro botón personalizado
     e.preventDefault();
     deferredPrompt = e;
 
-    // Mostrar el botón de instalación (si existe en el DOM)
-    const installBtn = document.getElementById('install-pwa-button');
-    if (installBtn) {
-        installBtn.classList.remove('hidden');
-        installBtn.classList.add('inline-flex');
-        installBtn.addEventListener('click', triggerInstall);
-    }
+    // Mostrar los botones de instalación (si existen en el DOM)
+    showInstallButtons();
 });
 
 window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
-    const installBtn = document.getElementById('install-pwa-button');
-    if (installBtn) {
-        installBtn.classList.add('hidden');
-        installBtn.classList.remove('inline-flex');
-    }
+    hideInstallButtons();
 });
 
 // Función para disparar el prompt de instalación
@@ -83,11 +113,7 @@ function triggerInstall() {
             console.log('Usuario canceló la instalación de la PWA');
         }
         deferredPrompt = null;
-        const installBtn = document.getElementById('install-pwa-button');
-        if (installBtn) {
-            installBtn.classList.add('hidden');
-            installBtn.classList.remove('inline-flex');
-        }
+        hideInstallButtons();
     });
 }
 

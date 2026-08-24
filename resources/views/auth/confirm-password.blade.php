@@ -24,8 +24,8 @@
 
             <div style="margin-bottom: 20px; text-align: left;">
                 <label for="password" style="display: block; color: #374151; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Contraseña Actual</label>
-                <input type="password" name="password" id="password" required autocomplete="current-password"
-                       style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box;">
+                <x-password-input name="password" id="password" required autocomplete="current-password"
+                       style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box;" />
             </div>
 
             <button type="submit" style="width: 100%; background: #1e3a8a; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">

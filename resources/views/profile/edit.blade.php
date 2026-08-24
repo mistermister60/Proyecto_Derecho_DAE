@@ -82,8 +82,8 @@
                     
                     <div>
                         <label for="current_password" style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Contraseña Actual</label>
-                        <input type="password" name="current_password" id="current_password" required autocomplete="current-password"
-                               style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;">
+                        <x-password-input name="current_password" id="current_password" required autocomplete="current-password"
+                               style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;" />
                         @error('current_password')
                             <p style="color: #DC2626; font-size: 13px; margin-top: 4px;">{{ $message }}</p>
                         @enderror
@@ -91,8 +91,8 @@
 
                     <div>
                         <label for="password" style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Nueva Contraseña</label>
-                        <input type="password" name="password" id="password" required autocomplete="new-password"
-                               style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;">
+                        <x-password-input name="password" id="password" required autocomplete="new-password"
+                               style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;" />
                         <p style="color: #9CA3AF; font-size: 12px; margin-top: 6px;">Mínimo 8 caracteres, mayúsculas, minúsculas, números y símbolos.</p>
                         @error('password')
                             <p style="color: #DC2626; font-size: 13px; margin-top: 4px;">{{ $message }}</p>
@@ -101,8 +101,8 @@
 
                     <div>
                         <label for="password_confirmation" style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Confirmar Nueva Contraseña</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password"
-                               style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;">
+                        <x-password-input name="password_confirmation" id="password_confirmation" required autocomplete="new-password"
+                               style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;" />
                         @error('password_confirmation')
                             <p style="color: #DC2626; font-size: 13px; margin-top: 4px;">{{ $message }}</p>
                         @enderror
@@ -178,9 +178,9 @@
             
             <div>
                 <label for="delete_password" style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Contraseña</label>
-                <input type="password" name="password" id="delete_password" required autocomplete="current-password"
-                       style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;"
-                       placeholder="Ingresa tu contraseña">
+                <x-password-input name="password" id="delete_password" required autocomplete="current-password"
+                       style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box;"
+                       placeholder="Ingresa tu contraseña" />
                 @error('password')
                     <p style="color: #DC2626; font-size: 13px; margin-top: 4px;">{{ $message }}</p>
                 @enderror

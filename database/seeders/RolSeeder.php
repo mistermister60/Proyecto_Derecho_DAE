@@ -27,11 +27,13 @@ class RolSeeder extends Seeder
                 'rol_nombre' => 'Director',
                 'rol_descripcion' => 'Director del Consultorio Jurídico',
                 'rol_estado' => 'activo',
+                'es_superadmin' => true,
             ],
             [
                 'rol_nombre' => 'Procurador',
                 'rol_descripcion' => 'Estudiante practicante',
                 'rol_estado' => 'activo',
+                'es_superadmin' => false,
             ],
         ]);
     }

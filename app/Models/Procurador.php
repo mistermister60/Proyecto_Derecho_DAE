@@ -66,13 +66,22 @@ class Procurador extends Model
         'procurador_dni',
         'procurador_carnet',
         'procurador_fecha_nacimiento',
-        'procurador_genero',
+        'procurador_direccion',
+        'procurador_telefono',
+        'procurador_contacto_emergencia',
         'procurador_email',
         'procurador_telefono',
         'procurador_direccion',
         'procurador_estado',
         'procurador_foto',
         'procurador_fecha_ingreso',
+    ];
+
+    // ─── Valores por defecto ────────────────────────────────
+    // El género es NOT NULL en la base de datos; si no se indica,
+    // se asume 'No especificado' al crear el registro.
+    protected $attributes = [
+        'procurador_genero' => 'No especificado',
     ];
 
     // ─── Castings de tipos ──────────────────────────────────

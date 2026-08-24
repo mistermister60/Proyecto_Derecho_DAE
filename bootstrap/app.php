@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\EnsurePasswordChanged;
+use App\Http\Middleware\EnsureProcuradorProfileComplete;
 use App\Http\Middleware\EnsureTwoFactorVerified;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'otp' => EnsureTwoFactorVerified::class,
             'password.changed' => EnsurePasswordChanged::class,
             'password.confirm' => RequirePassword::class,
+            'profile.complete' => EnsureProcuradorProfileComplete::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

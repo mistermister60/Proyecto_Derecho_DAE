@@ -189,7 +189,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_procurador_puede_subir_documento_a_su_caso(): void
     {
-        Storage::fake('local');
+        Storage::fake('private');
 
         $this->actingAsAuthenticated($this->procuradorA)
             ->post(route('documentos.store', $this->caso->caso_numero_expediente), [
@@ -213,7 +213,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_documento_rechaza_mime_no_permitido(): void
     {
-        Storage::fake('local');
+        Storage::fake('private');
 
         $this->actingAsAuthenticated($this->procuradorA)
             ->from(route('casos.show', $this->caso->caso_numero_expediente))
@@ -231,7 +231,7 @@ class ModulosDominioTest extends TestCase
      */
     public function test_procurador_no_puede_subir_documento_a_caso_ajeno(): void
     {
-        Storage::fake('local');
+        Storage::fake('private');
 
         $this->actingAsAuthenticated($this->procuradorB)
             ->post(route('documentos.store', $this->caso->caso_numero_expediente), [
@@ -248,10 +248,10 @@ class ModulosDominioTest extends TestCase
      */
     public function test_eliminar_documento_borra_el_archivo_del_disco(): void
     {
-        Storage::fake('local');
+        Storage::fake('private');
 
         $archivo = UploadedFile::fake()->create('contrato.pdf', 50, 'application/pdf');
-        $ruta = $archivo->store('documentos/'.$this->caso->caso_id, 'local');
+        $ruta = $archivo->store('documentos/'.$this->caso->caso_id, 'private');
 
         $doc = Documento::create([
             'caso_id' => $this->caso->caso_id,
@@ -266,7 +266,7 @@ class ModulosDominioTest extends TestCase
             ->delete(route('documentos.destroy', [$this->caso->caso_numero_expediente, $doc->documento_id]))
             ->assertRedirect();
 
-        Storage::disk('local')->assertMissing($ruta);
+        Storage::disk('private')->assertMissing($ruta);
         $this->assertDatabaseMissing('documentos', ['documento_id' => $doc->documento_id]);
     }
 

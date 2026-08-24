@@ -27,6 +27,7 @@ use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\PerfilProcuradorController;
 use App\Http\Controllers\ProcuradorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PwaController;
@@ -105,7 +106,7 @@ Route::get('/logo.png', function () {
 // Login con rate limiting (5 intentos → bloqueo 5 min).
 // Logout destruye sesión y revoca token Sanctum.
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:10,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ═══════════════════════════════════════════════════════
@@ -114,10 +115,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Rutas públicas. El usuario solicita un token por correo
 // y luego restablece su contraseña.
 Route::get('/olvide-mi-contrasena', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('/olvide-mi-contrasena', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/olvide-mi-contrasena', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:10,1');
 
 Route::get('/restablecer-contrasena/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update');
+Route::post('/restablecer-contrasena', [ResetPasswordController::class, 'reset'])->name('password.update')->middleware('throttle:10,1');
 
 // ═══════════════════════════════════════════════════════
 // CONFIRMACIÓN DE CONTRASEÑA — Acciones sensibles
@@ -153,7 +154,7 @@ Route::get('/verify-two-factor', function () {
     return view('auth.two-factor');
 })->name('auth.two-factor');
 
-Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify');
+Route::post('/verify-two-factor', [AuthController::class, 'verifyTwoFactor'])->name('auth.two-factor.verify')->middleware('throttle:10,1');
 
 // ═══════════════════════════════════════════════════════
 // PERFIL DE USUARIO
@@ -180,7 +181,7 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
         $request->user()->save();
 
         return back()->with('status', 'password-updated');
-    })->name('profile.password.update');
+    })->name('profile.password.update')->middleware('throttle:10,1');
 });
 
 // ═══════════════════════════════════════════════════════
@@ -193,7 +194,7 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
 // Middleware adicional:
 //   - role:Director  → solo Director (rol_id=1)
 //   - role:Procurador→ solo Procurador (rol_id=2)
-Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
+Route::middleware(['auth', 'otp', 'password.changed', 'profile.complete'])->group(function () {
 
     // ═══════════════════════════════════════════════════════
     // CAMBIO OBLIGATORIO DE CONTRASEÑA
@@ -202,6 +203,15 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     // para que el usuario pueda cambiar su contraseña en el primer inicio.
     Route::get('/cambiar-contrasena', [PasswordChangeController::class, 'showChangeForm'])->name('password.change');
     Route::post('/cambiar-contrasena', [PasswordChangeController::class, 'update'])->name('password.change.update');
+
+    // ═══════════════════════════════════════════════════════
+    // COMPLETAR PERFIL (PROCURADOR) — Primer inicio de sesión
+    // ═══════════════════════════════════════════════════════
+    // El procurador debe registrar DNI, fecha de nacimiento, celular y
+    // contacto de emergencia antes de usar el sistema. El middleware
+    // profile.complete permite explícitamente estas rutas.
+    Route::get('/procuradores/completar-perfil', [PerfilProcuradorController::class, 'show'])->name('procuradores.completar-perfil');
+    Route::post('/procuradores/completar-perfil', [PerfilProcuradorController::class, 'store'])->name('procuradores.completar-perfil.store');
 
     // ═══════════════════════════════════════════════════════
     // DASHBOARD — Panel principal
@@ -260,7 +270,7 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::middleware('role:Director')->group(function () {
         Route::get('/usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
         Route::get('/usuarios/crear', [UsuariosController::class, 'create'])->name('usuarios.create');
-        Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
+        Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store')->middleware('throttle:10,1');
         Route::get('/usuarios/{id}/editar', [UsuariosController::class, 'edit'])->name('usuarios.edit');
         Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
@@ -293,7 +303,7 @@ Route::middleware(['auth', 'otp', 'password.changed'])->group(function () {
     Route::middleware('role:Director')->group(function () {
         Route::get('/procuradores', [ProcuradorController::class, 'index'])->name('procuradores.index');
         Route::get('/procuradores/crear', [ProcuradorController::class, 'create'])->name('procuradores.create');
-        Route::post('/procuradores', [ProcuradorController::class, 'store'])->name('procuradores.store');
+        Route::post('/procuradores', [ProcuradorController::class, 'store'])->name('procuradores.store')->middleware('throttle:10,1');
         Route::get('/procuradores/{identidad}/editar', [ProcuradorController::class, 'edit'])->name('procuradores.edit');
         Route::put('/procuradores/{identidad}', [ProcuradorController::class, 'update'])->name('procuradores.update');
         Route::delete('/procuradores/{identidad}', [ProcuradorController::class, 'destroy'])->name('procuradores.destroy');

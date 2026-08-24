@@ -64,12 +64,12 @@
             </div>
             <div>
                 <label class="text-xs font-medium mb-1.5 block" style="color: #6B7280;">Contraseña</label>
-                <input type="password" name="contrasena" id="contrasena" 
+                <x-password-input name="contrasena" id="contrasena" 
                        @if(old('rol_id') != 2) required @endif
                        minlength="8" 
                        placeholder="Mínimo 8 caracteres, mayúscula, minúscula, número y símbolo" 
                        class="w-full rounded-lg px-3 py-2 text-sm outline-none @error('contrasena') border-red-500 @else border-gray-300 @enderror" 
-                       style="color: #111827; background: #FFFFFF;">
+                       style="color: #111827; background: #FFFFFF;" />
                 @error('contrasena')
                 <p class="text-xs mt-1 text-red-600">{{ $message }}</p>
                 @enderror

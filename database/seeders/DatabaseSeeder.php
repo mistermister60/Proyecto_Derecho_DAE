@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             EstadoCasoSeeder::class,
             TipoTramiteSeeder::class,
             ProcuradorSeeder::class,
+            ProcuradoresTemporalesSeeder::class,
 
             // Datos de prueba (dependen de catálogos)
             ClienteSeeder::class,

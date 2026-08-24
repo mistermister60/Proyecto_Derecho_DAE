@@ -40,7 +40,7 @@ class LoginCredentialsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email', 'max:255'],       // ─── Obligatorio, formato email válido, hasta 255 caracteres
+            'email' => ['required', 'string', 'email', 'max:255', 'ends_with:@usap.edu'],       // ─── Obligatorio, email institucional @usap.edu válido, hasta 255 caracteres
             'contrasena' => ['required', 'string', 'min:8'],              // ─── Obligatorio, mínimo 8 caracteres por seguridad
         ];
     }
@@ -57,6 +57,7 @@ class LoginCredentialsRequest extends FormRequest
         return [
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'El formato del correo electrónico no es válido.',
+            'email.ends_with' => 'El correo debe terminar en @usap.edu.',
             'contrasena.required' => 'La contraseña es obligatoria.',
             'contrasena.min' => 'La contraseña debe tener al menos 8 caracteres.',
         ];

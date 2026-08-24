@@ -36,15 +36,15 @@
 
             <div style="margin-bottom: 18px; text-align: left;">
                 <label for="password" style="display: block; color: #374151; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Nueva Contraseña</label>
-                <input type="password" name="password" id="password" required
-                       style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box;">
+                <x-password-input name="password" id="password" required
+                       style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box;" />
                 <p style="color: #9ca3af; font-size: 12px; margin-top: 6px;">Mínimo 8 caracteres, mayúsculas, minúsculas, números y símbolos.</p>
             </div>
 
             <div style="margin-bottom: 25px; text-align: left;">
                 <label for="password_confirmation" style="display: block; color: #374151; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Confirmar Nueva Contraseña</label>
-                <input type="password" name="password_confirmation" id="password_confirmation" required
-                       style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box;">
+                <x-password-input name="password_confirmation" id="password_confirmation" required
+                       style="width: 100%; padding: 12px 44px 12px 12px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box;" />
             </div>
 
             <button type="submit" style="width: 100%; background: #1e3a8a; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">

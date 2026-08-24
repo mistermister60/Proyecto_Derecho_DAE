@@ -56,6 +56,7 @@ class UpdateProcuradorRequest extends FormRequest
             'procurador_apellido' => 'required|string|max:30',                                                                                            // ─── Obligatorio, apellido (máx. 30 caracteres)
             'procurador_dni' => 'required|string|max:20|unique:procuradores,procurador_dni,'.$identidad.',procurador_dni',                                // ─── Obligatorio, DNI único (excluye actual)
             'procurador_telefono' => 'required|string|max:15',                                                                                            // ─── Obligatorio, teléfono (máx. 15 caracteres)
+            'procurador_contacto_emergencia' => 'nullable|string|max:150',                                                                                  // ─── Opcional, contacto de emergencia (máx. 150 caracteres)
             'procurador_direccion' => 'required|string|max:350',                                                                                          // ─── Obligatorio, dirección (máx. 350 caracteres)
             'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email,'.$identidad.',procurador_dni',                             // ─── Obligatorio, email único (excluye actual)
             'procurador_fecha_nacimiento' => 'required|date',                                                                                             // ─── Obligatorio, fecha de nacimiento válida
@@ -86,6 +87,7 @@ class UpdateProcuradorRequest extends FormRequest
             'procurador_dni.unique' => 'Este número de DNI ya está registrado en el sistema.',
             'procurador_telefono.required' => 'El teléfono o celular es obligatorio.',
             'procurador_telefono.max' => 'El teléfono no puede tener más de :max caracteres.',
+            'procurador_contacto_emergencia.max' => 'El contacto de emergencia no puede tener más de :max caracteres.',
             'procurador_direccion.required' => 'La dirección es obligatoria.',
             'procurador_direccion.max' => 'La dirección no puede tener más de :max caracteres.',
             'procurador_email.required' => 'El correo electrónico es obligatorio.',

@@ -56,7 +56,7 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_dni' => 'required|string|max:20|unique:procuradores,procurador_dni',           // ─── Obligatorio, DNI único (máx. 20 caracteres)
             'procurador_telefono' => 'required|string|max:15',                                         // ─── Obligatorio, teléfono de contacto (máx. 15 caracteres)
             'procurador_direccion' => 'required|string|max:350',                                       // ─── Obligatorio, dirección (máx. 350 caracteres)
-            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email',        // ─── Obligatorio, email único, formato válido
+            'procurador_email' => 'required|email|max:50|unique:procuradores,procurador_email|ends_with:@usap.edu',        // ─── Obligatorio, email único institucional @usap.edu
             'procurador_fecha_nacimiento' => 'required|date',                                          // ─── Obligatorio, fecha de nacimiento válida
             'procurador_genero' => 'required|string|in:Masculino,Femenino',                            // ─── Obligatorio, solo Masculino o Femenino
             'procurador_carnet' => 'nullable|string|max:50|unique:procuradores,procurador_carnet',     // ─── Opcional, carnet profesional único
@@ -91,6 +91,7 @@ class StoreProcuradorRequest extends FormRequest
             'procurador_email.email' => 'Debe ingresar un correo electrónico válido.',
             'procurador_email.max' => 'El correo electrónico no puede tener más de :max caracteres.',
             'procurador_email.unique' => 'Este correo electrónico ya está registrado en el sistema.',
+            'procurador_email.ends_with' => 'El correo debe terminar en @usap.edu.',
             'procurador_fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'procurador_fecha_nacimiento.date' => 'Debe ingresar una fecha de nacimiento válida.',
             'procurador_genero.required' => 'Debe seleccionar un género.',

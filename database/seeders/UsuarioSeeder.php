@@ -10,28 +10,21 @@ use Illuminate\Support\Facades\Hash;
  * ═══════════════════════════════════════════════════════
  * SEEDER: UsuarioSeeder
  * ═══════════════════════════════════════════════════════
- * Crea las cuentas de acceso al sistema para el Director
- * y los 5 Procuradores.
+ * Crea las cuentas de acceso al sistema para el Director,
+ * la abogada (Karen Fernández) y los 5 Procuradores.
  *
  * - Depende de: RolSeeder, ProcuradorSeeder
- * - Cada usuario tiene contraseña 'password' (hash Bcrypt)
  * - El Director no tiene procurador asociado (procurador_id = null)
- * - Los procuradores se vinculan por procurador_id
+ * - Usa updateOrInsert para ser idempotente (re-seed sin duplicados)
  */
 class UsuarioSeeder extends Seeder
 {
     public function run(): void
     {
-        // ─── Obtener IDs de roles ───────────────────────────
-        // Se consultan dinámicamente para no depender de IDs
-        // fijos, permitiendo ejecución en cualquier orden.
         $directorId = DB::table('roles')->where('rol_nombre', 'Director')->value('rol_id');
         $procuradorId = DB::table('roles')->where('rol_nombre', 'Procurador')->value('rol_id');
 
-        // ─── Usuarios del sistema ───────────────────────────
-        // Se crea un usuario por rol. El Director (rol_id=1)
-        // omite 2FA; los procuradores requieren OTP por email.
-        DB::table('usuarios')->insert([
+        $usuarios = [
             [
                 'rol_id' => $directorId,
                 'procurador_id' => null,
@@ -39,6 +32,15 @@ class UsuarioSeeder extends Seeder
                 'email' => 'director@usap.edu',
                 'contrasena' => Hash::make('password'),
                 'usuario_estado' => 'activo',
+            ],
+            [
+                'rol_id' => $directorId,
+                'procurador_id' => null,
+                'usuario_nombre' => 'Karen Fernández',
+                'email' => 'karen.fernandez@usap.edu',
+                'contrasena' => Hash::make('password'),
+                'usuario_estado' => 'activo',
+                'debe_cambiar_contrasena' => true,
             ],
             [
                 'rol_id' => $procuradorId,
@@ -80,6 +82,10 @@ class UsuarioSeeder extends Seeder
                 'contrasena' => Hash::make('password'),
                 'usuario_estado' => 'activo',
             ],
-        ]);
+        ];
+
+        foreach ($usuarios as $u) {
+            DB::table('usuarios')->updateOrInsert(['email' => $u['email']], $u);
+        }
     }
 }
