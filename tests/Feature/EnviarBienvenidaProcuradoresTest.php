@@ -37,14 +37,19 @@ class EnviarBienvenidaProcuradoresTest extends TestCase
     }
 
     #[Test]
-    public function envia_correos_a_los_24_procuradores_temporales(): void
+    public function envia_correos_a_los_procuradores_temporales(): void
     {
         Mail::fake();
 
         $this->artisan('procuradores:enviar-bienvenida')
             ->assertSuccessful();
 
-        Mail::assertSent(BienvenidaProcuradorMail::class, 24);
+        // Conteo dinámico: todos los procuradores con DNI temporal (TEMP-)
+        // deben recibir el correo de bienvenida (hoy son 26 tras agregar
+        // las cuentas 3240520 y 1230634).
+        $esperados = Procurador::where('procurador_dni', 'like', 'TEMP-%')->count();
+
+        Mail::assertSent(BienvenidaProcuradorMail::class, $esperados);
     }
 
     #[Test]
