@@ -47,7 +47,7 @@ class UsuarioSeeder extends Seeder
                 'procurador_id' => 1,
                 'usuario_nombre' => 'Iris Lizeth Rodríguez',
                 'email' => 'iris.rodriguez@usap.edu',
-                'contrasena' => Hash::make('password'),
+                'contrasena' => Hash::make('Password123'),
                 'usuario_estado' => 'activo',
             ],
             [
@@ -55,7 +55,7 @@ class UsuarioSeeder extends Seeder
                 'procurador_id' => 2,
                 'usuario_nombre' => 'Franklyn Geovanny Salgado',
                 'email' => 'franklyn.salgado@usap.edu',
-                'contrasena' => Hash::make('password'),
+                'contrasena' => Hash::make('Password123'),
                 'usuario_estado' => 'activo',
             ],
             [
@@ -63,7 +63,7 @@ class UsuarioSeeder extends Seeder
                 'procurador_id' => 3,
                 'usuario_nombre' => 'Indira Pauleth Galindo',
                 'email' => 'indira.galindo@usap.edu',
-                'contrasena' => Hash::make('password'),
+                'contrasena' => Hash::make('Password123'),
                 'usuario_estado' => 'activo',
             ],
             [
@@ -71,7 +71,7 @@ class UsuarioSeeder extends Seeder
                 'procurador_id' => 4,
                 'usuario_nombre' => 'Carlos Alberto Brizuela',
                 'email' => 'carlos.brizuela@usap.edu',
-                'contrasena' => Hash::make('password'),
+                'contrasena' => Hash::make('Password123'),
                 'usuario_estado' => 'activo',
             ],
             [
@@ -79,7 +79,7 @@ class UsuarioSeeder extends Seeder
                 'procurador_id' => 5,
                 'usuario_nombre' => 'Ena Elizabeth Flores',
                 'email' => 'ena.flores@usap.edu',
-                'contrasena' => Hash::make('password'),
+                'contrasena' => Hash::make('Password123'),
                 'usuario_estado' => 'activo',
             ],
         ];
