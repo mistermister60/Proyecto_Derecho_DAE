@@ -106,7 +106,7 @@ http://proyecto-derecho-dae.test
 **Detalles:**
 - ✅ Código expira en **15 minutos**
 - ✅ Máximo **5 intentos fallidos** → bloqueo 5 minutos
-- ✅ El 2FA es **obligatorio para todos los roles** (incluido el Director)
+- ✅ El **Director** (`director@usap.edu`, correo ficticio) **omite 2FA** automáticamente; el resto de roles pasa por OTP
 - ✅ Si es **primer login** → redirige a cambio obligatorio de contraseña
 
 ### Si no llega el código

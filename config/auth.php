@@ -114,6 +114,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Director (exención de 2FA)
+    |--------------------------------------------------------------------------
+    |
+    | Email del Director. Su correo es ficticio (no existe en el dominio),
+    | por lo que no puede recibir el OTP y se omite el segundo factor.
+    |
+    */
+    'director_email' => env('DIRECTOR_EMAIL', 'director@usap.edu'),
+
     /**
      * Tiempo de expiración del token de restablecimiento en minutos.
      */

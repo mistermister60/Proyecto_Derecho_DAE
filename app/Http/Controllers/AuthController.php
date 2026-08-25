@@ -70,6 +70,19 @@ class AuthController extends BaseController
 
             $user = auth()->user();
 
+            // ─── [Director: omite 2FA] ────────────────────────
+            // El correo del Director es ficticio, no recibe OTP,
+            // así que se marca la sesión como verificada.
+            if ($user && $user->email === config('auth.director_email')) {
+                Session::put('two_factor_verified', true);
+
+                if ($user->debe_cambiar_contrasena) {
+                    return redirect()->route('password.change');
+                }
+
+                return redirect()->intended(route('dashboard'));
+            }
+
             // ─── [Generación del código 2FA] ──────────────────
             // Crea un código aleatorio seguro de 6 dígitos para
             // el segundo factor de autenticación
