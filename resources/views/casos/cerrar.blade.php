@@ -104,15 +104,15 @@
                           placeholder="Detalles adicionales sobre la resolución del caso...">{{ old('resolucion_notas') }}</textarea>
             </div>
 
-            <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="px-5 py-2.5 rounded-lg text-sm font-medium transition-all"
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button type="submit" class="px-5 py-2.5 rounded-lg text-sm font-medium transition-all w-full sm:w-auto"
                         style="background: #DC2626; color: white;"
                         onmouseover="this.style.background='#B91C1C'"
                         onmouseout="this.style.background='#DC2626'">
                     Cerrar caso
                 </button>
                 <a href="{{ route('casos.show', $caso->caso_numero_expediente) }}"
-                   class="px-5 py-2.5 rounded-lg text-sm font-medium text-center transition-all"
+                   class="px-5 py-2.5 rounded-lg text-sm font-medium text-center transition-all w-full sm:w-auto"
                    style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;"
                    onmouseover="this.style.background='#E5E7EB'"
                    onmouseout="this.style.background='#F3F4F6'">

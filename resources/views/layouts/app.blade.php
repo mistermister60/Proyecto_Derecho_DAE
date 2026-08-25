@@ -351,7 +351,7 @@
                              x-transition:leave="transition ease-in duration-100"
                              x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                              @click.outside="openNotif = false"
-                             class="absolute top-12 right-0 w-80 rounded-xl shadow-lg border py-1 z-50"
+                             class="absolute top-12 right-0 w-80 max-w-[calc(100vw-2rem)] rounded-xl shadow-lg border py-1 z-50"
                              style="background: var(--color-dropdown-bg); border-color: var(--color-dropdown-border);">
                             <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid var(--color-dropdown-divider);">
                                 <p class="text-sm font-semibold" style="color: var(--color-dropdown-text);">Notificaciones</p>
