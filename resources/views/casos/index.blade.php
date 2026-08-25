@@ -92,14 +92,14 @@
         <x-tabla :encabezados="['No. Expediente', 'Cliente', 'Tipo de trámite', 'Parte', 'Procurador', 'Juzgado', 'Estado', 'Última actualización']">
             @forelse ($casos as $caso)
             <tr class="transition-colors border-t" style="border-color: #F3F4F6; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';" onclick="window.location='{{ route('casos.show', $caso->caso_numero_expediente) }}'">
-                <td class="px-4 py-3 text-sm font-medium" style="color: #2563EB;">{{ $caso->caso_numero_expediente }}</td>
-                <td class="px-4 py-3 text-sm">{{ $caso->cliente?->nombre_completo ?? 'N/A' }}</td>
-                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</td>
-                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso->caso_parte_representada }}</td>
-                <td class="px-4 py-3 text-sm" style="color: #6B7280;">{{ $caso->procurador?->nombre_completo ?? 'N/A' }}</td>
-                <td class="px-4 py-3 text-sm"><span class="px-2 py-0.5 rounded text-xs font-medium" style="background: #F3F4F6; color: #6B7280;">{{ $caso->caso_juzgado ?? 'N/A' }}</span></td>
-                <td class="px-4 py-3"><x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" /></td>
-                <td class="px-4 py-3 text-sm" style="color: #9CA3AF;">{{ $caso->created_at->format('d/m/Y') }}</td>
+                <td class="px-4 py-3 text-sm font-medium" style="color: #2563EB;" data-label="No. Expediente">{{ $caso->caso_numero_expediente }}</td>
+                <td class="px-4 py-3 text-sm" data-label="Cliente">{{ $caso->cliente?->nombre_completo ?? 'N/A' }}</td>
+                <td class="px-4 py-3 text-sm" style="color: #6B7280;" data-label="Tipo de trámite">{{ $caso->tipoTramite?->tramite_nombre ?? 'N/A' }}</td>
+                <td class="px-4 py-3 text-sm" style="color: #6B7280;" data-label="Parte">{{ $caso->caso_parte_representada }}</td>
+                <td class="px-4 py-3 text-sm" style="color: #6B7280;" data-label="Procurador">{{ $caso->procurador?->nombre_completo ?? 'N/A' }}</td>
+                <td class="px-4 py-3 text-sm" data-label="Juzgado"><span class="px-2 py-0.5 rounded text-xs font-medium" style="background: #F3F4F6; color: #6B7280;">{{ $caso->caso_juzgado ?? 'N/A' }}</span></td>
+                <td class="px-4 py-3" data-label="Estado"><x-estado-badge :estado="$caso->estado?->estado_nombre ?? 'N/A'" /></td>
+                <td class="px-4 py-3 text-sm" style="color: #9CA3AF;" data-label="Última actualización">{{ $caso->created_at->format('d/m/Y') }}</td>
             </tr>
             @empty
             {{-- Mensaje cuando no hay casos registrados --}}
@@ -120,9 +120,9 @@
     {{-- ─── [VISTA KANBAN] ───────────────────────── --}}
     {{-- Columnas agrupadas por estado del pipeline, cada columna contiene tarjetas de caso --}}
     {{-- Las tarjetas muestran: cliente, tipo de trámite, y fecha (si existe) --}}
-    <div x-show="vista === 'kanban'" class="flex gap-3 md:gap-4 overflow-x-auto pb-4" style="min-height: 500px;">
+    <div x-show="vista === 'kanban'" class="flex flex-col md:flex-row md:gap-4 md:overflow-x-auto pb-4" style="min-height: 500px;">
         @foreach ($columnas as $estado => [$color, $tarjetas])
-        <div class="flex flex-col rounded-xl shrink-0 min-w-[200px] md:min-w-[220px]" style="background: #F3F4F6;">
+        <div class="w-full md:w-auto md:shrink-0 md:min-w-[220px] flex flex-col rounded-xl mb-3 md:mb-0" style="background: #F3F4F6;">
             <div class="flex items-center gap-2 px-3 py-3">
                 <span class="rounded-full" style="width: 8px; height: 8px; background: {{ $color }}; display: inline-block;"></span>
                 <span class="text-xs font-semibold uppercase tracking-wider" style="color: #6B7280;">{{ $estado }}</span>

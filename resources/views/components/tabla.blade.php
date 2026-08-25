@@ -5,7 +5,7 @@
 --}}
 @props(['encabezados' => [], 'sinDatos' => 'No hay datos disponibles.'])
 
-<div class="w-full overflow-x-auto rounded-xl" style="border: 1px solid #E5E7EB; background: #FFFFFF;">
+<div class="tbl-responsive w-full overflow-x-auto rounded-xl" style="border: 1px solid #E5E7EB; background: #FFFFFF;">
     <table class="w-full text-sm">
         <thead>
             <tr style="background: #F9FAFB;">

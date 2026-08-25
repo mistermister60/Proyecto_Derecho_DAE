@@ -51,7 +51,7 @@
 
     {{-- Tabla de usuarios --}}
     <div class="rounded-xl overflow-hidden" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
-        <div class="overflow-x-auto">
+        <div class="tbl-responsive overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
@@ -67,38 +67,38 @@
                 @forelse ($usuarios as $usuario)
                 <tr class="usuario-row transition-colors hover:bg-gray-50" style="border-bottom: 1px solid #F3F4F6;"
                     x-show="shouldShow(@js($usuario->usuario_nombre), @js($usuario->email), @js($usuario->usuario_estado))">
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3" data-label="Nombre">
                         <a href="{{ route('usuarios.show', $usuario->usuario_id) }}" class="font-medium" style="color: #111827;">{{ $usuario->usuario_nombre }}</a>
                     </td>
-                    <td class="px-4 py-3" style="color: #6B7280;">{{ $usuario->email }}</td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3" style="color: #6B7280;" data-label="Email">{{ $usuario->email }}</td>
+                    <td class="px-4 py-3" data-label="Rol">
                         <span class="px-2 py-0.5 rounded text-xs font-medium" style="background: #EFF6FF; color: #2563EB;">
                             {{ $usuario->rol?->rol_nombre ?? '—' }}
                         </span>
                     </td>
-                    <td class="px-4 py-3" style="color: #6B7280;">
+                    <td class="px-4 py-3" style="color: #6B7280;" data-label="Procurador">
                         {{ $usuario->procurador?->nombre_completo ?? '—' }}
                     </td>
-                    <td class="px-4 py-3 text-center">
+                    <td class="px-4 py-3 text-center" data-label="Estado">
                         <x-estado-badge :estado="$usuario->usuario_estado === 'activo' ? 'Activo' : 'Inactivo'" />
                     </td>
-                    <td class="px-4 py-3 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('usuarios.edit', $usuario->usuario_id) }}" class="px-2.5 py-1 rounded text-xs font-medium transition-all"
-                               style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;"
-                               onmouseover="this.style.background='#E5E7EB';" onmouseout="this.style.background='#F3F4F6';">Editar</a>
+                    <td class="px-4 py-3 text-right" data-label="Acciones">
+                        <div class="flex flex-wrap items-center justify-end gap-2" data-actions>
+                            <a href="{{ route('usuarios.edit', $usuario->usuario_id) }}" class="px-2.5 py-1 rounded text-xs font-medium transition-all w-full sm:w-auto"
+                                style="background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB;"
+                                onmouseover="this.style.background='#E5E7EB';" onmouseout="this.style.background='#F3F4F6';">Editar</a>
                             @if ($usuario->usuario_estado === 'activo')
-                                <form action="{{ route('usuarios.destroy', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Desactivar usuario?" data-text="El usuario no podrá iniciar sesión." data-icon="warning" data-confirm-text="Sí, desactivar" style="display:inline;">
+                                <form action="{{ route('usuarios.destroy', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form w-full sm:w-auto" data-title="¿Desactivar usuario?" data-text="El usuario no podrá iniciar sesión." data-icon="warning" data-confirm-text="Sí, desactivar" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="px-2.5 py-1 rounded text-xs font-medium transition-all"
+                                    <button type="submit" class="px-2.5 py-1 rounded text-xs font-medium transition-all w-full sm:w-auto"
                                             style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;"
                                             onmouseover="this.style.background='#FECACA';" onmouseout="this.style.background='#FEE2E2';">Desactivar</button>
                                 </form>
                             @else
-                                <form action="{{ route('usuarios.activar', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form" data-title="¿Activar usuario?" data-text="El usuario podrá iniciar sesión nuevamente." data-icon="question" data-confirm-text="Sí, activar" style="display:inline;">
+                                <form action="{{ route('usuarios.activar', $usuario->usuario_id) }}" method="POST" class="swal-confirm-form w-full sm:w-auto" data-title="¿Activar usuario?" data-text="El usuario podrá iniciar sesión nuevamente." data-icon="question" data-confirm-text="Sí, activar" style="display:inline;">
                                     @csrf
-                                    <button type="submit" class="px-2.5 py-1 rounded text-xs font-medium transition-all"
+                                    <button type="submit" class="px-2.5 py-1 rounded text-xs font-medium transition-all w-full sm:w-auto"
                                             style="background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0;"
                                             onmouseover="this.style.background='#A7F3D0';" onmouseout="this.style.background='#D1FAE5';">Activar</button>
                                 </form>

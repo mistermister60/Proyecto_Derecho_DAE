@@ -312,6 +312,92 @@ html.view-transitions-enabled.view-transition-ready {
 .form-input { view-transition-name: form-input; }
 
 /* ============================================
+   TABLAS RESPONSIVE — Tabla → Tarjetas en móvil
+   Conviere <table> en bloques apilados sin scroll horizontal
+   en pantallas < 640px (hasta sm). En sm: se mantiene la tabla.
+   Requiere la clase .tbl-responsive en el wrapper de la tabla y
+   data-label="..." en cada <td>.
+   ============================================ */
+@media (max-width: 639px) {
+    .tbl-responsive {
+        overflow: visible !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .tbl-responsive table {
+        width: 100% !important;
+    }
+
+    .tbl-responsive thead {
+        display: none;
+    }
+
+    .tbl-responsive tbody,
+    .tbl-responsive tr,
+    .tbl-responsive td {
+        display: block;
+        width: 100%;
+    }
+
+    .tbl-responsive tr {
+        margin-bottom: 0.75rem;
+        border: 1px solid #E5E7EB;
+        border-radius: 0.75rem;
+        background: #FFFFFF;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .tbl-responsive tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    .tbl-responsive td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem;
+        border: none !important;
+        text-align: right;
+        font-size: 0.875rem;
+        min-width: 0;
+    }
+
+    .tbl-responsive td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6B7280;
+        text-align: left;
+        flex-shrink: 0;
+        padding-right: 0.5rem;
+    }
+
+    /* Botones de acción dentro de celdas: apilar y ocupar ancho en móvil */
+    .tbl-responsive td [data-actions] {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .tbl-responsive td [data-actions] > * {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    .dark .tbl-responsive tr {
+        background: var(--color-card-bg);
+        border-color: var(--color-card-border);
+    }
+
+    .dark .tbl-responsive td::before {
+        color: var(--color-dropdown-text-sec);
+    }
+}
+
+/* ============================================
    DARK MODE — Scrollbar y elementos base
    ============================================ */
 .dark ::-webkit-scrollbar-track {

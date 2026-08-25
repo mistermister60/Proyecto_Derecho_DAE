@@ -58,7 +58,7 @@
     </div>
 
     {{-- Tabs --}}
-    <div class="flex gap-1 mb-5 rounded-lg overflow-x-auto flex-nowrap" style="background: #F3F4F6; padding: 3px;">
+    <div class="flex flex-wrap gap-1 mb-5 rounded-lg" style="background: #F3F4F6; padding: 3px;">
         <button @click="tab = 'resumen'" class="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap"
                 :style="tab === 'resumen' ? 'background: white; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'color: #6B7280;'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -310,7 +310,7 @@
                     {{-- Botones de Plantillas Rápidas --}}
                     <div class="md:col-span-2">
                         <span class="block text-xs font-medium text-gray-700 mb-1">Plantillas rápidas (Clic para aplicar)</span>
-                        <div class="flex flex-nowrap md:flex-wrap gap-1.5 overflow-x-auto pb-1">
+                        <div class="flex flex-wrap gap-1.5">
                             {{-- Presentado al Juzgado --}}
                             <button type="button" @click="aplicarPlantilla('YA FUE PRESENTADO AL JUZGADO', 'Presentación')" 
                                     class="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100 transition inline-flex items-center whitespace-nowrap">

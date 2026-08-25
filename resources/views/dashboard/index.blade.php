@@ -48,14 +48,14 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
         <div class="lg:col-span-2 rounded-xl p-4 md:p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Casos por estado del pipeline</h3>
-            <div class="overflow-x-auto">
+            <div class="overflow-hidden">
                 <canvas id="pipelineChart" height="200"></canvas>
             </div>
         </div>
 
         <div class="rounded-xl p-4 md:p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Por tipo de trámite</h3>
-            <div class="overflow-x-auto">
+            <div class="overflow-hidden">
                 <canvas id="tipoChart" height="200"></canvas>
             </div>
         </div>
@@ -65,7 +65,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
         <div class="rounded-xl p-4 md:p-5" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
             <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Resoluciones (casos cerrados)</h3>
-            <div class="overflow-x-auto">
+            <div class="overflow-hidden">
                 <canvas id="resolucionesChart" height="200"></canvas>
             </div>
         </div>
@@ -212,3 +212,4 @@ function dashboardData() {
 </script>
 @endpush
 @endsection
+

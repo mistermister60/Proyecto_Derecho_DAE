@@ -109,7 +109,7 @@
     {{-- Todas las audiencias --}}
     <div class="rounded-xl p-5 mt-6" style="background: #FFFFFF; border: 1px solid #E5E7EB;">
         <h3 class="text-sm font-semibold mb-4" style="color: #111827;">Todas las audiencias</h3>
-        <div class="overflow-x-auto">
+        <div class="tbl-responsive overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr style="border-bottom: 1px solid #E5E7EB;">
@@ -125,13 +125,13 @@
             <tbody>
                 @forelse ($audiencias as $aud)
                 <tr class="transition-colors" style="cursor: pointer; border-bottom: 1px solid #F3F4F6;" onclick="window.location='{{ route('casos.show', $aud->caso->caso_numero_expediente) }}'" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='transparent';">
-                    <td class="py-2.5" style="color: #111827;">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m/Y') }}</td>
-                    <td class="py-2.5" style="color: #6B7280;">{{ \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') }}</td>
-                    <td class="py-2.5 font-medium" style="color: #2563EB;">{{ $aud->caso->caso_numero_expediente }}</td>
-                    <td class="py-2.5" style="color: #374151;">{{ $aud->audiencia_tipo }}</td>
-                    <td class="py-2.5"><span class="px-1.5 py-0.5 rounded text-xs" style="background: #F3F4F6; color: #6B7280;">{{ $aud->audiencia_juzgado }}</span></td>
-                    <td class="py-2.5" style="color: #6B7280;">{{ $aud->procurador?->nombre_completo ?? 'N/A' }}</td>
-                    <td class="py-2.5">
+                    <td class="py-2.5" style="color: #111827;" data-label="Fecha">{{ \Carbon\Carbon::parse($aud->audiencia_fecha)->format('d/m/Y') }}</td>
+                    <td class="py-2.5" style="color: #6B7280;" data-label="Hora">{{ \Carbon\Carbon::parse($aud->audiencia_hora)->format('H:i') }}</td>
+                    <td class="py-2.5 font-medium" style="color: #2563EB;" data-label="Expediente">{{ $aud->caso->caso_numero_expediente }}</td>
+                    <td class="py-2.5" style="color: #374151;" data-label="Tipo">{{ $aud->audiencia_tipo }}</td>
+                    <td class="py-2.5" data-label="Juzgado"><span class="px-1.5 py-0.5 rounded text-xs" style="background: #F3F4F6; color: #6B7280;">{{ $aud->audiencia_juzgado }}</span></td>
+                    <td class="py-2.5" style="color: #6B7280;" data-label="Procurador">{{ $aud->procurador?->nombre_completo ?? 'N/A' }}</td>
+                    <td class="py-2.5" data-label="Estado">
                         @if ($aud->audiencia_estado === 'pendiente')
                         <span class="text-xs px-2 py-0.5 rounded font-medium" style="background: #FEF3C7; color: #92400E;">Pendiente</span>
                         @elseif ($aud->audiencia_estado === 'realizada')
